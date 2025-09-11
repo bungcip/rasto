@@ -11,10 +11,7 @@ fn pretty_print_item(item: Item) -> String {
 }
 
 fn pretty_print_file(file: File) -> String {
-    let mut buf = String::new();
-    let mut fmt = Formatter::new(&mut buf);
-    file.pretty_print(&mut fmt).unwrap();
-    buf
+    todo!();
 }
 
 #[test]

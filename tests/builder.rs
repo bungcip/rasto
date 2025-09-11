@@ -1,5 +1,4 @@
 use rasto::ast::{builder::fn_def, Block, Expr, Lit, Stmt};
-use rasto::pretty_print::{Formatter, PrettyPrint};
 use std::fmt;
 
 struct TestRope {
