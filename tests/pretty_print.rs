@@ -11,7 +11,17 @@ fn pretty_print_item(item: Item) -> String {
 }
 
 fn pretty_print_file(file: File) -> String {
-    todo!();
+    let mut buf = String::new();
+    let mut printer = Printer::new(&mut buf);
+    for (i, item) in file.items.iter().enumerate() {
+        if i > 0 {
+            printer.hard_break();
+            printer.hard_break();
+        }
+        item.pretty_print_v2(&mut printer).unwrap();
+    }
+    printer.finish().unwrap();
+    buf
 }
 
 #[test]
@@ -59,6 +69,202 @@ fn test_fn() {
     );
 
     insta::assert_snapshot!(pretty_print_item(ast));
+}
+
+fn pretty_print_expr(expr: Expr) -> String {
+    let mut buf = String::new();
+    let mut printer = Printer::new(&mut buf);
+    expr.pretty_print_v2(&mut printer).unwrap();
+    printer.finish().unwrap();
+    buf
+}
+
+#[test]
+fn test_expr_array() {
+    let ast = Expr::Array(ExprArray {
+        elems: vec![Expr::Lit(Lit::Int(1)), Expr::Lit(Lit::Int(2))],
+    });
+    insta::assert_snapshot!(pretty_print_expr(ast));
+}
+
+#[test]
+fn test_expr_async() {
+    let ast = Expr::Async(ExprAsync {
+        block: Block {
+            leading_comments: vec![],
+            stmts: vec![Stmt::Expr(Expr::Lit(Lit::Int(1)))],
+            trailing_comments: vec![],
+        },
+    });
+    insta::assert_snapshot!(pretty_print_expr(ast));
+}
+
+#[test]
+fn test_expr_await() {
+    let ast = Expr::Await(ExprAwait {
+        expr: Box::new(Expr::Lit(Lit::Str("future".to_string()))),
+    });
+    insta::assert_snapshot!(pretty_print_expr(ast));
+}
+
+#[test]
+fn test_expr_break() {
+    let ast = Expr::Break(ExprBreak);
+    insta::assert_snapshot!(pretty_print_expr(ast));
+}
+
+#[test]
+fn test_expr_call() {
+    let ast = Expr::Call(ExprCall {
+        func: Box::new(Expr::Lit(Lit::Str("foo".to_string()))),
+        args: vec![Expr::Lit(Lit::Int(1)), Expr::Lit(Lit::Int(2))],
+    });
+    insta::assert_snapshot!(pretty_print_expr(ast));
+}
+
+#[test]
+fn test_expr_cast() {
+    let ast = Expr::Cast(ExprCast {
+        expr: Box::new(Expr::Lit(Lit::Str("x".to_string()))),
+        ty: "u32".to_string(),
+    });
+    insta::assert_snapshot!(pretty_print_expr(ast));
+}
+
+#[test]
+fn test_expr_closure() {
+    let ast = Expr::Closure(ExprClosure {
+        inputs: vec!["a".to_string(), "b".to_string()],
+        body: Box::new(Expr::Lit(Lit::Int(1))),
+    });
+    insta::assert_snapshot!(pretty_print_expr(ast));
+}
+
+#[test]
+fn test_expr_const() {
+    let ast = Expr::Const(ExprConst {
+        block: Block {
+            leading_comments: vec![],
+            stmts: vec![Stmt::Expr(Expr::Lit(Lit::Int(1)))],
+            trailing_comments: vec![],
+        },
+    });
+    insta::assert_snapshot!(pretty_print_expr(ast));
+}
+
+#[test]
+fn test_expr_continue() {
+    let ast = Expr::Continue(ExprContinue);
+    insta::assert_snapshot!(pretty_print_expr(ast));
+}
+
+#[test]
+fn test_expr_field() {
+    let ast = Expr::Field(ExprField {
+        expr: Box::new(Expr::Lit(Lit::Str("stru".to_string()))),
+        member: "field".to_string(),
+    });
+    insta::assert_snapshot!(pretty_print_expr(ast));
+}
+
+#[test]
+fn test_expr_index() {
+    let ast = Expr::Index(ExprIndex {
+        expr: Box::new(Expr::Lit(Lit::Str("arr".to_string()))),
+        index: Box::new(Expr::Lit(Lit::Int(0))),
+    });
+    insta::assert_snapshot!(pretty_print_expr(ast));
+}
+
+#[test]
+fn test_expr_match() {
+    let ast = Expr::Match(ExprMatch {
+        expr: Box::new(Expr::Lit(Lit::Str("x".to_string()))),
+        arms: vec![
+            Arm {
+                pat: "Some(y)".to_string(),
+                guard: None,
+                body: Box::new(Expr::Lit(Lit::Int(1))),
+            },
+            Arm {
+                pat: "None".to_string(),
+                guard: Some(Box::new(Expr::Lit(Lit::Bool(true)))),
+                body: Box::new(Expr::Lit(Lit::Int(2))),
+            },
+        ],
+    });
+    insta::assert_snapshot!(pretty_print_expr(ast));
+}
+
+#[test]
+fn test_expr_method_call() {
+    let ast = Expr::MethodCall(ExprMethodCall {
+        receiver: Box::new(Expr::Lit(Lit::Str("obj".to_string()))),
+        method: "method".to_string(),
+        args: vec![Expr::Lit(Lit::Int(1)), Expr::Lit(Lit::Int(2))],
+    });
+    insta::assert_snapshot!(pretty_print_expr(ast));
+}
+
+#[test]
+fn test_expr_paren() {
+    let ast = Expr::Paren(ExprParen {
+        expr: Box::new(Expr::Lit(Lit::Int(1))),
+    });
+    insta::assert_snapshot!(pretty_print_expr(ast));
+}
+
+#[test]
+fn test_expr_range() {
+    let ast = Expr::Range(ExprRange {
+        start: Some(Box::new(Expr::Lit(Lit::Int(1)))),
+        limits: RangeLimits::HalfOpen,
+        end: Some(Box::new(Expr::Lit(Lit::Int(5)))),
+    });
+    insta::assert_snapshot!(pretty_print_expr(ast));
+}
+
+#[test]
+fn test_expr_reference() {
+    let ast = Expr::Reference(ExprRef {
+        is_mut: true,
+        expr: Box::new(Expr::Lit(Lit::Str("x".to_string()))),
+    });
+    insta::assert_snapshot!(pretty_print_expr(ast));
+}
+
+#[test]
+fn test_expr_return() {
+    let ast = Expr::Return(ExprReturn {
+        expr: Some(Box::new(Expr::Lit(Lit::Int(1)))),
+    });
+    insta::assert_snapshot!(pretty_print_expr(ast));
+}
+
+#[test]
+fn test_expr_struct() {
+    let ast = Expr::Struct(ExprStruct {
+        path: "Foo".to_string(),
+        fields: vec![
+            FieldValue {
+                member: "a".to_string(),
+                value: Expr::Lit(Lit::Int(1)),
+            },
+            FieldValue {
+                member: "b".to_string(),
+                value: Expr::Lit(Lit::Int(2)),
+            },
+        ],
+    });
+    insta::assert_snapshot!(pretty_print_expr(ast));
+}
+
+#[test]
+fn test_expr_tuple() {
+    let ast = Expr::Tuple(ExprTuple {
+        elems: vec![Expr::Lit(Lit::Int(1)), Expr::Lit(Lit::Int(2))],
+    });
+    insta::assert_snapshot!(pretty_print_expr(ast));
 }
 
 #[test]

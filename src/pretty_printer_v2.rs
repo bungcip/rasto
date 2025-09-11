@@ -250,7 +250,7 @@ impl PrettyPrintV2 for Lit {
         match self {
             Lit::Str(s) => printer.string(format!("\"{}\"", s)),
             Lit::Int(i) => printer.string(i.to_string()),
-            Lit::Bool(b) => todo!(),
+            Lit::Bool(b) => printer.string(b.to_string()),
         }
         Ok(())
     }
@@ -291,26 +291,266 @@ impl PrettyPrintV2 for Expr {
             Expr::For(expr) => expr.pretty_print_v2(printer),
             Expr::Assign(expr) => expr.pretty_print_v2(printer),
             Expr::MacroCall(expr) => expr.pretty_print_v2(printer),
-            Expr::Array(expr_array) => todo!(),
-            Expr::Async(expr_async) => todo!(),
-            Expr::Await(expr_await) => todo!(),
-            Expr::Break(expr_break) => todo!(),
-            Expr::Call(expr_call) => todo!(),
-            Expr::Cast(expr_cast) => todo!(),
-            Expr::Closure(expr_closure) => todo!(),
-            Expr::Const(expr_const) => todo!(),
-            Expr::Continue(expr_continue) => todo!(),
-            Expr::Field(expr_field) => todo!(),
-            Expr::Index(expr_index) => todo!(),
-            Expr::Match(expr_match) => todo!(),
-            Expr::MethodCall(expr_method_call) => todo!(),
-            Expr::Paren(expr_paren) => todo!(),
-            Expr::Range(expr_range) => todo!(),
-            Expr::Reference(expr_ref) => todo!(),
-            Expr::Return(expr_return) => todo!(),
-            Expr::Struct(expr_struct) => todo!(),
-            Expr::Tuple(expr_tuple) => todo!(),
+            Expr::Array(expr) => expr.pretty_print_v2(printer),
+            Expr::Async(expr) => expr.pretty_print_v2(printer),
+            Expr::Await(expr) => expr.pretty_print_v2(printer),
+            Expr::Break(expr) => expr.pretty_print_v2(printer),
+            Expr::Call(expr) => expr.pretty_print_v2(printer),
+            Expr::Cast(expr) => expr.pretty_print_v2(printer),
+            Expr::Closure(expr) => expr.pretty_print_v2(printer),
+            Expr::Const(expr) => expr.pretty_print_v2(printer),
+            Expr::Continue(expr) => expr.pretty_print_v2(printer),
+            Expr::Field(expr) => expr.pretty_print_v2(printer),
+            Expr::Index(expr) => expr.pretty_print_v2(printer),
+            Expr::Match(expr) => expr.pretty_print_v2(printer),
+            Expr::MethodCall(expr) => expr.pretty_print_v2(printer),
+            Expr::Paren(expr) => expr.pretty_print_v2(printer),
+            Expr::Range(expr) => expr.pretty_print_v2(printer),
+            Expr::Reference(expr) => expr.pretty_print_v2(printer),
+            Expr::Return(expr) => expr.pretty_print_v2(printer),
+            Expr::Struct(expr) => expr.pretty_print_v2(printer),
+            Expr::Tuple(expr) => expr.pretty_print_v2(printer),
         }
+    }
+}
+
+impl PrettyPrintV2 for ExprArray {
+    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        printer.begin(BreakStyle::Consistent, "[");
+        printer.break_();
+        for (i, elem) in self.elems.iter().enumerate() {
+            if i > 0 {
+                printer.string(", ");
+                printer.break_();
+            }
+            elem.pretty_print_v2(printer)?;
+        }
+        printer.end("]");
+        Ok(())
+    }
+}
+
+impl PrettyPrintV2 for ExprAsync {
+    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        printer.string("async ");
+        self.block.pretty_print_v2(printer)
+    }
+}
+
+impl PrettyPrintV2 for ExprAwait {
+    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        self.expr.pretty_print_v2(printer)?;
+        printer.string(".await");
+        Ok(())
+    }
+}
+
+impl PrettyPrintV2 for ExprBreak {
+    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        printer.string("break");
+        Ok(())
+    }
+}
+
+impl PrettyPrintV2 for ExprCall {
+    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        self.func.pretty_print_v2(printer)?;
+        printer.begin(BreakStyle::Consistent, "(");
+        for (i, arg) in self.args.iter().enumerate() {
+            if i > 0 {
+                printer.string(", ");
+            }
+            arg.pretty_print_v2(printer)?;
+        }
+        printer.end(")");
+        Ok(())
+    }
+}
+
+impl PrettyPrintV2 for ExprCast {
+    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        self.expr.pretty_print_v2(printer)?;
+        printer.string(" as ");
+        printer.string(&self.ty);
+        Ok(())
+    }
+}
+
+impl PrettyPrintV2 for ExprClosure {
+    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        printer.string("|");
+        for (i, input) in self.inputs.iter().enumerate() {
+            if i > 0 {
+                printer.string(", ");
+            }
+            printer.string(input);
+        }
+        printer.string("| ");
+        self.body.pretty_print_v2(printer)
+    }
+}
+
+impl PrettyPrintV2 for ExprConst {
+    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        printer.string("const ");
+        self.block.pretty_print_v2(printer)
+    }
+}
+
+impl PrettyPrintV2 for ExprContinue {
+    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        printer.string("continue");
+        Ok(())
+    }
+}
+
+impl PrettyPrintV2 for ExprField {
+    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        self.expr.pretty_print_v2(printer)?;
+        printer.string(".");
+        printer.string(&self.member);
+        Ok(())
+    }
+}
+
+impl PrettyPrintV2 for ExprIndex {
+    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        self.expr.pretty_print_v2(printer)?;
+        printer.string("[");
+        self.index.pretty_print_v2(printer)?;
+        printer.string("]");
+        Ok(())
+    }
+}
+
+impl PrettyPrintV2 for ExprMatch {
+    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        printer.string("match ");
+        self.expr.pretty_print_v2(printer)?;
+        printer.string(" {");
+        printer.hard_break();
+        for arm in &self.arms {
+            arm.pretty_print_v2(printer)?;
+            printer.string(",");
+            printer.hard_break();
+        }
+        printer.string("}");
+        Ok(())
+    }
+}
+
+impl PrettyPrintV2 for Arm {
+    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        printer.string(&self.pat);
+        if let Some(guard) = &self.guard {
+            printer.string(" if ");
+            guard.pretty_print_v2(printer)?;
+        }
+        printer.string(" => ");
+        self.body.pretty_print_v2(printer)
+    }
+}
+
+impl PrettyPrintV2 for ExprMethodCall {
+    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        self.receiver.pretty_print_v2(printer)?;
+        printer.string(".");
+        printer.string(&self.method);
+        printer.begin(BreakStyle::Consistent, "(");
+        for (i, arg) in self.args.iter().enumerate() {
+            if i > 0 {
+                printer.string(", ");
+            }
+            arg.pretty_print_v2(printer)?;
+        }
+        printer.end(")");
+        Ok(())
+    }
+}
+
+impl PrettyPrintV2 for ExprParen {
+    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        printer.string("(");
+        self.expr.pretty_print_v2(printer)?;
+        printer.string(")");
+        Ok(())
+    }
+}
+
+impl PrettyPrintV2 for ExprRange {
+    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        if let Some(start) = &self.start {
+            start.pretty_print_v2(printer)?;
+        }
+        match self.limits {
+            RangeLimits::HalfOpen => printer.string(".."),
+            RangeLimits::Closed => printer.string("..="),
+        }
+        if let Some(end) = &self.end {
+            end.pretty_print_v2(printer)?;
+        }
+        Ok(())
+    }
+}
+
+impl PrettyPrintV2 for ExprRef {
+    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        printer.string("&");
+        if self.is_mut {
+            printer.string("mut ");
+        }
+        self.expr.pretty_print_v2(printer)
+    }
+}
+
+impl PrettyPrintV2 for ExprReturn {
+    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        printer.string("return");
+        if let Some(expr) = &self.expr {
+            printer.string(" ");
+            expr.pretty_print_v2(printer)?;
+        }
+        Ok(())
+    }
+}
+
+impl PrettyPrintV2 for ExprStruct {
+    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        printer.string(&self.path);
+        printer.string(" {");
+        printer.break_();
+        for (i, field) in self.fields.iter().enumerate() {
+            if i > 0 {
+                printer.string(",");
+                printer.break_();
+            }
+            field.pretty_print_v2(printer)?;
+        }
+        printer.break_();
+        printer.string("}");
+        Ok(())
+    }
+}
+
+impl PrettyPrintV2 for FieldValue {
+    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        printer.string(&self.member);
+        printer.string(": ");
+        self.value.pretty_print_v2(printer)
+    }
+}
+
+impl PrettyPrintV2 for ExprTuple {
+    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        printer.begin(BreakStyle::Consistent, "(");
+        for (i, elem) in self.elems.iter().enumerate() {
+            if i > 0 {
+                printer.string(", ");
+            }
+            elem.pretty_print_v2(printer)?;
+        }
+        printer.end(")");
+        Ok(())
     }
 }
 
