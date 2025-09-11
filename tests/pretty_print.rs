@@ -26,6 +26,149 @@ fn test_fn() {
     insta::assert_snapshot!(pretty_print_item(ast));
 }
 
+#[test]
+fn test_trait() {
+    let ast = Item::Trait(ItemTrait {
+        leading_comments: vec![Comment::Line(" A simple trait.".to_string())],
+        ident: "MyTrait".to_string(),
+        items: vec![TraitItem::Fn(TraitItemFn {
+            leading_comments: vec![],
+            sig: Signature {
+                ident: "my_func".to_string(),
+            },
+            block: None,
+            trailing_comments: vec![],
+        })],
+        trailing_comments: vec![],
+    });
+
+    insta::assert_snapshot!(pretty_print_item(ast));
+}
+
+#[test]
+fn test_loop_expression() {
+    let ast = Item::Fn(ItemFn {
+        leading_comments: vec![],
+        sig: Signature {
+            ident: "foo".to_string(),
+        },
+        block: Block {
+            leading_comments: vec![],
+            stmts: vec![Stmt::Expr(Expr::Loop(ExprLoop {
+                body: Block {
+                    leading_comments: vec![],
+                    stmts: vec![Stmt::Expr(Expr::Lit(Lit::Int(1)))],
+                    trailing_comments: vec![],
+                },
+            }))],
+            trailing_comments: vec![],
+        },
+        trailing_comments: vec![],
+    });
+
+    insta::assert_snapshot!(pretty_print_item(ast));
+}
+
+#[test]
+fn test_while_expression() {
+    let ast = Item::Fn(ItemFn {
+        leading_comments: vec![],
+        sig: Signature {
+            ident: "foo".to_string(),
+        },
+        block: Block {
+            leading_comments: vec![],
+            stmts: vec![Stmt::Expr(Expr::While(ExprWhile {
+                cond: Box::new(Expr::Lit(Lit::Int(1))),
+                body: Block {
+                    leading_comments: vec![],
+                    stmts: vec![Stmt::Expr(Expr::Lit(Lit::Int(2)))],
+                    trailing_comments: vec![],
+                },
+            }))],
+            trailing_comments: vec![],
+        },
+        trailing_comments: vec![],
+    });
+
+    insta::assert_snapshot!(pretty_print_item(ast));
+}
+
+#[test]
+fn test_for_expression() {
+    let ast = Item::Fn(ItemFn {
+        leading_comments: vec![],
+        sig: Signature {
+            ident: "foo".to_string(),
+        },
+        block: Block {
+            leading_comments: vec![],
+            stmts: vec![Stmt::Expr(Expr::For(ExprFor {
+                pat: "x".to_string(),
+                expr: Box::new(Expr::Lit(Lit::Int(1))),
+                body: Block {
+                    leading_comments: vec![],
+                    stmts: vec![Stmt::Expr(Expr::Lit(Lit::Int(2)))],
+                    trailing_comments: vec![],
+                },
+            }))],
+            trailing_comments: vec![],
+        },
+        trailing_comments: vec![],
+    });
+
+    insta::assert_snapshot!(pretty_print_item(ast));
+}
+
+#[test]
+fn test_assign_expression() {
+    let ast = Item::Fn(ItemFn {
+        leading_comments: vec![],
+        sig: Signature {
+            ident: "foo".to_string(),
+        },
+        block: Block {
+            leading_comments: vec![],
+            stmts: vec![Stmt::Expr(Expr::Assign(ExprAssign {
+                left: Box::new(Expr::Lit(Lit::Str("x".to_string()))),
+                right: Box::new(Expr::Lit(Lit::Int(1))),
+            }))],
+            trailing_comments: vec![],
+        },
+        trailing_comments: vec![],
+    });
+
+    insta::assert_snapshot!(pretty_print_item(ast));
+}
+
+#[test]
+fn test_macro_call_expression() {
+    let ast = Item::Fn(ItemFn {
+        leading_comments: vec![],
+        sig: Signature {
+            ident: "foo".to_string(),
+        },
+        block: Block {
+            leading_comments: vec![],
+            stmts: vec![Stmt::Expr(Expr::MacroCall(ExprMacroCall {
+                ident: "println".to_string(),
+                tokens: TokenStream {
+                    tokens: vec![TokenTree::Group(Group {
+                        delimiter: Delimiter::Parenthesis,
+                        stream: TokenStream {
+                            tokens: vec![TokenTree::Literal(Lit::Str("hello".to_string()))],
+                        },
+                    })],
+                },
+            }))],
+            trailing_comments: vec![],
+        },
+        trailing_comments: vec![],
+    });
+
+    insta::assert_snapshot!(pretty_print_item(ast));
+}
+
 
 #[test]
 fn test_enum() {

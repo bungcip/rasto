@@ -12,6 +12,41 @@ pub enum Item {
     Enum(ItemEnum),
     /// An impl block: `impl Foo { ... }`
     Impl(ItemImpl),
+    /// A trait item: `trait Foo { ... }`
+    Trait(ItemTrait),
+}
+
+/// A trait item: `trait Foo { ... }`
+#[derive(Debug, Clone)]
+pub struct ItemTrait {
+    /// Comments that appear before the trait.
+    pub leading_comments: Vec<Comment>,
+    /// The name of the trait.
+    pub ident: String,
+    /// The items within the trait.
+    pub items: Vec<TraitItem>,
+    /// Comments that appear after the trait.
+    pub trailing_comments: Vec<Comment>,
+}
+
+/// An item within a trait.
+#[derive(Debug, Clone)]
+pub enum TraitItem {
+    /// A function item: `fn foo();`
+    Fn(TraitItemFn),
+}
+
+/// A function item within a trait.
+#[derive(Debug, Clone)]
+pub struct TraitItemFn {
+    /// Comments that appear before the function.
+    pub leading_comments: Vec<Comment>,
+    /// The function signature.
+    pub sig: Signature,
+    /// An optional function body.
+    pub block: Option<Block>,
+    /// Comments that appear after the function.
+    pub trailing_comments: Vec<Comment>,
 }
 
 /// A struct item: `struct Foo { ... }`
