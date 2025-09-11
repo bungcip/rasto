@@ -61,6 +61,155 @@ impl PrettyPrint for Comment {
     }
 }
 
+impl PrettyPrint for ExprLoop {
+    fn pretty_print(&self, fmt: &mut Formatter) -> fmt::Result {
+        fmt.write_str("loop ")?;
+        self.body.pretty_print(fmt)
+    }
+}
+
+impl PrettyPrint for ExprWhile {
+    fn pretty_print(&self, fmt: &mut Formatter) -> fmt::Result {
+        fmt.write_str("while ")?;
+        self.cond.pretty_print(fmt)?;
+        fmt.write_str(" ")?;
+        self.body.pretty_print(fmt)
+    }
+}
+
+impl PrettyPrint for ExprFor {
+    fn pretty_print(&self, fmt: &mut Formatter) -> fmt::Result {
+        fmt.write_str("for ")?;
+        fmt.write_str(&self.pat)?;
+        fmt.write_str(" in ")?;
+        self.expr.pretty_print(fmt)?;
+        fmt.write_str(" ")?;
+        self.body.pretty_print(fmt)
+    }
+}
+
+impl PrettyPrint for ExprAssign {
+    fn pretty_print(&self, fmt: &mut Formatter) -> fmt::Result {
+        self.left.pretty_print(fmt)?;
+        fmt.write_str(" = ")?;
+        self.right.pretty_print(fmt)
+    }
+}
+
+impl PrettyPrint for ExprMacroCall {
+    fn pretty_print(&self, fmt: &mut Formatter) -> fmt::Result {
+        fmt.write_str(&self.ident)?;
+        fmt.write_str("!")?;
+        self.tokens.pretty_print(fmt)
+    }
+}
+
+impl PrettyPrint for TokenStream {
+    fn pretty_print(&self, fmt: &mut Formatter) -> fmt::Result {
+        for (i, token) in self.tokens.iter().enumerate() {
+            if i > 0 {
+                fmt.write_str(" ")?;
+            }
+            token.pretty_print(fmt)?;
+        }
+        Ok(())
+    }
+}
+
+impl PrettyPrint for TokenTree {
+    fn pretty_print(&self, fmt: &mut Formatter) -> fmt::Result {
+        match self {
+            TokenTree::Group(group) => group.pretty_print(fmt),
+            TokenTree::Ident(ident) => fmt.write_str(ident),
+            TokenTree::Punct(punct) => punct.pretty_print(fmt),
+            TokenTree::Literal(lit) => lit.pretty_print(fmt),
+        }
+    }
+}
+
+impl PrettyPrint for Group {
+    fn pretty_print(&self, fmt: &mut Formatter) -> fmt::Result {
+        let (open, close) = match self.delimiter {
+            Delimiter::Parenthesis => ("(", ")"),
+            Delimiter::Brace => ("{", "}"),
+            Delimiter::Bracket => ("[", "]"),
+            Delimiter::None => ("", ""),
+        };
+        fmt.write_str(open)?;
+        self.stream.pretty_print(fmt)?;
+        fmt.write_str(close)
+    }
+}
+
+impl PrettyPrint for Punct {
+    fn pretty_print(&self, fmt: &mut Formatter) -> fmt::Result {
+        fmt.write_str(&self.ch.to_string())?;
+        if self.spacing == Spacing::Alone {
+            // fmt.write_str(" ")?;
+        }
+        Ok(())
+    }
+}
+
+impl PrettyPrint for ItemTrait {
+    fn pretty_print(&self, fmt: &mut Formatter) -> fmt::Result {
+        for comment in &self.leading_comments {
+            comment.pretty_print(fmt)?;
+        }
+
+        fmt.write_indented(&format!("trait {} ", self.ident))?;
+        fmt.write_line("{")?;
+        fmt.indent();
+
+        for item in &self.items {
+            item.pretty_print(fmt)?;
+        }
+
+        fmt.dedent();
+        fmt.write_line("}")?;
+        fmt.write_line("")?;
+
+        for comment in &self.trailing_comments {
+            comment.pretty_print(fmt)?;
+        }
+
+        Ok(())
+    }
+}
+
+impl PrettyPrint for TraitItem {
+    fn pretty_print(&self, fmt: &mut Formatter) -> fmt::Result {
+        match self {
+            TraitItem::Fn(item_fn) => item_fn.pretty_print(fmt),
+        }
+    }
+}
+
+impl PrettyPrint for TraitItemFn {
+    fn pretty_print(&self, fmt: &mut Formatter) -> fmt::Result {
+        for comment in &self.leading_comments {
+            comment.pretty_print(fmt)?;
+        }
+
+        fmt.write_indented("fn ")?;
+        self.sig.pretty_print(fmt)?;
+        if let Some(block) = &self.block {
+            fmt.write_str(" ")?;
+            block.pretty_print(fmt)?;
+            fmt.write_str("\n")?;
+        } else {
+            fmt.write_line(";")?;
+        }
+
+
+        for comment in &self.trailing_comments {
+            comment.pretty_print(fmt)?;
+        }
+
+        Ok(())
+    }
+}
+
 impl PrettyPrint for ExprBinary {
     fn pretty_print(&self, fmt: &mut Formatter) -> fmt::Result {
         self.left.pretty_print(fmt)?;
@@ -109,6 +258,7 @@ impl PrettyPrint for Item {
             Item::Struct(item_struct) => item_struct.pretty_print(fmt),
             Item::Enum(item_enum) => item_enum.pretty_print(fmt),
             Item::Impl(item_impl) => item_impl.pretty_print(fmt),
+            Item::Trait(item_trait) => item_trait.pretty_print(fmt),
         }
     }
 }
@@ -306,6 +456,11 @@ impl PrettyPrint for Expr {
             Expr::Binary(expr) => expr.pretty_print(fmt),
             Expr::If(expr) => expr.pretty_print(fmt),
             Expr::Block(expr) => expr.pretty_print(fmt),
+            Expr::Loop(expr) => expr.pretty_print(fmt),
+            Expr::While(expr) => expr.pretty_print(fmt),
+            Expr::For(expr) => expr.pretty_print(fmt),
+            Expr::Assign(expr) => expr.pretty_print(fmt),
+            Expr::MacroCall(expr) => expr.pretty_print(fmt),
         }
     }
 }
