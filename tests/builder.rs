@@ -46,10 +46,7 @@ fn test_fn_builder() {
         })
         .build();
 
-    let mut rope = TestRope::new();
-    let mut fmt = Formatter::new(&mut rope);
-    item_fn.pretty_print(&mut fmt).unwrap();
-    let actual = rope.buffer;
+    let actual = item_fn.to_string();
 
     insta::assert_snapshot!(actual);
 }

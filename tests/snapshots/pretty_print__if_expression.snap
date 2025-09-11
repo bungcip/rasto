@@ -2,12 +2,12 @@
 source: tests/pretty_print.rs
 expression: pretty_print_item(ast)
 ---
-fn foo()  {
-    if 1      {
-        2;
-    } else if 3      {
-        4;
-    } else      {
-        5;
-    }
+fn foo() {
+if 1 {
+2;
+} else if 3 {
+4;
+} else {
+5;
+};
 }

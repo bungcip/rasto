@@ -2,8 +2,4 @@
 source: tests/pretty_print.rs
 expression: pretty_print_item(ast)
 ---
-fn foo() {
-loop {
-1;
-};
-}
+struct MyStruct { field: i32, }

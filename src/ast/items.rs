@@ -1,5 +1,6 @@
 use crate::ast::comments::Comment;
 use crate::ast::statements::Block;
+use crate::pretty_printer_v2::{Printer, PrettyPrintV2};
 
 /// A top-level item in a Rust file.
 #[derive(Debug, Clone)]
@@ -47,6 +48,61 @@ pub struct TraitItemFn {
     pub block: Option<Block>,
     /// Comments that appear after the function.
     pub trailing_comments: Vec<Comment>,
+}
+
+impl ItemFn {
+    /// Pretty-prints the function to a string.
+    pub fn to_string(&self) -> String {
+        let mut buf = String::new();
+        let mut printer = Printer::new(&mut buf);
+        self.pretty_print_v2(&mut printer).unwrap();
+        printer.finish().unwrap();
+        buf
+    }
+}
+
+impl ItemStruct {
+    /// Pretty-prints the struct to a string.
+    pub fn to_string(&self) -> String {
+        let mut buf = String::new();
+        let mut printer = Printer::new(&mut buf);
+        self.pretty_print_v2(&mut printer).unwrap();
+        printer.finish().unwrap();
+        buf
+    }
+}
+
+impl ItemEnum {
+    /// Pretty-prints the enum to a string.
+    pub fn to_string(&self) -> String {
+        let mut buf = String::new();
+        let mut printer = Printer::new(&mut buf);
+        self.pretty_print_v2(&mut printer).unwrap();
+        printer.finish().unwrap();
+        buf
+    }
+}
+
+impl ItemImpl {
+    /// Pretty-prints the impl to a string.
+    pub fn to_string(&self) -> String {
+        let mut buf = String::new();
+        let mut printer = Printer::new(&mut buf);
+        self.pretty_print_v2(&mut printer).unwrap();
+        printer.finish().unwrap();
+        buf
+    }
+}
+
+impl ItemTrait {
+    /// Pretty-prints the trait to a string.
+    pub fn to_string(&self) -> String {
+        let mut buf = String::new();
+        let mut printer = Printer::new(&mut buf);
+        self.pretty_print_v2(&mut printer).unwrap();
+        printer.finish().unwrap();
+        buf
+    }
 }
 
 /// A struct item: `struct Foo { ... }`
