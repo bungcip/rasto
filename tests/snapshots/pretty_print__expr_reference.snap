@@ -1,0 +1,5 @@
+---
+source: tests/pretty_print.rs
+expression: pretty_print_expr(ast)
+---
+&mut "x"
