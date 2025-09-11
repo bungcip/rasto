@@ -6,5 +6,5 @@ fn foo() {
     "a_very_long_string_that_should_cause_a_line_break"
     +
     "another_very_long_string_that_should_also_cause_a_line_break";
-
+    
 }

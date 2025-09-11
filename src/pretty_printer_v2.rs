@@ -250,6 +250,7 @@ impl PrettyPrintV2 for Lit {
         match self {
             Lit::Str(s) => printer.string(format!("\"{}\"", s)),
             Lit::Int(i) => printer.string(i.to_string()),
+            Lit::Bool(b) => todo!(),
         }
         Ok(())
     }
@@ -290,6 +291,25 @@ impl PrettyPrintV2 for Expr {
             Expr::For(expr) => expr.pretty_print_v2(printer),
             Expr::Assign(expr) => expr.pretty_print_v2(printer),
             Expr::MacroCall(expr) => expr.pretty_print_v2(printer),
+            Expr::Array(expr_array) => todo!(),
+            Expr::Async(expr_async) => todo!(),
+            Expr::Await(expr_await) => todo!(),
+            Expr::Break(expr_break) => todo!(),
+            Expr::Call(expr_call) => todo!(),
+            Expr::Cast(expr_cast) => todo!(),
+            Expr::Closure(expr_closure) => todo!(),
+            Expr::Const(expr_const) => todo!(),
+            Expr::Continue(expr_continue) => todo!(),
+            Expr::Field(expr_field) => todo!(),
+            Expr::Index(expr_index) => todo!(),
+            Expr::Match(expr_match) => todo!(),
+            Expr::MethodCall(expr_method_call) => todo!(),
+            Expr::Paren(expr_paren) => todo!(),
+            Expr::Range(expr_range) => todo!(),
+            Expr::Reference(expr_ref) => todo!(),
+            Expr::Return(expr_return) => todo!(),
+            Expr::Struct(expr_struct) => todo!(),
+            Expr::Tuple(expr_tuple) => todo!(),
         }
     }
 }
