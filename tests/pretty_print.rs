@@ -1,4 +1,5 @@
-use rasto::*;
+use rasto::ast::*;
+use rasto::pretty_print::{Formatter, PrettyPrint};
 
 fn pretty_print_item(item: Item) -> String {
     let mut buf = String::new();
