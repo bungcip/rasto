@@ -125,3 +125,33 @@ pub struct Signature {
     pub ident: String,
     // For simplicity, we'll omit arguments and return type for now.
 }
+
+impl From<ItemFn> for Item {
+    fn from(item: ItemFn) -> Self {
+        Item::Fn(item)
+    }
+}
+
+impl From<ItemStruct> for Item {
+    fn from(item: ItemStruct) -> Self {
+        Item::Struct(item)
+    }
+}
+
+impl From<ItemEnum> for Item {
+    fn from(item: ItemEnum) -> Self {
+        Item::Enum(item)
+    }
+}
+
+impl From<ItemImpl> for Item {
+    fn from(item: ItemImpl) -> Self {
+        Item::Impl(item)
+    }
+}
+
+impl From<ItemTrait> for Item {
+    fn from(item: ItemTrait) -> Self {
+        Item::Trait(item)
+    }
+}

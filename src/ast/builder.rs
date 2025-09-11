@@ -1,4 +1,23 @@
-use crate::ast::{Block, ItemFn, Signature};
+use crate::ast::{Block, File, Item, ItemFn, Signature};
+
+pub struct FileBuilder {
+    items: Vec<Item>,
+}
+
+impl FileBuilder {
+    pub fn new() -> Self {
+        Self { items: vec![] }
+    }
+
+    pub fn item(mut self, item: impl Into<Item>) -> Self {
+        self.items.push(item.into());
+        self
+    }
+
+    pub fn build(self) -> File {
+        File { items: self.items }
+    }
+}
 
 pub struct FnBuilder {
     ident: Option<String>,

@@ -61,6 +61,16 @@ impl PrettyPrint for Comment {
     }
 }
 
+impl PrettyPrint for File {
+    fn pretty_print(&self, fmt: &mut Formatter) -> fmt::Result {
+        for item in &self.items {
+            item.pretty_print(fmt)?;
+            fmt.write_line("")?;
+        }
+        Ok(())
+    }
+}
+
 impl PrettyPrint for ExprLoop {
     fn pretty_print(&self, fmt: &mut Formatter) -> fmt::Result {
         fmt.write_str("loop ")?;

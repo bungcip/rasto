@@ -1,0 +1,16 @@
+---
+source: tests/pretty_print.rs
+expression: pretty_print_file(ast)
+---
+// A simple struct.
+struct Foo {
+    field1: i32    ,
+    field2: String    ,
+}
+
+
+// A simple function.
+fn foo()  {
+    /* An inner comment */
+    42;
+}// Trailing comment.

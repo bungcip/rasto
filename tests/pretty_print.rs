@@ -8,6 +8,48 @@ fn pretty_print_item(item: Item) -> String {
     buf
 }
 
+fn pretty_print_file(file: File) -> String {
+    let mut buf = String::new();
+    let mut fmt = Formatter::new(&mut buf);
+    file.pretty_print(&mut fmt).unwrap();
+    buf
+}
+
+#[test]
+fn test_file() {
+    let ast = FileBuilder::new()
+        .item(Item::Struct(ItemStruct {
+            leading_comments: vec![Comment::Line(" A simple struct.".to_string())],
+            ident: "Foo".to_string(),
+            fields: vec![
+                Field {
+                    ident: "field1".to_string(),
+                    ty: "i32".to_string(),
+                },
+                Field {
+                    ident: "field2".to_string(),
+                    ty: "String".to_string(),
+                },
+            ],
+            trailing_comments: vec![],
+        }))
+        .item(Item::Fn(ItemFn {
+            leading_comments: vec![Comment::Line(" A simple function.".to_string())],
+            sig: Signature {
+                ident: "foo".to_string(),
+            },
+            block: Block {
+                leading_comments: vec![Comment::Block(" An inner comment ".to_string())],
+                stmts: vec![Stmt::Expr(Expr::Lit(Lit::Int(42)))],
+                trailing_comments: vec![],
+            },
+            trailing_comments: vec![Comment::Line(" Trailing comment.".to_string())],
+        }))
+        .build();
+
+    insta::assert_snapshot!(pretty_print_file(ast));
+}
+
 #[test]
 fn test_fn() {
     let ast = Item::Fn(ItemFn {
