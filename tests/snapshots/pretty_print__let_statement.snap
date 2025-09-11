@@ -2,6 +2,6 @@
 source: tests/pretty_print.rs
 expression: pretty_print_item(ast)
 ---
-fn foo()  {
-    let x: i32 = 42;
+fn foo() {
+let x: i32 = 42;
 }

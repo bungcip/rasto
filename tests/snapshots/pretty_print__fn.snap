@@ -2,7 +2,10 @@
 source: tests/pretty_print.rs
 expression: pretty_print_item(ast)
 ---
-fn foo()  {
-    /* An inner comment */
-    42;
+// A simple function.
+fn foo() {
+
+/* An inner comment */
+42;
 }
+// Trailing comment.

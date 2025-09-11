@@ -1,11 +1,12 @@
 use rasto::ast::builder::{file, fn_def};
 use rasto::ast::*;
-use rasto::pretty_print::{Formatter, PrettyPrint};
+use rasto::pretty_printer_v2::{PrettyPrintV2, Printer};
 
 fn pretty_print_item(item: Item) -> String {
     let mut buf = String::new();
-    let mut fmt = Formatter::new(&mut buf);
-    item.pretty_print(&mut fmt).unwrap();
+    let mut printer = Printer::new(&mut buf);
+    item.pretty_print_v2(&mut printer).unwrap();
+    printer.finish().unwrap();
     buf
 }
 
@@ -59,6 +60,87 @@ fn test_fn() {
             })
             .build(),
     );
+
+    insta::assert_snapshot!(pretty_print_item(ast));
+}
+
+#[test]
+fn test_long_enum() {
+    let ast = Item::Enum(ItemEnum {
+        leading_comments: vec![],
+        ident: "MyLongLongLongLongLongEnum".to_string(),
+        variants: vec![
+            Variant {
+                ident: "AVeryLongVariantNameThatShouldCauseALineBreak".to_string(),
+            },
+            Variant {
+                ident: "AnotherVeryLongVariantNameThatShouldAlsoCauseALineBreak".to_string(),
+            },
+        ],
+        trailing_comments: vec![],
+    });
+
+    insta::assert_snapshot!(pretty_print_item(ast));
+}
+
+#[test]
+fn test_single_field_struct() {
+    let ast = Item::Struct(ItemStruct {
+        leading_comments: vec![],
+        ident: "MyStruct".to_string(),
+        fields: vec![Field {
+            ident: "field".to_string(),
+            ty: "i32".to_string(),
+        }],
+        trailing_comments: vec![],
+    });
+
+    insta::assert_snapshot!(pretty_print_item(ast));
+}
+
+#[test]
+fn test_nested_struct() {
+    let ast = Item::Struct(ItemStruct {
+        leading_comments: vec![],
+        ident: "Outer".to_string(),
+        fields: vec![
+            Field {
+                ident: "inner".to_string(),
+                ty: "Inner".to_string(),
+            },
+            Field {
+                ident: "another_field".to_string(),
+                ty: "i32".to_string(),
+            },
+        ],
+        trailing_comments: vec![],
+    });
+
+    insta::assert_snapshot!(pretty_print_item(ast));
+}
+
+#[test]
+fn test_long_binary_expression() {
+    let ast = Item::Fn(ItemFn {
+        leading_comments: vec![],
+        sig: Signature {
+            ident: "foo".to_string(),
+        },
+        block: Block {
+            leading_comments: vec![],
+            stmts: vec![Stmt::Expr(Expr::Binary(ExprBinary {
+                left: Box::new(Expr::Lit(Lit::Str(
+                    "a_very_long_string_that_should_cause_a_line_break".to_string(),
+                ))),
+                op: BinOp::Add,
+                right: Box::new(Expr::Lit(Lit::Str(
+                    "another_very_long_string_that_should_also_cause_a_line_break".to_string(),
+                ))),
+            }))],
+            trailing_comments: vec![],
+        },
+        trailing_comments: vec![],
+    });
 
     insta::assert_snapshot!(pretty_print_item(ast));
 }
