@@ -1,5 +1,9 @@
 use crate::ast::*;
 
+pub fn file() -> FileBuilder {
+    FileBuilder::new()
+}
+
 pub struct FileBuilder {
     items: Vec<Item>,
 }
@@ -17,6 +21,10 @@ impl FileBuilder {
     pub fn build(self) -> File {
         File { items: self.items }
     }
+}
+
+pub fn fn_def(name: impl Into<String>) -> FnBuilder {
+    FnBuilder::new(name)
 }
 
 pub struct FnBuilder {

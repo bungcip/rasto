@@ -1,3 +1,4 @@
+use rasto::ast::builder::{file, fn_def};
 use rasto::ast::*;
 use rasto::pretty_print::{Formatter, PrettyPrint};
 
@@ -17,7 +18,7 @@ fn pretty_print_file(file: File) -> String {
 
 #[test]
 fn test_file() {
-    let ast = FileBuilder::new()
+    let ast = file()
         .item(Item::Struct(ItemStruct {
             leading_comments: vec![Comment::Line(" A simple struct.".to_string())],
             ident: "Foo".to_string(),
@@ -33,18 +34,15 @@ fn test_file() {
             ],
             trailing_comments: vec![],
         }))
-        .item(Item::Fn(ItemFn {
-            leading_comments: vec![Comment::Line(" A simple function.".to_string())],
-            sig: Signature {
-                ident: "foo".to_string(),
-            },
-            block: Block {
-                leading_comments: vec![Comment::Block(" An inner comment ".to_string())],
-                stmts: vec![Stmt::Expr(Expr::Lit(Lit::Int(42)))],
-                trailing_comments: vec![],
-            },
-            trailing_comments: vec![Comment::Line(" Trailing comment.".to_string())],
-        }))
+        .item(
+            fn_def("foo")
+                .block(Block {
+                    leading_comments: vec![],
+                    stmts: vec![Stmt::Expr(Expr::Lit(Lit::Int(42)))],
+                    trailing_comments: vec![],
+                })
+                .build(),
+        )
         .build();
 
     insta::assert_snapshot!(pretty_print_file(ast));
@@ -52,18 +50,15 @@ fn test_file() {
 
 #[test]
 fn test_fn() {
-    let ast = Item::Fn(ItemFn {
-        leading_comments: vec![Comment::Line(" A simple function.".to_string())],
-        sig: Signature {
-            ident: "foo".to_string(),
-        },
-        block: Block {
-            leading_comments: vec![Comment::Block(" An inner comment ".to_string())],
-            stmts: vec![Stmt::Expr(Expr::Lit(Lit::Int(42)))],
-            trailing_comments: vec![],
-        },
-        trailing_comments: vec![Comment::Line(" Trailing comment.".to_string())],
-    });
+    let ast = Item::Fn(
+        fn_def("foo")
+            .block(Block {
+                leading_comments: vec![Comment::Block(" An inner comment ".to_string())],
+                stmts: vec![Stmt::Expr(Expr::Lit(Lit::Int(42)))],
+                trailing_comments: vec![],
+            })
+            .build(),
+    );
 
     insta::assert_snapshot!(pretty_print_item(ast));
 }
@@ -89,128 +84,112 @@ fn test_trait() {
 
 #[test]
 fn test_loop_expression() {
-    let ast = Item::Fn(ItemFn {
-        leading_comments: vec![],
-        sig: Signature {
-            ident: "foo".to_string(),
-        },
-        block: Block {
-            leading_comments: vec![],
-            stmts: vec![Stmt::Expr(Expr::Loop(ExprLoop {
-                body: Block {
-                    leading_comments: vec![],
-                    stmts: vec![Stmt::Expr(Expr::Lit(Lit::Int(1)))],
-                    trailing_comments: vec![],
-                },
-            }))],
-            trailing_comments: vec![],
-        },
-        trailing_comments: vec![],
-    });
+    let ast = Item::Fn(
+        fn_def("foo")
+            .block(Block {
+                leading_comments: vec![],
+                stmts: vec![Stmt::Expr(Expr::Loop(ExprLoop {
+                    body: Block {
+                        leading_comments: vec![],
+                        stmts: vec![Stmt::Expr(Expr::Lit(Lit::Int(1)))],
+                        trailing_comments: vec![],
+                    },
+                }))],
+                trailing_comments: vec![],
+            })
+            .build(),
+    );
 
     insta::assert_snapshot!(pretty_print_item(ast));
 }
 
 #[test]
 fn test_while_expression() {
-    let ast = Item::Fn(ItemFn {
-        leading_comments: vec![],
-        sig: Signature {
-            ident: "foo".to_string(),
-        },
-        block: Block {
-            leading_comments: vec![],
-            stmts: vec![Stmt::Expr(Expr::While(ExprWhile {
-                cond: Box::new(Expr::Lit(Lit::Int(1))),
-                body: Block {
-                    leading_comments: vec![],
-                    stmts: vec![Stmt::Expr(Expr::Lit(Lit::Int(2)))],
-                    trailing_comments: vec![],
-                },
-            }))],
-            trailing_comments: vec![],
-        },
-        trailing_comments: vec![],
-    });
+    let ast = Item::Fn(
+        fn_def("foo")
+            .block(Block {
+                leading_comments: vec![],
+                stmts: vec![Stmt::Expr(Expr::While(ExprWhile {
+                    cond: Box::new(Expr::Lit(Lit::Int(1))),
+                    body: Block {
+                        leading_comments: vec![],
+                        stmts: vec![Stmt::Expr(Expr::Lit(Lit::Int(2)))],
+                        trailing_comments: vec![],
+                    },
+                }))],
+                trailing_comments: vec![],
+            })
+            .build(),
+    );
 
     insta::assert_snapshot!(pretty_print_item(ast));
 }
 
 #[test]
 fn test_for_expression() {
-    let ast = Item::Fn(ItemFn {
-        leading_comments: vec![],
-        sig: Signature {
-            ident: "foo".to_string(),
-        },
-        block: Block {
-            leading_comments: vec![],
-            stmts: vec![Stmt::Expr(Expr::For(ExprFor {
-                pat: "x".to_string(),
-                expr: Box::new(Expr::Lit(Lit::Int(1))),
-                body: Block {
-                    leading_comments: vec![],
-                    stmts: vec![Stmt::Expr(Expr::Lit(Lit::Int(2)))],
-                    trailing_comments: vec![],
-                },
-            }))],
-            trailing_comments: vec![],
-        },
-        trailing_comments: vec![],
-    });
+    let ast = Item::Fn(
+        fn_def("foo")
+            .block(Block {
+                leading_comments: vec![],
+                stmts: vec![Stmt::Expr(Expr::For(ExprFor {
+                    pat: "x".to_string(),
+                    expr: Box::new(Expr::Lit(Lit::Int(1))),
+                    body: Block {
+                        leading_comments: vec![],
+                        stmts: vec![Stmt::Expr(Expr::Lit(Lit::Int(2)))],
+                        trailing_comments: vec![],
+                    },
+                }))],
+                trailing_comments: vec![],
+            })
+            .build(),
+    );
 
     insta::assert_snapshot!(pretty_print_item(ast));
 }
 
 #[test]
 fn test_assign_expression() {
-    let ast = Item::Fn(ItemFn {
-        leading_comments: vec![],
-        sig: Signature {
-            ident: "foo".to_string(),
-        },
-        block: Block {
-            leading_comments: vec![],
-            stmts: vec![Stmt::Expr(Expr::Assign(ExprAssign {
-                left: Box::new(Expr::Lit(Lit::Str("x".to_string()))),
-                right: Box::new(Expr::Lit(Lit::Int(1))),
-            }))],
-            trailing_comments: vec![],
-        },
-        trailing_comments: vec![],
-    });
+    let ast = Item::Fn(
+        fn_def("foo")
+            .block(Block {
+                leading_comments: vec![],
+                stmts: vec![Stmt::Expr(Expr::Assign(ExprAssign {
+                    left: Box::new(Expr::Lit(Lit::Str("x".to_string()))),
+                    right: Box::new(Expr::Lit(Lit::Int(1))),
+                }))],
+                trailing_comments: vec![],
+            })
+            .build(),
+    );
 
     insta::assert_snapshot!(pretty_print_item(ast));
 }
 
 #[test]
 fn test_macro_call_expression() {
-    let ast = Item::Fn(ItemFn {
-        leading_comments: vec![],
-        sig: Signature {
-            ident: "foo".to_string(),
-        },
-        block: Block {
-            leading_comments: vec![],
-            stmts: vec![Stmt::Expr(Expr::MacroCall(ExprMacroCall {
-                ident: "println".to_string(),
-                tokens: TokenStream {
-                    tokens: vec![TokenTree::Group(Group {
-                        delimiter: Delimiter::Parenthesis,
-                        stream: TokenStream {
-                            tokens: vec![TokenTree::Literal(Lit::Str("hello".to_string()))],
-                        },
-                    })],
-                },
-            }))],
-            trailing_comments: vec![],
-        },
-        trailing_comments: vec![],
-    });
+    let ast = Item::Fn(
+        fn_def("foo")
+            .block(Block {
+                leading_comments: vec![],
+                stmts: vec![Stmt::Expr(Expr::MacroCall(ExprMacroCall {
+                    ident: "println".to_string(),
+                    tokens: TokenStream {
+                        tokens: vec![TokenTree::Group(Group {
+                            delimiter: Delimiter::Parenthesis,
+                            stream: TokenStream {
+                                tokens: vec![TokenTree::Literal(Lit::Str("hello".to_string()))],
+                            },
+                        })],
+                    },
+                }))],
+                trailing_comments: vec![],
+            })
+            .build(),
+    );
 
     insta::assert_snapshot!(pretty_print_item(ast));
 }
-
 
 #[test]
 fn test_enum() {
@@ -236,18 +215,13 @@ fn test_impl() {
     let ast = Item::Impl(ItemImpl {
         leading_comments: vec![Comment::Line(" A simple impl.".to_string())],
         ident: "MyStruct".to_string(),
-        fns: vec![ItemFn {
-            leading_comments: vec![],
-            sig: Signature {
-                ident: "new".to_string(),
-            },
-            block: Block {
+        fns: vec![fn_def("new")
+            .block(Block {
                 leading_comments: vec![],
                 stmts: vec![],
                 trailing_comments: vec![],
-            },
-            trailing_comments: vec![],
-        }],
+            })
+            .build()],
         trailing_comments: vec![],
     });
 
@@ -256,84 +230,75 @@ fn test_impl() {
 
 #[test]
 fn test_let_statement() {
-    let ast = Item::Fn(ItemFn {
-        leading_comments: vec![],
-        sig: Signature {
-            ident: "foo".to_string(),
-        },
-        block: Block {
-            leading_comments: vec![],
-            stmts: vec![Stmt::Let(StmtLet {
-                ident: "x".to_string(),
-                ty: Some("i32".to_string()),
-                expr: Some(Expr::Lit(Lit::Int(42))),
-            })],
-            trailing_comments: vec![],
-        },
-        trailing_comments: vec![],
-    });
+    let ast = Item::Fn(
+        fn_def("foo")
+            .block(Block {
+                leading_comments: vec![],
+                stmts: vec![Stmt::Let(StmtLet {
+                    ident: "x".to_string(),
+                    ty: Some("i32".to_string()),
+                    expr: Some(Expr::Lit(Lit::Int(42))),
+                })],
+                trailing_comments: vec![],
+            })
+            .build(),
+    );
 
     insta::assert_snapshot!(pretty_print_item(ast));
 }
 
 #[test]
 fn test_if_expression() {
-    let ast = Item::Fn(ItemFn {
-        leading_comments: vec![],
-        sig: Signature {
-            ident: "foo".to_string(),
-        },
-        block: Block {
-            leading_comments: vec![],
-            stmts: vec![Stmt::Expr(Expr::If(ExprIf {
-                cond: Box::new(Expr::Lit(Lit::Int(1))),
-                then_branch: Block {
-                    leading_comments: vec![],
-                    stmts: vec![Stmt::Expr(Expr::Lit(Lit::Int(2)))],
-                    trailing_comments: vec![],
-                },
-                else_branch: Some(Box::new(Expr::If(ExprIf {
-                    cond: Box::new(Expr::Lit(Lit::Int(3))),
+    let ast = Item::Fn(
+        fn_def("foo")
+            .block(Block {
+                leading_comments: vec![],
+                stmts: vec![Stmt::Expr(Expr::If(ExprIf {
+                    cond: Box::new(Expr::Lit(Lit::Int(1))),
                     then_branch: Block {
                         leading_comments: vec![],
-                        stmts: vec![Stmt::Expr(Expr::Lit(Lit::Int(4)))],
+                        stmts: vec![Stmt::Expr(Expr::Lit(Lit::Int(2)))],
                         trailing_comments: vec![],
                     },
-                    else_branch: Some(Box::new(Expr::Block(ExprBlock {
-                        block: Block {
+                    else_branch: Some(Box::new(Expr::If(ExprIf {
+                        cond: Box::new(Expr::Lit(Lit::Int(3))),
+                        then_branch: Block {
                             leading_comments: vec![],
-                            stmts: vec![Stmt::Expr(Expr::Lit(Lit::Int(5)))],
+                            stmts: vec![Stmt::Expr(Expr::Lit(Lit::Int(4)))],
                             trailing_comments: vec![],
                         },
+                        else_branch: Some(Box::new(Expr::Block(ExprBlock {
+                            block: Block {
+                                leading_comments: vec![],
+                                stmts: vec![Stmt::Expr(Expr::Lit(Lit::Int(5)))],
+                                trailing_comments: vec![],
+                            },
+                        }))),
                     }))),
-                }))),
-            }))],
-            trailing_comments: vec![],
-        },
-        trailing_comments: vec![],
-    });
+                }))],
+                trailing_comments: vec![],
+            })
+            .build(),
+    );
 
     insta::assert_snapshot!(pretty_print_item(ast));
 }
 
 #[test]
 fn test_binary_expression() {
-    let ast = Item::Fn(ItemFn {
-        leading_comments: vec![],
-        sig: Signature {
-            ident: "foo".to_string(),
-        },
-        block: Block {
-            leading_comments: vec![],
-            stmts: vec![Stmt::Expr(Expr::Binary(ExprBinary {
-                left: Box::new(Expr::Lit(Lit::Int(1))),
-                op: BinOp::Add,
-                right: Box::new(Expr::Lit(Lit::Int(2))),
-            }))],
-            trailing_comments: vec![],
-        },
-        trailing_comments: vec![],
-    });
+    let ast = Item::Fn(
+        fn_def("foo")
+            .block(Block {
+                leading_comments: vec![],
+                stmts: vec![Stmt::Expr(Expr::Binary(ExprBinary {
+                    left: Box::new(Expr::Lit(Lit::Int(1))),
+                    op: BinOp::Add,
+                    right: Box::new(Expr::Lit(Lit::Int(2))),
+                }))],
+                trailing_comments: vec![],
+            })
+            .build(),
+    );
 
     insta::assert_snapshot!(pretty_print_item(ast));
 }

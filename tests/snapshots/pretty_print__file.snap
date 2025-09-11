@@ -9,8 +9,6 @@ struct Foo {
 }
 
 
-// A simple function.
 fn foo()  {
-    /* An inner comment */
     42;
-}// Trailing comment.
+}
