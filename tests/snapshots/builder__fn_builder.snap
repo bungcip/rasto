@@ -1,0 +1,7 @@
+---
+source: tests/builder.rs
+expression: actual
+---
+fn foo()  {
+    "Hello, world!";
+}
