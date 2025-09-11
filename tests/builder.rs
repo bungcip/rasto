@@ -1,5 +1,4 @@
-use rasto::ast::{Block, FnBuilder, Expr, Lit};
-use rasto::ast::statements::Stmt;
+use rasto::ast::{builder::fn_def, Block, Expr, Lit, Stmt};
 use rasto::pretty_print::{Formatter, PrettyPrint};
 use std::fmt;
 
@@ -37,8 +36,7 @@ impl fmt::Write for TestRope {
 
 #[test]
 fn test_fn_builder() {
-    let item_fn = FnBuilder::new()
-        .name("foo")
+    let item_fn = fn_def("foo")
         .block(Block {
             leading_comments: vec![],
             stmts: vec![Stmt::Expr(Expr::Lit(Lit::Str(

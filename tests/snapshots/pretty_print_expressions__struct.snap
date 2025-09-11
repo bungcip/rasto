@@ -1,0 +1,10 @@
+---
+source: tests/pretty_print_expressions.rs
+expression: s
+---
+fn test_fn()  {
+    Foo     {
+        a: 1        ,
+        b: "bar"        ,
+    };
+}
