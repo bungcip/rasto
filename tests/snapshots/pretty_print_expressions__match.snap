@@ -6,6 +6,5 @@ fn test_fn()  {
     match "x"     {
         Some(y) => "y"        ,
         None => 0        ,
-    }
-;
+    };
 }

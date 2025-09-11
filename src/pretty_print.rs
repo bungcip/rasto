@@ -61,6 +61,244 @@ impl PrettyPrint for Comment {
     }
 }
 
+impl PrettyPrint for ExprArray {
+    fn pretty_print(&self, fmt: &mut Formatter) -> fmt::Result {
+        fmt.write_str("[")?;
+        for (i, elem) in self.elems.iter().enumerate() {
+            if i > 0 {
+                fmt.write_str(", ")?;
+            }
+            elem.pretty_print(fmt)?;
+        }
+        fmt.write_str("]")
+    }
+}
+
+impl PrettyPrint for ExprAsync {
+    fn pretty_print(&self, fmt: &mut Formatter) -> fmt::Result {
+        fmt.write_str("async ")?;
+        self.block.pretty_print(fmt)
+    }
+}
+
+impl PrettyPrint for ExprAwait {
+    fn pretty_print(&self, fmt: &mut Formatter) -> fmt::Result {
+        self.expr.pretty_print(fmt)?;
+        fmt.write_str(".await")
+    }
+}
+
+impl PrettyPrint for ExprBreak {
+    fn pretty_print(&self, fmt: &mut Formatter) -> fmt::Result {
+        fmt.write_str("break")
+    }
+}
+
+impl PrettyPrint for ExprCall {
+    fn pretty_print(&self, fmt: &mut Formatter) -> fmt::Result {
+        self.func.pretty_print(fmt)?;
+        fmt.write_str("(")?;
+        for (i, arg) in self.args.iter().enumerate() {
+            if i > 0 {
+                fmt.write_str(", ")?;
+            }
+            arg.pretty_print(fmt)?;
+        }
+        fmt.write_str(")")
+    }
+}
+
+impl PrettyPrint for ExprCast {
+    fn pretty_print(&self, fmt: &mut Formatter) -> fmt::Result {
+        self.expr.pretty_print(fmt)?;
+        fmt.write_str(" as ")?;
+        fmt.write_str(&self.ty)
+    }
+}
+
+impl PrettyPrint for ExprClosure {
+    fn pretty_print(&self, fmt: &mut Formatter) -> fmt::Result {
+        fmt.write_str("|")?;
+        for (i, input) in self.inputs.iter().enumerate() {
+            if i > 0 {
+                fmt.write_str(", ")?;
+            }
+            fmt.write_str(input)?;
+        }
+        fmt.write_str("| ")?;
+        self.body.pretty_print(fmt)
+    }
+}
+
+impl PrettyPrint for ExprConst {
+    fn pretty_print(&self, fmt: &mut Formatter) -> fmt::Result {
+        fmt.write_str("const ")?;
+        self.block.pretty_print(fmt)
+    }
+}
+
+impl PrettyPrint for ExprContinue {
+    fn pretty_print(&self, fmt: &mut Formatter) -> fmt::Result {
+        fmt.write_str("continue")
+    }
+}
+
+impl PrettyPrint for ExprField {
+    fn pretty_print(&self, fmt: &mut Formatter) -> fmt::Result {
+        self.expr.pretty_print(fmt)?;
+        fmt.write_str(".")?;
+        fmt.write_str(&self.member)
+    }
+}
+
+impl PrettyPrint for ExprIndex {
+    fn pretty_print(&self, fmt: &mut Formatter) -> fmt::Result {
+        self.expr.pretty_print(fmt)?;
+        fmt.write_str("[")?;
+        self.index.pretty_print(fmt)?;
+        fmt.write_str("]")
+    }
+}
+
+impl PrettyPrint for ExprMatch {
+    fn pretty_print(&self, fmt: &mut Formatter) -> fmt::Result {
+        fmt.write_str("match ")?;
+        self.expr.pretty_print(fmt)?;
+        fmt.write_line(" {")?;
+        fmt.indent();
+        for arm in &self.arms {
+            arm.pretty_print(fmt)?;
+            fmt.write_line(",")?;
+        }
+        fmt.dedent();
+        fmt.write_indented("}")
+    }
+}
+
+impl PrettyPrint for Arm {
+    fn pretty_print(&self, fmt: &mut Formatter) -> fmt::Result {
+        fmt.write_indented(&self.pat)?;
+        if let Some(guard) = &self.guard {
+            fmt.write_str(" if ")?;
+            guard.pretty_print(fmt)?;
+        }
+        fmt.write_str(" => ")?;
+        self.body.pretty_print(fmt)
+    }
+}
+
+impl PrettyPrint for ExprMethodCall {
+    fn pretty_print(&self, fmt: &mut Formatter) -> fmt::Result {
+        self.receiver.pretty_print(fmt)?;
+        fmt.write_str(".")?;
+        fmt.write_str(&self.method)?;
+        fmt.write_str("(")?;
+        for (i, arg) in self.args.iter().enumerate() {
+            if i > 0 {
+                fmt.write_str(", ")?;
+            }
+            arg.pretty_print(fmt)?;
+        }
+        fmt.write_str(")")
+    }
+}
+
+impl PrettyPrint for ExprParen {
+    fn pretty_print(&self, fmt: &mut Formatter) -> fmt::Result {
+        fmt.write_str("(")?;
+        self.expr.pretty_print(fmt)?;
+        fmt.write_str(")")
+    }
+}
+
+impl PrettyPrint for ExprRange {
+    fn pretty_print(&self, fmt: &mut Formatter) -> fmt::Result {
+        if let Some(start) = &self.start {
+            start.pretty_print(fmt)?;
+        }
+        self.limits.pretty_print(fmt)?;
+        if let Some(end) = &self.end {
+            end.pretty_print(fmt)?;
+        }
+        Ok(())
+    }
+}
+
+impl PrettyPrint for RangeLimits {
+    fn pretty_print(&self, fmt: &mut Formatter) -> fmt::Result {
+        match self {
+            RangeLimits::HalfOpen => fmt.write_str(".."),
+            RangeLimits::Closed => fmt.write_str("..="),
+        }
+    }
+}
+
+impl PrettyPrint for ExprRef {
+    fn pretty_print(&self, fmt: &mut Formatter) -> fmt::Result {
+        fmt.write_str("&")?;
+        if self.is_mut {
+            fmt.write_str("mut ")?;
+        }
+        self.expr.pretty_print(fmt)
+    }
+}
+
+impl PrettyPrint for ExprReturn {
+    fn pretty_print(&self, fmt: &mut Formatter) -> fmt::Result {
+        fmt.write_str("return")?;
+        if let Some(expr) = &self.expr {
+            fmt.write_str(" ")?;
+            expr.pretty_print(fmt)?;
+        }
+        Ok(())
+    }
+}
+
+impl PrettyPrint for ExprStruct {
+    fn pretty_print(&self, fmt: &mut Formatter) -> fmt::Result {
+        fmt.write_str(&self.path)?;
+        fmt.write_line(" {")?;
+        fmt.indent();
+        for field in &self.fields {
+            field.pretty_print(fmt)?;
+            fmt.write_line(",")?;
+        }
+        fmt.dedent();
+        fmt.write_indented("}")
+    }
+}
+
+impl PrettyPrint for FieldValue {
+    fn pretty_print(&self, fmt: &mut Formatter) -> fmt::Result {
+        fmt.write_indented(&self.member)?;
+        fmt.write_str(": ")?;
+        self.value.pretty_print(fmt)
+    }
+}
+
+impl PrettyPrint for ExprTuple {
+    fn pretty_print(&self, fmt: &mut Formatter) -> fmt::Result {
+        fmt.write_str("(")?;
+        for (i, elem) in self.elems.iter().enumerate() {
+            if i > 0 {
+                fmt.write_str(", ")?;
+            }
+            elem.pretty_print(fmt)?;
+        }
+        fmt.write_str(")")
+    }
+}
+
+impl PrettyPrint for File {
+    fn pretty_print(&self, fmt: &mut Formatter) -> fmt::Result {
+        for item in &self.items {
+            item.pretty_print(fmt)?;
+            fmt.write_line("")?;
+        }
+        Ok(())
+    }
+}
+
 impl PrettyPrint for ExprLoop {
     fn pretty_print(&self, fmt: &mut Formatter) -> fmt::Result {
         fmt.write_str("loop ")?;
@@ -449,237 +687,21 @@ impl PrettyPrint for Stmt {
     }
 }
 
-impl PrettyPrint for ExprArray {
-    fn pretty_print(&self, fmt: &mut Formatter) -> fmt::Result {
-        fmt.write_str("[")?;
-        for (i, elem) in self.elems.iter().enumerate() {
-            if i > 0 {
-                fmt.write_str(", ")?;
-            }
-            elem.pretty_print(fmt)?;
-        }
-        fmt.write_str("]")
-    }
-}
-
-impl PrettyPrint for ExprAsync {
-    fn pretty_print(&self, fmt: &mut Formatter) -> fmt::Result {
-        fmt.write_str("async ")?;
-        self.block.pretty_print(fmt)
-    }
-}
-
-impl PrettyPrint for ExprAwait {
-    fn pretty_print(&self, fmt: &mut Formatter) -> fmt::Result {
-        self.expr.pretty_print(fmt)?;
-        fmt.write_str(".await")
-    }
-}
-
-impl PrettyPrint for ExprBreak {
-    fn pretty_print(&self, fmt: &mut Formatter) -> fmt::Result {
-        fmt.write_str("break")
-    }
-}
-
-impl PrettyPrint for ExprCall {
-    fn pretty_print(&self, fmt: &mut Formatter) -> fmt::Result {
-        self.func.pretty_print(fmt)?;
-        fmt.write_str("(")?;
-        for (i, arg) in self.args.iter().enumerate() {
-            if i > 0 {
-                fmt.write_str(", ")?;
-            }
-            arg.pretty_print(fmt)?;
-        }
-        fmt.write_str(")")
-    }
-}
-
-impl PrettyPrint for ExprCast {
-    fn pretty_print(&self, fmt: &mut Formatter) -> fmt::Result {
-        self.expr.pretty_print(fmt)?;
-        fmt.write_str(" as ")?;
-        fmt.write_str(&self.ty)
-    }
-}
-
-impl PrettyPrint for ExprClosure {
-    fn pretty_print(&self, fmt: &mut Formatter) -> fmt::Result {
-        fmt.write_str("|")?;
-        for (i, input) in self.inputs.iter().enumerate() {
-            if i > 0 {
-                fmt.write_str(", ")?;
-            }
-            fmt.write_str(input)?;
-        }
-        fmt.write_str("| ")?;
-        self.body.pretty_print(fmt)
-    }
-}
-
-impl PrettyPrint for ExprConst {
-    fn pretty_print(&self, fmt: &mut Formatter) -> fmt::Result {
-        fmt.write_str("const ")?;
-        self.block.pretty_print(fmt)
-    }
-}
-
-impl PrettyPrint for ExprContinue {
-    fn pretty_print(&self, fmt: &mut Formatter) -> fmt::Result {
-        fmt.write_str("continue")
-    }
-}
-
-impl PrettyPrint for ExprField {
-    fn pretty_print(&self, fmt: &mut Formatter) -> fmt::Result {
-        self.expr.pretty_print(fmt)?;
-        fmt.write_str(".")?;
-        fmt.write_str(&self.member)
-    }
-}
-
-impl PrettyPrint for ExprIndex {
-    fn pretty_print(&self, fmt: &mut Formatter) -> fmt::Result {
-        self.expr.pretty_print(fmt)?;
-        fmt.write_str("[")?;
-        self.index.pretty_print(fmt)?;
-        fmt.write_str("]")
-    }
-}
-
-impl PrettyPrint for ExprMatch {
-    fn pretty_print(&self, fmt: &mut Formatter) -> fmt::Result {
-        fmt.write_str("match ")?;
-        self.expr.pretty_print(fmt)?;
-        fmt.write_line(" {")?;
-        fmt.indent();
-        for arm in &self.arms {
-            arm.pretty_print(fmt)?;
-        }
-        fmt.dedent();
-        fmt.write_line("}")
-    }
-}
-
-impl PrettyPrint for Arm {
-    fn pretty_print(&self, fmt: &mut Formatter) -> fmt::Result {
-        fmt.write_indented(&self.pat)?;
-        if let Some(guard) = &self.guard {
-            fmt.write_str(" if ")?;
-            guard.pretty_print(fmt)?;
-        }
-        fmt.write_str(" => ")?;
-        self.body.pretty_print(fmt)?;
-        fmt.write_line(",")
-    }
-}
-
-impl PrettyPrint for ExprMethodCall {
-    fn pretty_print(&self, fmt: &mut Formatter) -> fmt::Result {
-        self.receiver.pretty_print(fmt)?;
-        fmt.write_str(".")?;
-        fmt.write_str(&self.method)?;
-        fmt.write_str("(")?;
-        for (i, arg) in self.args.iter().enumerate() {
-            if i > 0 {
-                fmt.write_str(", ")?;
-            }
-            arg.pretty_print(fmt)?;
-        }
-        fmt.write_str(")")
-    }
-}
-
-impl PrettyPrint for ExprParen {
-    fn pretty_print(&self, fmt: &mut Formatter) -> fmt::Result {
-        fmt.write_str("(")?;
-        self.expr.pretty_print(fmt)?;
-        fmt.write_str(")")
-    }
-}
-
-impl PrettyPrint for ExprRange {
-    fn pretty_print(&self, fmt: &mut Formatter) -> fmt::Result {
-        if let Some(start) = &self.start {
-            start.pretty_print(fmt)?;
-        }
-        match self.limits {
-            RangeLimits::HalfOpen => fmt.write_str("..")?,
-            RangeLimits::Closed => fmt.write_str("..=")?,
-        }
-        if let Some(end) = &self.end {
-            end.pretty_print(fmt)?;
-        }
-        Ok(())
-    }
-}
-
-impl PrettyPrint for ExprRef {
-    fn pretty_print(&self, fmt: &mut Formatter) -> fmt::Result {
-        fmt.write_str("&")?;
-        if self.is_mut {
-            fmt.write_str("mut ")?;
-        }
-        self.expr.pretty_print(fmt)
-    }
-}
-
-impl PrettyPrint for ExprReturn {
-    fn pretty_print(&self, fmt: &mut Formatter) -> fmt::Result {
-        fmt.write_str("return")?;
-        if let Some(expr) = &self.expr {
-            fmt.write_str(" ")?;
-            expr.pretty_print(fmt)?;
-        }
-        Ok(())
-    }
-}
-
-impl PrettyPrint for ExprStruct {
-    fn pretty_print(&self, fmt: &mut Formatter) -> fmt::Result {
-        fmt.write_str(&self.path)?;
-        fmt.write_line(" {")?;
-        fmt.indent();
-        for field in &self.fields {
-            field.pretty_print(fmt)?;
-            fmt.write_line(",")?;
-        }
-        fmt.dedent();
-        fmt.write_indented("}")
-    }
-}
-
-impl PrettyPrint for FieldValue {
-    fn pretty_print(&self, fmt: &mut Formatter) -> fmt::Result {
-        fmt.write_indented(&self.member)?;
-        fmt.write_str(": ")?;
-        self.value.pretty_print(fmt)
-    }
-}
-
-impl PrettyPrint for ExprTuple {
-    fn pretty_print(&self, fmt: &mut Formatter) -> fmt::Result {
-        fmt.write_str("(")?;
-        for (i, elem) in self.elems.iter().enumerate() {
-            if i > 0 {
-                fmt.write_str(", ")?;
-            }
-            elem.pretty_print(fmt)?;
-        }
-        fmt.write_str(")")
-    }
-}
-
 impl PrettyPrint for Expr {
     fn pretty_print(&self, fmt: &mut Formatter) -> fmt::Result {
         match self {
-            Expr::Array(expr) => expr.pretty_print(fmt),
+            Expr::Lit(lit) => lit.pretty_print(fmt),
+            Expr::Binary(expr) => expr.pretty_print(fmt),
+            Expr::If(expr) => expr.pretty_print(fmt),
+            Expr::Block(expr) => expr.pretty_print(fmt),
+            Expr::Loop(expr) => expr.pretty_print(fmt),
+            Expr::While(expr) => expr.pretty_print(fmt),
+            Expr::For(expr) => expr.pretty_print(fmt),
             Expr::Assign(expr) => expr.pretty_print(fmt),
+            Expr::MacroCall(expr) => expr.pretty_print(fmt),
+            Expr::Array(expr) => expr.pretty_print(fmt),
             Expr::Async(expr) => expr.pretty_print(fmt),
             Expr::Await(expr) => expr.pretty_print(fmt),
-            Expr::Binary(expr) => expr.pretty_print(fmt),
-            Expr::Block(expr) => expr.pretty_print(fmt),
             Expr::Break(expr) => expr.pretty_print(fmt),
             Expr::Call(expr) => expr.pretty_print(fmt),
             Expr::Cast(expr) => expr.pretty_print(fmt),
@@ -687,12 +709,7 @@ impl PrettyPrint for Expr {
             Expr::Const(expr) => expr.pretty_print(fmt),
             Expr::Continue(expr) => expr.pretty_print(fmt),
             Expr::Field(expr) => expr.pretty_print(fmt),
-            Expr::For(expr) => expr.pretty_print(fmt),
-            Expr::If(expr) => expr.pretty_print(fmt),
             Expr::Index(expr) => expr.pretty_print(fmt),
-            Expr::Lit(lit) => lit.pretty_print(fmt),
-            Expr::Loop(expr) => expr.pretty_print(fmt),
-            Expr::MacroCall(expr) => expr.pretty_print(fmt),
             Expr::Match(expr) => expr.pretty_print(fmt),
             Expr::MethodCall(expr) => expr.pretty_print(fmt),
             Expr::Paren(expr) => expr.pretty_print(fmt),
@@ -701,7 +718,6 @@ impl PrettyPrint for Expr {
             Expr::Return(expr) => expr.pretty_print(fmt),
             Expr::Struct(expr) => expr.pretty_print(fmt),
             Expr::Tuple(expr) => expr.pretty_print(fmt),
-            Expr::While(expr) => expr.pretty_print(fmt),
         }
     }
 }
