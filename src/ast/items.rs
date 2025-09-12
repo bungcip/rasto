@@ -1,4 +1,14 @@
 use crate::ast::comments::Comment;
+use crate::ast::item_const::ItemConst;
+use crate::ast::item_extern_crate::ItemExternCrate;
+use crate::ast::item_foreign_mod::ItemForeignMod;
+use crate::ast::item_macro::ItemMacro;
+use crate::ast::item_mod::ItemMod;
+use crate::ast::item_static::ItemStatic;
+use crate::ast::item_trait_alias::ItemTraitAlias;
+use crate::ast::item_type::ItemType;
+use crate::ast::item_union::ItemUnion;
+use crate::ast::item_use::ItemUse;
 use crate::ast::statements::Block;
 use crate::pretty_printer_v2::{Printer, PrettyPrintV2};
 
@@ -15,6 +25,16 @@ pub enum Item {
     Impl(ItemImpl),
     /// A trait item: `trait Foo { ... }`
     Trait(ItemTrait),
+    Const(ItemConst),
+    ExternCrate(ItemExternCrate),
+    ForeignMod(ItemForeignMod),
+    Macro(ItemMacro),
+    Mod(ItemMod),
+    Static(ItemStatic),
+    TraitAlias(ItemTraitAlias),
+    Type(ItemType),
+    Union(ItemUnion),
+    Use(ItemUse),
 }
 
 /// A trait item: `trait Foo { ... }`
@@ -209,5 +229,65 @@ impl From<ItemImpl> for Item {
 impl From<ItemTrait> for Item {
     fn from(item: ItemTrait) -> Self {
         Item::Trait(item)
+    }
+}
+
+impl From<ItemConst> for Item {
+    fn from(item: ItemConst) -> Self {
+        Item::Const(item)
+    }
+}
+
+impl From<ItemExternCrate> for Item {
+    fn from(item: ItemExternCrate) -> Self {
+        Item::ExternCrate(item)
+    }
+}
+
+impl From<ItemForeignMod> for Item {
+    fn from(item: ItemForeignMod) -> Self {
+        Item::ForeignMod(item)
+    }
+}
+
+impl From<ItemMacro> for Item {
+    fn from(item: ItemMacro) -> Self {
+        Item::Macro(item)
+    }
+}
+
+impl From<ItemMod> for Item {
+    fn from(item: ItemMod) -> Self {
+        Item::Mod(item)
+    }
+}
+
+impl From<ItemStatic> for Item {
+    fn from(item: ItemStatic) -> Self {
+        Item::Static(item)
+    }
+}
+
+impl From<ItemTraitAlias> for Item {
+    fn from(item: ItemTraitAlias) -> Self {
+        Item::TraitAlias(item)
+    }
+}
+
+impl From<ItemType> for Item {
+    fn from(item: ItemType) -> Self {
+        Item::Type(item)
+    }
+}
+
+impl From<ItemUnion> for Item {
+    fn from(item: ItemUnion) -> Self {
+        Item::Union(item)
+    }
+}
+
+impl From<ItemUse> for Item {
+    fn from(item: ItemUse) -> Self {
+        Item::Use(item)
     }
 }

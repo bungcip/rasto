@@ -1,0 +1,8 @@
+---
+source: tests/items.rs
+expression: item.to_string()
+---
+union MyUnion {
+f1: u32,
+f2: f32,
+}

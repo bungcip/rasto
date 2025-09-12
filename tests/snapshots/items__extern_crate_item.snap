@@ -1,0 +1,5 @@
+---
+source: tests/items.rs
+expression: item.to_string()
+---
+extern crate serde;
