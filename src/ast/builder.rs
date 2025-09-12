@@ -80,6 +80,8 @@ pub fn fn_def(name: impl Into<String>) -> FnBuilder {
 /// A builder for constructing an `ItemFn` (function definition) AST node.
 pub struct FnBuilder {
     ident: String,
+    inputs: Vec<Type>,
+    output: Option<Type>,
     block: Option<Block>,
 }
 
@@ -92,8 +94,30 @@ impl FnBuilder {
     pub fn new(name: impl Into<String>) -> Self {
         Self {
             ident: name.into(),
+            inputs: vec![],
+            output: None,
             block: None,
         }
+    }
+
+    /// Adds an input parameter to the function.
+    ///
+    /// # Parameters
+    ///
+    /// - `ty`: The type of the input parameter.
+    pub fn input(mut self, ty: impl Into<Type>) -> Self {
+        self.inputs.push(ty.into());
+        self
+    }
+
+    /// Sets the return type of the function.
+    ///
+    /// # Parameters
+    ///
+    /// - `ty`: The return type.
+    pub fn output(mut self, ty: impl Into<Type>) -> Self {
+        self.output = Some(ty.into());
+        self
     }
 
     /// Sets the block of statements for the function.
@@ -120,7 +144,11 @@ impl FnBuilder {
 
         ItemFn {
             leading_comments: vec![],
-            sig: Signature { ident: self.ident },
+            sig: Signature {
+                ident: self.ident,
+                inputs: self.inputs,
+                output: self.output,
+            },
             block,
             trailing_comments: vec![],
         }
@@ -229,7 +257,7 @@ impl ExprBuilder {
     ///
     /// - `expr`: The expression to cast.
     /// - `ty`: The type to cast to.
-    pub fn cast(self, expr: Expr, ty: impl Into<String>) -> Expr {
+    pub fn cast(self, expr: Expr, ty: impl Into<Type>) -> Expr {
         Expr::Cast(ExprCast {
             expr: Box::new(expr),
             ty: ty.into(),
@@ -480,14 +508,14 @@ impl ExprBuilder {
 }
 
 #[allow(missing_docs)]
-pub fn const_item(name: impl Into<String>, ty: impl Into<String>, expr: impl Into<Expr>) -> ItemConstBuilder {
+pub fn const_item(name: impl Into<String>, ty: impl Into<Type>, expr: impl Into<Expr>) -> ItemConstBuilder {
     ItemConstBuilder::new(name, ty, expr)
 }
 
 #[allow(missing_docs)]
 pub struct ItemConstBuilder {
     ident: String,
-    ty: String,
+    ty: Type,
     expr: Box<Expr>,
     leading_comments: Vec<Comment>,
     trailing_comments: Vec<Comment>,
@@ -495,7 +523,7 @@ pub struct ItemConstBuilder {
 
 impl ItemConstBuilder {
     #[allow(missing_docs)]
-    pub fn new(name: impl Into<String>, ty: impl Into<String>, expr: impl Into<Expr>) -> Self {
+    pub fn new(name: impl Into<String>, ty: impl Into<Type>, expr: impl Into<Expr>) -> Self {
         Self {
             ident: name.into(),
             ty: ty.into(),
@@ -663,7 +691,7 @@ impl ItemMacroBuilder {
     #[allow(missing_docs)]
     pub fn build(self) -> ItemMacro {
         ItemMacro {
-            expr: self.expr,
+            expr: Box::new(self.expr),
             leading_comments: self.leading_comments,
             trailing_comments: self.trailing_comments,
         }
@@ -724,14 +752,14 @@ impl ItemModBuilder {
 }
 
 #[allow(missing_docs)]
-pub fn static_item(name: impl Into<String>, ty: impl Into<String>, expr: impl Into<Expr>) -> ItemStaticBuilder {
+pub fn static_item(name: impl Into<String>, ty: impl Into<Type>, expr: impl Into<Expr>) -> ItemStaticBuilder {
     ItemStaticBuilder::new(name, ty, expr)
 }
 
 #[allow(missing_docs)]
 pub struct ItemStaticBuilder {
     ident: String,
-    ty: String,
+    ty: Type,
     expr: Box<Expr>,
     leading_comments: Vec<Comment>,
     trailing_comments: Vec<Comment>,
@@ -739,7 +767,7 @@ pub struct ItemStaticBuilder {
 
 impl ItemStaticBuilder {
     #[allow(missing_docs)]
-    pub fn new(name: impl Into<String>, ty: impl Into<String>, expr: impl Into<Expr>) -> Self {
+    pub fn new(name: impl Into<String>, ty: impl Into<Type>, expr: impl Into<Expr>) -> Self {
         Self {
             ident: name.into(),
             ty: ty.into(),
@@ -821,21 +849,21 @@ impl ItemTraitAliasBuilder {
 }
 
 #[allow(missing_docs)]
-pub fn type_item(name: impl Into<String>, ty: impl Into<String>) -> ItemTypeBuilder {
+pub fn type_item(name: impl Into<String>, ty: impl Into<Type>) -> ItemTypeBuilder {
     ItemTypeBuilder::new(name, ty)
 }
 
 #[allow(missing_docs)]
 pub struct ItemTypeBuilder {
     ident: String,
-    ty: String,
+    ty: Type,
     leading_comments: Vec<Comment>,
     trailing_comments: Vec<Comment>,
 }
 
 impl ItemTypeBuilder {
     #[allow(missing_docs)]
-    pub fn new(name: impl Into<String>, ty: impl Into<String>) -> Self {
+    pub fn new(name: impl Into<String>, ty: impl Into<Type>) -> Self {
         Self {
             ident: name.into(),
             ty: ty.into(),

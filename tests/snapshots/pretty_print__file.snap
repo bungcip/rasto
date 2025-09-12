@@ -5,6 +5,6 @@ expression: pretty_print_file(ast)
 // A simple struct.
 struct Foo { field1: i32, field2: String, }
 
-fn foo() {
+fn foo(i32) -> i32 {
 42;
 }

@@ -113,13 +113,14 @@ pub struct ExprCall {
     pub args: Vec<Expr>,
 }
 
+use crate::ast::types::Type;
 /// A type cast expression: `x as u32`.
 #[derive(Debug, Clone, PartialEq)]
 pub struct ExprCast {
     /// The expression to cast.
     pub expr: Box<Expr>,
     /// The type to cast to.
-    pub ty: String,
+    pub ty: Type,
 }
 
 /// A closure expression: `|a, b| a + b`.
@@ -333,4 +334,19 @@ pub struct ExprMacroCall {
     pub ident: String,
     /// The token stream passed to the macro.
     pub tokens: TokenStream,
+}
+
+/// A path expression: `foo::bar::baz`.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Path {
+    /// The segments of the path.
+    pub segments: Vec<PathSegment>,
+}
+
+/// A segment of a path.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PathSegment {
+    /// The identifier of the segment.
+    pub ident: String,
+    // Note: We are not including generics for now for simplicity.
 }

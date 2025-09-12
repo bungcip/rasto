@@ -1,4 +1,5 @@
 use crate::ast::comments::Comment;
+use crate::ast::types::Type;
 use crate::pretty_printer_v2::{PrettyPrintV2, Printer};
 use std::fmt;
 
@@ -10,7 +11,7 @@ pub struct ItemType {
     /// The name of the type alias.
     pub ident: String,
     /// The type being aliased.
-    pub ty: String,
+    pub ty: Type,
     /// Comments that appear after the type item.
     pub trailing_comments: Vec<Comment>,
 }
@@ -34,7 +35,7 @@ impl PrettyPrintV2 for ItemType {
         printer.string("type ");
         printer.string(&self.ident);
         printer.string(" = ");
-        printer.string(&self.ty);
+        self.ty.pretty_print_v2(printer)?;
         printer.string(";");
         for comment in &self.trailing_comments {
             comment.pretty_print_v2(printer)?;

@@ -21,6 +21,8 @@
 //!             leading_comments: vec![Comment::Line(" A simple function.".to_string())],
 //!             sig: Signature {
 //!                 ident: "foo".to_string(),
+//!                 inputs: vec![],
+//!                 output: None,
 //!             },
 //!             block: Block {
 //!                 leading_comments: vec![Comment::Block(" An inner comment ".to_string())],

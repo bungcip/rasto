@@ -2,7 +2,7 @@
 source: tests/pretty_print.rs
 expression: pretty_print_item(ast)
 ---
-fn foo() {
+fn foo(i32) -> i32 {
 
 /* An inner comment */
 42;

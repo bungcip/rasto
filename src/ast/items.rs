@@ -15,6 +15,7 @@ use crate::ast::item_type::ItemType;
 use crate::ast::item_union::ItemUnion;
 use crate::ast::item_use::ItemUse;
 use crate::ast::statements::Block;
+use crate::ast::types::Type;
 use crate::pretty_printer_v2::{Printer, PrettyPrintV2};
 
 /// A top-level item in a Rust file.
@@ -179,7 +180,7 @@ pub struct Field {
     /// The name of the field.
     pub ident: String,
     /// The type of the field.
-    pub ty: String,
+    pub ty: Type,
 }
 
 /// An enum item: `enum Foo { ... }`.
@@ -208,7 +209,7 @@ pub struct ItemImpl {
     /// Comments that appear before the `impl` block.
     pub leading_comments: Vec<Comment>,
     /// The type the `impl` block is for.
-    pub ident: String,
+    pub ty: Type,
     /// The functions within the `impl` block.
     pub fns: Vec<ItemFn>,
     /// Comments that appear after the `impl` block.
@@ -229,12 +230,15 @@ pub struct ItemFn {
 }
 
 /// A function signature.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct Signature {
     // The `fn` token would go here.
     /// The name of the function.
     pub ident: String,
-    // For simplicity, we'll omit arguments and return type for now.
+    /// The arguments of the function.
+    pub inputs: Vec<Type>,
+    /// The return type of the function.
+    pub output: Option<Type>,
 }
 
 impl From<ItemFn> for Item {

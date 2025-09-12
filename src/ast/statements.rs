@@ -5,6 +5,7 @@
 
 use crate::ast::comments::Comment;
 use crate::ast::expressions::Expr;
+use crate::ast::types::Type;
 
 /// A block of code, enclosed in curly braces: `{ ... }`.
 ///
@@ -35,7 +36,7 @@ pub struct StmtLet {
     /// The name of the variable being bound.
     pub ident: String,
     /// The optional type annotation of the variable.
-    pub ty: Option<String>,
+    pub ty: Option<Type>,
     /// The optional expression to initialize the variable.
     pub expr: Option<Expr>,
 }

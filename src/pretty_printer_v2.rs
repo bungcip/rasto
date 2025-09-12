@@ -345,6 +345,25 @@ impl PrettyPrintV2 for Comment {
     }
 }
 
+impl PrettyPrintV2 for Path {
+    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        for (i, segment) in self.segments.iter().enumerate() {
+            if i > 0 {
+                printer.string("::");
+            }
+            segment.pretty_print_v2(printer)?;
+        }
+        Ok(())
+    }
+}
+
+impl PrettyPrintV2 for PathSegment {
+    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        printer.string(&self.ident);
+        Ok(())
+    }
+}
+
 impl PrettyPrintV2 for Lit {
     fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         match self {
@@ -471,7 +490,7 @@ impl PrettyPrintV2 for ExprCast {
     fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         self.expr.pretty_print_v2(printer)?;
         printer.string(" as ");
-        printer.string(&self.ty);
+        self.ty.pretty_print_v2(printer)?;
         Ok(())
     }
 }
@@ -673,7 +692,18 @@ impl PrettyPrintV2 for ItemFn {
 impl PrettyPrintV2 for Signature {
     fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string(&self.ident);
-        printer.string("()");
+        printer.begin(BreakStyle::Consistent, "(");
+        for (i, input) in self.inputs.iter().enumerate() {
+            if i > 0 {
+                printer.string(", ");
+            }
+            input.pretty_print_v2(printer)?;
+        }
+        printer.end(")");
+        if let Some(output) = &self.output {
+            printer.string(" -> ");
+            output.pretty_print_v2(printer)?;
+        }
         Ok(())
     }
 }
@@ -725,7 +755,7 @@ impl PrettyPrintV2 for StmtLet {
         printer.string(&self.ident);
         if let Some(ty) = &self.ty {
             printer.string(": ");
-            printer.string(ty);
+            ty.pretty_print_v2(printer)?;
         }
         if let Some(expr) = &self.expr {
             printer.string(" = ");
@@ -785,7 +815,7 @@ impl PrettyPrintV2 for Field {
     fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string(&self.ident);
         printer.string(": ");
-        printer.string(&self.ty);
+        self.ty.pretty_print_v2(printer)?;
         Ok(())
     }
 }
@@ -826,7 +856,7 @@ impl PrettyPrintV2 for ItemImpl {
             comment.pretty_print_v2(printer)?;
         }
         printer.string("impl ");
-        printer.string(&self.ident);
+        self.ty.pretty_print_v2(printer)?;
         printer.string(" ");
         printer.begin(BreakStyle::Consistent, "{");
         printer.break_();

@@ -1,5 +1,6 @@
 use crate::ast::comments::Comment;
 use crate::ast::expressions::Expr;
+use crate::ast::types::Type;
 use crate::pretty_printer_v2::{PrettyPrintV2, Printer};
 use std::fmt;
 
@@ -11,7 +12,7 @@ pub struct ItemStatic {
     /// The name of the static item.
     pub ident: String,
     /// The type of the static item.
-    pub ty: String,
+    pub ty: Type,
     /// The value of the static item.
     pub expr: Box<Expr>,
     /// Comments that appear after the static item.
@@ -37,7 +38,7 @@ impl PrettyPrintV2 for ItemStatic {
         printer.string("static ");
         printer.string(&self.ident);
         printer.string(": ");
-        printer.string(&self.ty);
+        self.ty.pretty_print_v2(printer)?;
         printer.string(" = ");
         self.expr.pretty_print_v2(printer)?;
         printer.string(";");
