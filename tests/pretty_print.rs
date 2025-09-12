@@ -78,6 +78,30 @@ fn test_fn() {
     insta::assert_snapshot!(pretty_print_item(ast));
 }
 
+#[test]
+fn unary_expression() {
+    let expr = expr().unary(UnOp::Neg, expr().lit(Lit::Int(42)));
+
+    let mut output = String::new();
+    let mut printer = Printer::new(&mut output);
+    expr.pretty_print(&mut printer).unwrap();
+    printer.finish().unwrap();
+
+    insta::assert_snapshot!(output, @"-42");
+}
+
+#[test]
+fn unary_expression_not() {
+    let expr = expr().unary(UnOp::Not, expr().lit(Lit::Bool(true)));
+
+    let mut output = String::new();
+    let mut printer = Printer::new(&mut output);
+    expr.pretty_print(&mut printer).unwrap();
+    printer.finish().unwrap();
+
+    insta::assert_snapshot!(output, @"!true");
+}
+
 fn pretty_print_expr(expr: Expr) -> String {
     let mut buf = String::new();
     let mut printer = Printer::new(&mut buf);

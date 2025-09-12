@@ -64,8 +64,28 @@ pub enum Expr {
     Struct(ExprStruct),
     /// A tuple expression: `(a, b, c)`.
     Tuple(ExprTuple),
+    /// A unary operation: `!x` or `-x`.
+    Unary(ExprUnary),
     /// A `while` loop expression: `while x { ... }`.
     While(ExprWhile),
+}
+
+/// A unary operator.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum UnOp {
+    /// The `!` operator (logical negation).
+    Not,
+    /// The `-` operator (negation).
+    Neg,
+}
+
+/// A unary expression: `!x` or `-x`.
+#[derive(Debug, Clone, PartialEq)]
+pub struct ExprUnary {
+    /// The unary operator.
+    pub op: UnOp,
+    /// The expression.
+    pub expr: Box<Expr>,
 }
 
 /// An array expression: `[a, b, c]`.
