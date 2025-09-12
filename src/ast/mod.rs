@@ -12,25 +12,25 @@ pub mod statements;
 pub mod items;
 pub mod tokens;
 pub mod file;
-#[allow(missing_docs)]
+/// Defines the AST node for a `const` item.
 pub mod item_const;
-#[allow(missing_docs)]
+/// Defines the AST node for an `extern crate` item.
 pub mod item_extern_crate;
-#[allow(missing_docs)]
+/// Defines the AST node for a foreign module.
 pub mod item_foreign_mod;
-#[allow(missing_docs)]
+/// Defines the AST node for a macro definition.
 pub mod item_macro;
-#[allow(missing_docs)]
+/// Defines the AST node for a module.
 pub mod item_mod;
-#[allow(missing_docs)]
+/// Defines the AST node for a `static` item.
 pub mod item_static;
-#[allow(missing_docs)]
+/// Defines the AST node for a trait alias.
 pub mod item_trait_alias;
-#[allow(missing_docs)]
+/// Defines the AST node for a type alias.
 pub mod item_type;
-#[allow(missing_docs)]
+/// Defines the AST node for a `union` item.
 pub mod item_union;
-#[allow(missing_docs)]
+/// Defines the AST node for a `use` item.
 pub mod item_use;
 
 pub use comments::*;

@@ -521,12 +521,16 @@ impl ExprBuilder {
     }
 }
 
-#[allow(missing_docs)]
-pub fn const_item(name: impl Into<String>, ty: impl Into<Type>, expr: impl Into<Expr>) -> ItemConstBuilder {
+/// Creates a new `ItemConstBuilder` to construct a `const` item.
+pub fn const_item(
+    name: impl Into<String>,
+    ty: impl Into<Type>,
+    expr: impl Into<Expr>,
+) -> ItemConstBuilder {
     ItemConstBuilder::new(name, ty, expr)
 }
 
-#[allow(missing_docs)]
+/// A builder for constructing an `ItemConst` AST node.
 pub struct ItemConstBuilder {
     ident: String,
     ty: Type,
@@ -536,7 +540,7 @@ pub struct ItemConstBuilder {
 }
 
 impl ItemConstBuilder {
-    #[allow(missing_docs)]
+    /// Creates a new `ItemConstBuilder`.
     pub fn new(name: impl Into<String>, ty: impl Into<Type>, expr: impl Into<Expr>) -> Self {
         Self {
             ident: name.into(),
@@ -547,19 +551,19 @@ impl ItemConstBuilder {
         }
     }
 
-    #[allow(missing_docs)]
+    /// Adds a leading comment to the `const` item.
     pub fn leading_comment(mut self, comment: impl Into<Comment>) -> Self {
         self.leading_comments.push(comment.into());
         self
     }
 
-    #[allow(missing_docs)]
+    /// Adds a trailing comment to the `const` item.
     pub fn trailing_comment(mut self, comment: impl Into<Comment>) -> Self {
         self.trailing_comments.push(comment.into());
         self
     }
 
-    #[allow(missing_docs)]
+    /// Builds the `ItemConst` AST node.
     pub fn build(self) -> ItemConst {
         ItemConst {
             attrs: vec![],
@@ -572,12 +576,12 @@ impl ItemConstBuilder {
     }
 }
 
-#[allow(missing_docs)]
+/// Creates a new `ItemExternCrateBuilder` to construct an `extern crate` item.
 pub fn extern_crate_item(name: impl Into<String>) -> ItemExternCrateBuilder {
     ItemExternCrateBuilder::new(name)
 }
 
-#[allow(missing_docs)]
+/// A builder for constructing an `ItemExternCrate` AST node.
 pub struct ItemExternCrateBuilder {
     ident: String,
     leading_comments: Vec<Comment>,
@@ -585,7 +589,7 @@ pub struct ItemExternCrateBuilder {
 }
 
 impl ItemExternCrateBuilder {
-    #[allow(missing_docs)]
+    /// Creates a new `ItemExternCrateBuilder`.
     pub fn new(name: impl Into<String>) -> Self {
         Self {
             ident: name.into(),
@@ -594,19 +598,19 @@ impl ItemExternCrateBuilder {
         }
     }
 
-    #[allow(missing_docs)]
+    /// Adds a leading comment to the `extern crate` item.
     pub fn leading_comment(mut self, comment: impl Into<Comment>) -> Self {
         self.leading_comments.push(comment.into());
         self
     }
 
-    #[allow(missing_docs)]
+    /// Adds a trailing comment to the `extern crate` item.
     pub fn trailing_comment(mut self, comment: impl Into<Comment>) -> Self {
         self.trailing_comments.push(comment.into());
         self
     }
 
-    #[allow(missing_docs)]
+    /// Builds the `ItemExternCrate` AST node.
     pub fn build(self) -> ItemExternCrate {
         ItemExternCrate {
             attrs: vec![],
@@ -617,12 +621,12 @@ impl ItemExternCrateBuilder {
     }
 }
 
-#[allow(missing_docs)]
+/// Creates a new `ItemForeignModBuilder` to construct a foreign module.
 pub fn foreign_mod_item(abi: impl Into<String>) -> ItemForeignModBuilder {
     ItemForeignModBuilder::new(abi)
 }
 
-#[allow(missing_docs)]
+/// A builder for constructing an `ItemForeignMod` AST node.
 pub struct ItemForeignModBuilder {
     abi: String,
     items: Vec<Item>,
@@ -631,7 +635,7 @@ pub struct ItemForeignModBuilder {
 }
 
 impl ItemForeignModBuilder {
-    #[allow(missing_docs)]
+    /// Creates a new `ItemForeignModBuilder`.
     pub fn new(abi: impl Into<String>) -> Self {
         Self {
             abi: abi.into(),
@@ -641,25 +645,25 @@ impl ItemForeignModBuilder {
         }
     }
 
-    #[allow(missing_docs)]
+    /// Adds an item to the foreign module.
     pub fn item(mut self, item: impl Into<Item>) -> Self {
         self.items.push(item.into());
         self
     }
 
-    #[allow(missing_docs)]
+    /// Adds a leading comment to the foreign module.
     pub fn leading_comment(mut self, comment: impl Into<Comment>) -> Self {
         self.leading_comments.push(comment.into());
         self
     }
 
-    #[allow(missing_docs)]
+    /// Adds a trailing comment to the foreign module.
     pub fn trailing_comment(mut self, comment: impl Into<Comment>) -> Self {
         self.trailing_comments.push(comment.into());
         self
     }
 
-    #[allow(missing_docs)]
+    /// Builds the `ItemForeignMod` AST node.
     pub fn build(self) -> ItemForeignMod {
         ItemForeignMod {
             attrs: vec![],
@@ -671,12 +675,12 @@ impl ItemForeignModBuilder {
     }
 }
 
-#[allow(missing_docs)]
+/// Creates a new `ItemMacroBuilder` to construct a macro item.
 pub fn macro_item(expr: impl Into<Expr>) -> ItemMacroBuilder {
     ItemMacroBuilder::new(expr)
 }
 
-#[allow(missing_docs)]
+/// A builder for constructing an `ItemMacro` AST node.
 pub struct ItemMacroBuilder {
     expr: Expr,
     leading_comments: Vec<Comment>,
@@ -684,7 +688,7 @@ pub struct ItemMacroBuilder {
 }
 
 impl ItemMacroBuilder {
-    #[allow(missing_docs)]
+    /// Creates a new `ItemMacroBuilder`.
     pub fn new(expr: impl Into<Expr>) -> Self {
         Self {
             expr: expr.into(),
@@ -693,19 +697,19 @@ impl ItemMacroBuilder {
         }
     }
 
-    #[allow(missing_docs)]
+    /// Adds a leading comment to the macro item.
     pub fn leading_comment(mut self, comment: impl Into<Comment>) -> Self {
         self.leading_comments.push(comment.into());
         self
     }
 
-    #[allow(missing_docs)]
+    /// Adds a trailing comment to the macro item.
     pub fn trailing_comment(mut self, comment: impl Into<Comment>) -> Self {
         self.trailing_comments.push(comment.into());
         self
     }
 
-    #[allow(missing_docs)]
+    /// Builds the `ItemMacro` AST node.
     pub fn build(self) -> ItemMacro {
         ItemMacro {
             attrs: vec![],
@@ -716,12 +720,12 @@ impl ItemMacroBuilder {
     }
 }
 
-#[allow(missing_docs)]
+/// Creates a new `ItemModBuilder` to construct a module item.
 pub fn mod_item(name: impl Into<String>) -> ItemModBuilder {
     ItemModBuilder::new(name)
 }
 
-#[allow(missing_docs)]
+/// A builder for constructing an `ItemMod` AST node.
 pub struct ItemModBuilder {
     ident: String,
     content: Option<Vec<Item>>,
@@ -730,7 +734,7 @@ pub struct ItemModBuilder {
 }
 
 impl ItemModBuilder {
-    #[allow(missing_docs)]
+    /// Creates a new `ItemModBuilder`.
     pub fn new(name: impl Into<String>) -> Self {
         Self {
             ident: name.into(),
@@ -740,25 +744,25 @@ impl ItemModBuilder {
         }
     }
 
-    #[allow(missing_docs)]
+    /// Sets the content of the module.
     pub fn content(mut self, content: Vec<Item>) -> Self {
         self.content = Some(content);
         self
     }
 
-    #[allow(missing_docs)]
+    /// Adds a leading comment to the module item.
     pub fn leading_comment(mut self, comment: impl Into<Comment>) -> Self {
         self.leading_comments.push(comment.into());
         self
     }
 
-    #[allow(missing_docs)]
+    /// Adds a trailing comment to the module item.
     pub fn trailing_comment(mut self, comment: impl Into<Comment>) -> Self {
         self.trailing_comments.push(comment.into());
         self
     }
 
-    #[allow(missing_docs)]
+    /// Builds the `ItemMod` AST node.
     pub fn build(self) -> ItemMod {
         ItemMod {
             attrs: vec![],
@@ -770,12 +774,16 @@ impl ItemModBuilder {
     }
 }
 
-#[allow(missing_docs)]
-pub fn static_item(name: impl Into<String>, ty: impl Into<Type>, expr: impl Into<Expr>) -> ItemStaticBuilder {
+/// Creates a new `ItemStaticBuilder` to construct a `static` item.
+pub fn static_item(
+    name: impl Into<String>,
+    ty: impl Into<Type>,
+    expr: impl Into<Expr>,
+) -> ItemStaticBuilder {
     ItemStaticBuilder::new(name, ty, expr)
 }
 
-#[allow(missing_docs)]
+/// A builder for constructing an `ItemStatic` AST node.
 pub struct ItemStaticBuilder {
     ident: String,
     ty: Type,
@@ -785,7 +793,7 @@ pub struct ItemStaticBuilder {
 }
 
 impl ItemStaticBuilder {
-    #[allow(missing_docs)]
+    /// Creates a new `ItemStaticBuilder`.
     pub fn new(name: impl Into<String>, ty: impl Into<Type>, expr: impl Into<Expr>) -> Self {
         Self {
             ident: name.into(),
@@ -796,19 +804,19 @@ impl ItemStaticBuilder {
         }
     }
 
-    #[allow(missing_docs)]
+    /// Adds a leading comment to the `static` item.
     pub fn leading_comment(mut self, comment: impl Into<Comment>) -> Self {
         self.leading_comments.push(comment.into());
         self
     }
 
-    #[allow(missing_docs)]
+    /// Adds a trailing comment to the `static` item.
     pub fn trailing_comment(mut self, comment: impl Into<Comment>) -> Self {
         self.trailing_comments.push(comment.into());
         self
     }
 
-    #[allow(missing_docs)]
+    /// Builds the `ItemStatic` AST node.
     pub fn build(self) -> ItemStatic {
         ItemStatic {
             attrs: vec![],
@@ -821,12 +829,12 @@ impl ItemStaticBuilder {
     }
 }
 
-#[allow(missing_docs)]
+/// Creates a new `ItemTraitAliasBuilder` to construct a trait alias.
 pub fn trait_alias_item(name: impl Into<String>, bounds: Vec<String>) -> ItemTraitAliasBuilder {
     ItemTraitAliasBuilder::new(name, bounds)
 }
 
-#[allow(missing_docs)]
+/// A builder for constructing an `ItemTraitAlias` AST node.
 pub struct ItemTraitAliasBuilder {
     ident: String,
     bounds: Vec<String>,
@@ -835,7 +843,7 @@ pub struct ItemTraitAliasBuilder {
 }
 
 impl ItemTraitAliasBuilder {
-    #[allow(missing_docs)]
+    /// Creates a new `ItemTraitAliasBuilder`.
     pub fn new(name: impl Into<String>, bounds: Vec<String>) -> Self {
         Self {
             ident: name.into(),
@@ -845,19 +853,19 @@ impl ItemTraitAliasBuilder {
         }
     }
 
-    #[allow(missing_docs)]
+    /// Adds a leading comment to the trait alias.
     pub fn leading_comment(mut self, comment: impl Into<Comment>) -> Self {
         self.leading_comments.push(comment.into());
         self
     }
 
-    #[allow(missing_docs)]
+    /// Adds a trailing comment to the trait alias.
     pub fn trailing_comment(mut self, comment: impl Into<Comment>) -> Self {
         self.trailing_comments.push(comment.into());
         self
     }
 
-    #[allow(missing_docs)]
+    /// Builds the `ItemTraitAlias` AST node.
     pub fn build(self) -> ItemTraitAlias {
         ItemTraitAlias {
             attrs: vec![],
@@ -869,12 +877,12 @@ impl ItemTraitAliasBuilder {
     }
 }
 
-#[allow(missing_docs)]
+/// Creates a new `ItemTypeBuilder` to construct a type alias.
 pub fn type_item(name: impl Into<String>, ty: impl Into<Type>) -> ItemTypeBuilder {
     ItemTypeBuilder::new(name, ty)
 }
 
-#[allow(missing_docs)]
+/// A builder for constructing an `ItemType` AST node.
 pub struct ItemTypeBuilder {
     ident: String,
     ty: Type,
@@ -883,7 +891,7 @@ pub struct ItemTypeBuilder {
 }
 
 impl ItemTypeBuilder {
-    #[allow(missing_docs)]
+    /// Creates a new `ItemTypeBuilder`.
     pub fn new(name: impl Into<String>, ty: impl Into<Type>) -> Self {
         Self {
             ident: name.into(),
@@ -893,19 +901,19 @@ impl ItemTypeBuilder {
         }
     }
 
-    #[allow(missing_docs)]
+    /// Adds a leading comment to the type alias.
     pub fn leading_comment(mut self, comment: impl Into<Comment>) -> Self {
         self.leading_comments.push(comment.into());
         self
     }
 
-    #[allow(missing_docs)]
+    /// Adds a trailing comment to the type alias.
     pub fn trailing_comment(mut self, comment: impl Into<Comment>) -> Self {
         self.trailing_comments.push(comment.into());
         self
     }
 
-    #[allow(missing_docs)]
+    /// Builds the `ItemType` AST node.
     pub fn build(self) -> ItemType {
         ItemType {
             attrs: vec![],
@@ -917,12 +925,12 @@ impl ItemTypeBuilder {
     }
 }
 
-#[allow(missing_docs)]
+/// Creates a new `ItemUnionBuilder` to construct a `union` item.
 pub fn union_item(name: impl Into<String>) -> ItemUnionBuilder {
     ItemUnionBuilder::new(name)
 }
 
-#[allow(missing_docs)]
+/// A builder for constructing an `ItemUnion` AST node.
 pub struct ItemUnionBuilder {
     ident: String,
     fields: Vec<Field>,
@@ -931,7 +939,7 @@ pub struct ItemUnionBuilder {
 }
 
 impl ItemUnionBuilder {
-    #[allow(missing_docs)]
+    /// Creates a new `ItemUnionBuilder`.
     pub fn new(name: impl Into<String>) -> Self {
         Self {
             ident: name.into(),
@@ -941,25 +949,25 @@ impl ItemUnionBuilder {
         }
     }
 
-    #[allow(missing_docs)]
+    /// Adds a field to the `union`.
     pub fn field(mut self, field: Field) -> Self {
         self.fields.push(field);
         self
     }
 
-    #[allow(missing_docs)]
+    /// Adds a leading comment to the `union` item.
     pub fn leading_comment(mut self, comment: impl Into<Comment>) -> Self {
         self.leading_comments.push(comment.into());
         self
     }
 
-    #[allow(missing_docs)]
+    /// Adds a trailing comment to the `union` item.
     pub fn trailing_comment(mut self, comment: impl Into<Comment>) -> Self {
         self.trailing_comments.push(comment.into());
         self
     }
 
-    #[allow(missing_docs)]
+    /// Builds the `ItemUnion` AST node.
     pub fn build(self) -> ItemUnion {
         ItemUnion {
             attrs: vec![],
@@ -971,12 +979,12 @@ impl ItemUnionBuilder {
     }
 }
 
-#[allow(missing_docs)]
+/// Creates a new `ItemUseBuilder` to construct a `use` item.
 pub fn use_item(path: impl Into<String>) -> ItemUseBuilder {
     ItemUseBuilder::new(path)
 }
 
-#[allow(missing_docs)]
+/// A builder for constructing an `ItemUse` AST node.
 pub struct ItemUseBuilder {
     path: String,
     leading_comments: Vec<Comment>,
@@ -984,7 +992,7 @@ pub struct ItemUseBuilder {
 }
 
 impl ItemUseBuilder {
-    #[allow(missing_docs)]
+    /// Creates a new `ItemUseBuilder`.
     pub fn new(path: impl Into<String>) -> Self {
         Self {
             path: path.into(),
@@ -993,19 +1001,19 @@ impl ItemUseBuilder {
         }
     }
 
-    #[allow(missing_docs)]
+    /// Adds a leading comment to the `use` item.
     pub fn leading_comment(mut self, comment: impl Into<Comment>) -> Self {
         self.leading_comments.push(comment.into());
         self
     }
 
-    #[allow(missing_docs)]
+    /// Adds a trailing comment to the `use` item.
     pub fn trailing_comment(mut self, comment: impl Into<Comment>) -> Self {
         self.trailing_comments.push(comment.into());
         self
     }
 
-    #[allow(missing_docs)]
+    /// Builds the `ItemUse` AST node.
     pub fn build(self) -> ItemUse {
         ItemUse {
             attrs: vec![],
