@@ -4,7 +4,8 @@
 //! They are the building blocks of function bodies and other code blocks.
 
 use crate::ast::comments::Comment;
-use crate::ast::expressions::Expr;
+use crate::ast::expressions::{Expr, ExprMacroCall};
+use crate::ast::items::Item;
 use crate::ast::types::Type;
 
 /// A block of code, enclosed in curly braces: `{ ... }`.
@@ -23,16 +24,19 @@ pub struct Block {
 /// A statement in a block.
 #[derive(Debug, Clone, PartialEq)]
 pub enum Stmt {
-    /// An expression statement, such as `2 + 2;`.
-    /// For now, we assume all expression statements are terminated by a semicolon.
-    Expr(Expr),
-    /// A `let` statement, which binds a variable: `let x = 1;`.
-    Let(StmtLet),
+    /// A local (let) binding.
+    Local(Local),
+    /// An item definition.
+    Item(Item),
+    /// An expression statement, with an optional trailing semicolon.
+    Expr(Expr, bool),
+    /// A macro call.
+    MacCall(ExprMacroCall),
 }
 
 /// A `let` statement: `let x = 1;`.
 #[derive(Debug, Clone, PartialEq)]
-pub struct StmtLet {
+pub struct Local {
     /// The name of the variable being bound.
     pub ident: String,
     /// The optional type annotation of the variable.
