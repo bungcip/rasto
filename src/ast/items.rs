@@ -30,15 +30,25 @@ pub enum Item {
     Impl(ItemImpl),
     /// A trait item: `trait Foo { ... }`.
     Trait(ItemTrait),
+    #[allow(missing_docs)]
     Const(ItemConst),
+    #[allow(missing_docs)]
     ExternCrate(ItemExternCrate),
+    #[allow(missing_docs)]
     ForeignMod(ItemForeignMod),
+    #[allow(missing_docs)]
     Macro(ItemMacro),
+    #[allow(missing_docs)]
     Mod(ItemMod),
+    #[allow(missing_docs)]
     Static(ItemStatic),
+    #[allow(missing_docs)]
     TraitAlias(ItemTraitAlias),
+    #[allow(missing_docs)]
     Type(ItemType),
+    #[allow(missing_docs)]
     Union(ItemUnion),
+    #[allow(missing_docs)]
     Use(ItemUse),
 }
 

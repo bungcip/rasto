@@ -3,7 +3,7 @@ use crate::pretty_printer_v2::{PrettyPrintV2, Printer};
 use std::fmt;
 
 /// A trait alias item: `pub trait ShareableIterator = Iterator + Sync;`
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct ItemTraitAlias {
     /// Comments that appear before the trait alias.
     pub leading_comments: Vec<Comment>,

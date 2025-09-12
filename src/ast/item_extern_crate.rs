@@ -3,7 +3,7 @@ use crate::pretty_printer_v2::{PrettyPrintV2, Printer};
 use std::fmt;
 
 /// An `extern crate` item: `extern crate serde;`
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct ItemExternCrate {
     /// Comments that appear before the extern crate item.
     pub leading_comments: Vec<Comment>,

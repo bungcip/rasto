@@ -4,7 +4,7 @@ use crate::pretty_printer_v2::{PrettyPrintV2, Printer};
 use std::fmt;
 
 /// A `mod` item: `mod my_module;` or `mod my_module { ... }`
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct ItemMod {
     /// Comments that appear before the mod item.
     pub leading_comments: Vec<Comment>,
