@@ -1,26 +1,85 @@
+//! A pretty-printer for the Rust AST.
+//!
+//! This module provides a flexible and efficient way to format Rust code from an
+//! Abstract Syntax Tree (AST). The implementation is based on the paper
+//! "A Prettier Printer" by Philip Wadler, which describes a linear-time algorithm
+//! for pretty-printing documents with layout constraints.
+//!
+//! The core of the pretty-printer is the `Printer` struct, which manages the
+//! printing process. It uses a token-based approach, where the AST is first
+//! converted into a sequence of `Token`s. These tokens represent strings,
+//! potential line breaks, and grouping constructs. The printer then uses a
+//! two-pass algorithm:
+//!
+//! 1. **Scan Pass**: The printer scans the tokens to determine the best layout
+//!    by calculating the size of each token group. This pass decides whether
+//!    a group should be printed on a single line or broken into multiple lines.
+//!
+//! 2. **Print Pass**: The printer iterates through the tokens again, this time
+//!    writing the formatted output to a `Write` buffer. It uses the information
+//     from the scan pass to insert line breaks and indentation where necessary.
+//!
+//! The `PrettyPrintV2` trait is implemented by all AST nodes that can be
+//! pretty-printed. This trait provides a `pretty_print_v2` method that
+//! converts the AST node into a sequence of tokens for the `Printer`.
+
 use crate::ast::*;
 use std::borrow::Cow;
 use std::fmt::{self, Write};
 
-const INFINITY: isize = 0xffff;
+/// The line width to aim for when formatting.
 const LINE_WIDTH: isize = 100;
 
-#[derive(Clone, Copy, PartialEq)]
+/// A large integer value used to represent an infinitely long line.
+const INFINITY: isize = 0xffff;
+
+/// The style of a break.
+#[derive(Clone, Copy, PartialEq, Eq)]
 pub enum BreakStyle {
+    /// A consistent break means that if the group is broken, all breaks within
+    /// the group will be broken.
     Consistent,
+    /// An inconsistent break means that breaks within the group can be broken
+    /// independently.
     Inconsistent,
 }
 
+/// A token used by the pretty-printer.
 pub enum Token<'a> {
+    /// A string to be printed.
     String(Cow<'a, str>),
-    Break { len: usize },
+    /// A potential line break. If the line is too long, this will be replaced
+    /// with a newline and indentation. Otherwise, it will be replaced with a
+    /// space.
+    Break {
+        /// The number of spaces to print if the break is not taken.
+        len: usize,
+    },
+    /// A hard line break that will always be printed as a newline.
     HardBreak,
-    Begin { style: BreakStyle, open: &'a str },
-    End { close: &'a str },
+    /// The beginning of a group of tokens.
+    Begin {
+        /// The style of the break.
+        style: BreakStyle,
+        /// The opening string of the group (e.g., `(`, `[`, `{`).
+        open: &'a str,
+    },
+    /// The end of a group of tokens.
+    End {
+        /// The closing string of the group (e.g., `)`, `]`, `}`).
+        close: &'a str,
+    },
+    /// A comment.
     Comment(Cow<'a, str>),
 }
 
+/// A trait for types that can be pretty-printed.
 pub trait PrettyPrintV2 {
+    /// Pretty-prints the value to the given printer.
+    ///
+    /// # Parameters
+    ///
+    /// - `printer`: The `Printer` to use for formatting.
     fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result;
 }
 
@@ -30,6 +89,7 @@ impl<T: PrettyPrintV2 + ?Sized> PrettyPrintV2 for Box<T> {
     }
 }
 
+/// A pretty-printer for the Rust AST.
 pub struct Printer<'a> {
     writer: &'a mut dyn Write,
     tokens: Vec<Token<'a>>,
@@ -46,6 +106,11 @@ pub struct Printer<'a> {
 }
 
 impl<'a> Printer<'a> {
+    /// Creates a new printer that writes to the given writer.
+    ///
+    /// # Parameters
+    ///
+    /// - `writer`: The `Write` buffer to write the formatted output to.
     pub fn new(writer: &'a mut dyn Write) -> Self {
         Self {
             writer,
@@ -61,6 +126,11 @@ impl<'a> Printer<'a> {
         }
     }
 
+    /// Adds a string to the printer's token stream.
+    ///
+    /// # Parameters
+    ///
+    /// - `s`: The string to add.
     pub fn string(&mut self, s: impl Into<Cow<'a, str>>) {
         let s = s.into();
         if !s.is_empty() {
@@ -68,26 +138,49 @@ impl<'a> Printer<'a> {
         }
     }
 
+    /// Adds a potential line break to the token stream.
     pub fn break_(&mut self) {
         self.tokens.push(Token::Break { len: 1 });
     }
 
+    /// Adds a hard line break to the token stream.
     pub fn hard_break(&mut self) {
         self.tokens.push(Token::HardBreak);
     }
 
+    /// Begins a new group of tokens.
+    ///
+    /// # Parameters
+    ///
+    /// - `style`: The `BreakStyle` of the group.
+    /// - `open`: The opening string of the group (e.g., `(`, `[`, `{`).
     pub fn begin(&mut self, style: BreakStyle, open: &'a str) {
         self.tokens.push(Token::Begin { style, open });
     }
 
+    /// Ends the current group of tokens.
+    ///
+    /// # Parameters
+    ///
+    /// - `close`: The closing string of the group (e.g., `)`, `]`, `}`).
     pub fn end(&mut self, close: &'a str) {
         self.tokens.push(Token::End { close });
     }
 
+    /// Adds a comment to the token stream.
+    ///
+    /// # Parameters
+    ///
+    /// - `s`: The comment string.
     pub fn comment(&mut self, s: impl Into<Cow<'a, str>>) {
         self.tokens.push(Token::Comment(s.into()));
     }
 
+    /// Scans the token stream to determine the best layout.
+    ///
+    /// This method implements the first pass of the pretty-printing algorithm.
+    /// It calculates the size of each token group to decide whether it should
+    /// be broken into multiple lines or printed on a single line.
     pub fn scan(&mut self) {
         self.sizes = vec![INFINITY; self.tokens.len()];
         self.scan_buffer_head = 0;
@@ -95,35 +188,33 @@ impl<'a> Printer<'a> {
 
         for i in 0..self.tokens.len() {
             match &self.tokens[i] {
-                Token::Begin{..} => {
+                Token::Begin { .. } => {
                     self.scan_push(i, -self.right_total);
                 }
-                Token::End{..} => {
-                    loop {
-                        if self.scan_buffer_head == 0 {
+                Token::End { .. } => loop {
+                    if self.scan_buffer_head == 0 {
+                        break;
+                    }
+                    self.scan_buffer_head -= 1;
+                    let (j, offset) = self.scan_buffer[self.scan_buffer_head];
+                    match self.tokens[j] {
+                        Token::Begin { .. } => {
+                            let len = self.right_total + offset;
+                            self.sizes[j] = if len > self.margin { INFINITY } else { len };
                             break;
                         }
-                        self.scan_buffer_head -= 1;
-                        let (j, offset) = self.scan_buffer[self.scan_buffer_head];
-                        match self.tokens[j] {
-                            Token::Begin{..} => {
-                                let len = self.right_total + offset;
-                                self.sizes[j] = if len > self.margin { INFINITY } else { len };
-                                break;
-                            }
-                            Token::Break { .. } | Token::HardBreak => {
-                                let len = self.right_total + offset;
-                                self.sizes[j] = if len > self.margin { INFINITY } else { len };
-                            }
-                            _ => {}
+                        Token::Break { .. } | Token::HardBreak => {
+                            let len = self.right_total + offset;
+                            self.sizes[j] = if len > self.margin { INFINITY } else { len };
                         }
+                        _ => {}
                     }
-                }
+                },
                 Token::Break { .. } | Token::HardBreak => {
                     while self.scan_buffer_head > 0 {
                         let (j, offset) = self.scan_buffer[self.scan_buffer_head - 1];
                         match self.tokens[j] {
-                            Token::Begin{..} => break,
+                            Token::Begin { .. } => break,
                             Token::Break { .. } | Token::HardBreak => {
                                 self.scan_buffer_head -= 1;
                                 let len = self.right_total + offset;
@@ -160,6 +251,11 @@ impl<'a> Printer<'a> {
         self.scan_buffer_head += 1;
     }
 
+    /// Prints the token stream to the writer.
+    ///
+    /// This method implements the second pass of the pretty-printing algorithm.
+    /// It iterates through the tokens and writes the formatted output to the
+    /// `Write` buffer, using the layout information from the `scan` pass.
     pub fn print(&mut self) -> fmt::Result {
         for i in 0..self.tokens.len() {
             match &self.tokens[i] {
@@ -187,7 +283,8 @@ impl<'a> Printer<'a> {
                     self.space -= close.len() as isize;
                 }
                 Token::Break { len } => {
-                    let (_, is_broken, style) = self.print_stack.last().copied().unwrap_or((0, false, BreakStyle::Consistent));
+                    let (_, is_broken, style) =
+                        self.print_stack.last().copied().unwrap_or((0, false, BreakStyle::Consistent));
 
                     let break_decision = if style == BreakStyle::Consistent {
                         is_broken
@@ -227,6 +324,9 @@ impl<'a> Printer<'a> {
         Ok(())
     }
 
+    /// Scans and prints the token stream to the writer.
+    ///
+    /// This is a convenience method that calls `scan` and then `print`.
     pub fn finish(mut self) -> fmt::Result {
         self.scan();
         self.print()
@@ -581,7 +681,9 @@ impl PrettyPrintV2 for Signature {
 impl PrettyPrintV2 for Block {
     fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.begin(BreakStyle::Consistent, "{");
-        let is_empty = self.stmts.is_empty() && self.leading_comments.is_empty() && self.trailing_comments.is_empty();
+        let is_empty = self.stmts.is_empty()
+            && self.leading_comments.is_empty()
+            && self.trailing_comments.is_empty();
 
         if !is_empty {
             printer.hard_break();
