@@ -11,17 +11,7 @@ fn pretty_print_item(item: Item) -> String {
 }
 
 fn pretty_print_file(file: File) -> String {
-    let mut buf = String::new();
-    let mut printer = Printer::new(&mut buf);
-    for (i, item) in file.items.iter().enumerate() {
-        if i > 0 {
-            printer.hard_break();
-            printer.hard_break();
-        }
-        item.pretty_print(&mut printer).unwrap();
-    }
-    printer.finish().unwrap();
-    buf
+    file.to_string()
 }
 
 #[test]

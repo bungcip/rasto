@@ -811,6 +811,19 @@ impl PrettyPrinter for Item {
     }
 }
 
+impl PrettyPrinter for File {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        for (i, item) in self.items.iter().enumerate() {
+            if i > 0 {
+                printer.hard_break();
+                printer.hard_break();
+            }
+            item.pretty_print(printer)?;
+        }
+        Ok(())
+    }
+}
+
 impl PrettyPrinter for ItemStruct {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         for attr in &self.attrs {
