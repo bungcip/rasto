@@ -4,7 +4,7 @@ use crate::pretty_printer_v2::{PrettyPrintV2, Printer};
 use std::fmt;
 
 /// A `static` item: `static COUNTER: u32 = 0;`
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct ItemStatic {
     /// Comments that appear before the static item.
     pub leading_comments: Vec<Comment>,

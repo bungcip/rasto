@@ -4,7 +4,7 @@ use crate::pretty_printer_v2::{PrettyPrintV2, Printer};
 use std::fmt;
 
 /// A foreign mod item: `extern "C" { ... }`
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct ItemForeignMod {
     /// Comments that appear before the foreign mod item.
     pub leading_comments: Vec<Comment>,

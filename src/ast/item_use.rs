@@ -3,7 +3,7 @@ use crate::pretty_printer_v2::{PrettyPrintV2, Printer};
 use std::fmt;
 
 /// A `use` item: `use std::collections::HashMap;`
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct ItemUse {
     /// Comments that appear before the use item.
     pub leading_comments: Vec<Comment>,

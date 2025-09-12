@@ -11,15 +11,25 @@ pub mod statements;
 pub mod items;
 pub mod tokens;
 pub mod file;
+#[allow(missing_docs)]
 pub mod item_const;
+#[allow(missing_docs)]
 pub mod item_extern_crate;
+#[allow(missing_docs)]
 pub mod item_foreign_mod;
+#[allow(missing_docs)]
 pub mod item_macro;
+#[allow(missing_docs)]
 pub mod item_mod;
+#[allow(missing_docs)]
 pub mod item_static;
+#[allow(missing_docs)]
 pub mod item_trait_alias;
+#[allow(missing_docs)]
 pub mod item_type;
+#[allow(missing_docs)]
 pub mod item_union;
+#[allow(missing_docs)]
 pub mod item_use;
 
 pub use comments::*;

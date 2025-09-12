@@ -3,7 +3,7 @@ use crate::pretty_printer_v2::{PrettyPrintV2, Printer};
 use std::fmt;
 
 /// A `type` item: `type MyResult<T> = Result<T, MyError>;`
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct ItemType {
     /// Comments that appear before the type item.
     pub leading_comments: Vec<Comment>,

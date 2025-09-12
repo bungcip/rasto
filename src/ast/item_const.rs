@@ -4,7 +4,7 @@ use crate::pretty_printer_v2::{PrettyPrintV2, Printer};
 use std::fmt;
 
 /// A `const` item: `const MAX: u16 = 234342;`
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct ItemConst {
     /// Comments that appear before the const item.
     pub leading_comments: Vec<Comment>,

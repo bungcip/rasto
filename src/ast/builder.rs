@@ -479,10 +479,12 @@ impl ExprBuilder {
     }
 }
 
+#[allow(missing_docs)]
 pub fn const_item(name: impl Into<String>, ty: impl Into<String>, expr: impl Into<Expr>) -> ItemConstBuilder {
     ItemConstBuilder::new(name, ty, expr)
 }
 
+#[allow(missing_docs)]
 pub struct ItemConstBuilder {
     ident: String,
     ty: String,
@@ -492,6 +494,7 @@ pub struct ItemConstBuilder {
 }
 
 impl ItemConstBuilder {
+    #[allow(missing_docs)]
     pub fn new(name: impl Into<String>, ty: impl Into<String>, expr: impl Into<Expr>) -> Self {
         Self {
             ident: name.into(),
@@ -502,16 +505,19 @@ impl ItemConstBuilder {
         }
     }
 
+    #[allow(missing_docs)]
     pub fn leading_comment(mut self, comment: impl Into<Comment>) -> Self {
         self.leading_comments.push(comment.into());
         self
     }
 
+    #[allow(missing_docs)]
     pub fn trailing_comment(mut self, comment: impl Into<Comment>) -> Self {
         self.trailing_comments.push(comment.into());
         self
     }
 
+    #[allow(missing_docs)]
     pub fn build(self) -> ItemConst {
         ItemConst {
             ident: self.ident,
@@ -523,10 +529,12 @@ impl ItemConstBuilder {
     }
 }
 
+#[allow(missing_docs)]
 pub fn extern_crate_item(name: impl Into<String>) -> ItemExternCrateBuilder {
     ItemExternCrateBuilder::new(name)
 }
 
+#[allow(missing_docs)]
 pub struct ItemExternCrateBuilder {
     ident: String,
     leading_comments: Vec<Comment>,
@@ -534,6 +542,7 @@ pub struct ItemExternCrateBuilder {
 }
 
 impl ItemExternCrateBuilder {
+    #[allow(missing_docs)]
     pub fn new(name: impl Into<String>) -> Self {
         Self {
             ident: name.into(),
@@ -542,16 +551,19 @@ impl ItemExternCrateBuilder {
         }
     }
 
+    #[allow(missing_docs)]
     pub fn leading_comment(mut self, comment: impl Into<Comment>) -> Self {
         self.leading_comments.push(comment.into());
         self
     }
 
+    #[allow(missing_docs)]
     pub fn trailing_comment(mut self, comment: impl Into<Comment>) -> Self {
         self.trailing_comments.push(comment.into());
         self
     }
 
+    #[allow(missing_docs)]
     pub fn build(self) -> ItemExternCrate {
         ItemExternCrate {
             ident: self.ident,
@@ -561,10 +573,12 @@ impl ItemExternCrateBuilder {
     }
 }
 
+#[allow(missing_docs)]
 pub fn foreign_mod_item(abi: impl Into<String>) -> ItemForeignModBuilder {
     ItemForeignModBuilder::new(abi)
 }
 
+#[allow(missing_docs)]
 pub struct ItemForeignModBuilder {
     abi: String,
     items: Vec<Item>,
@@ -573,6 +587,7 @@ pub struct ItemForeignModBuilder {
 }
 
 impl ItemForeignModBuilder {
+    #[allow(missing_docs)]
     pub fn new(abi: impl Into<String>) -> Self {
         Self {
             abi: abi.into(),
@@ -582,21 +597,25 @@ impl ItemForeignModBuilder {
         }
     }
 
+    #[allow(missing_docs)]
     pub fn item(mut self, item: impl Into<Item>) -> Self {
         self.items.push(item.into());
         self
     }
 
+    #[allow(missing_docs)]
     pub fn leading_comment(mut self, comment: impl Into<Comment>) -> Self {
         self.leading_comments.push(comment.into());
         self
     }
 
+    #[allow(missing_docs)]
     pub fn trailing_comment(mut self, comment: impl Into<Comment>) -> Self {
         self.trailing_comments.push(comment.into());
         self
     }
 
+    #[allow(missing_docs)]
     pub fn build(self) -> ItemForeignMod {
         ItemForeignMod {
             abi: self.abi,
@@ -607,10 +626,12 @@ impl ItemForeignModBuilder {
     }
 }
 
+#[allow(missing_docs)]
 pub fn macro_item(expr: impl Into<Expr>) -> ItemMacroBuilder {
     ItemMacroBuilder::new(expr)
 }
 
+#[allow(missing_docs)]
 pub struct ItemMacroBuilder {
     expr: Expr,
     leading_comments: Vec<Comment>,
@@ -618,6 +639,7 @@ pub struct ItemMacroBuilder {
 }
 
 impl ItemMacroBuilder {
+    #[allow(missing_docs)]
     pub fn new(expr: impl Into<Expr>) -> Self {
         Self {
             expr: expr.into(),
@@ -626,16 +648,19 @@ impl ItemMacroBuilder {
         }
     }
 
+    #[allow(missing_docs)]
     pub fn leading_comment(mut self, comment: impl Into<Comment>) -> Self {
         self.leading_comments.push(comment.into());
         self
     }
 
+    #[allow(missing_docs)]
     pub fn trailing_comment(mut self, comment: impl Into<Comment>) -> Self {
         self.trailing_comments.push(comment.into());
         self
     }
 
+    #[allow(missing_docs)]
     pub fn build(self) -> ItemMacro {
         ItemMacro {
             expr: self.expr,
@@ -645,10 +670,12 @@ impl ItemMacroBuilder {
     }
 }
 
+#[allow(missing_docs)]
 pub fn mod_item(name: impl Into<String>) -> ItemModBuilder {
     ItemModBuilder::new(name)
 }
 
+#[allow(missing_docs)]
 pub struct ItemModBuilder {
     ident: String,
     content: Option<Vec<Item>>,
@@ -657,6 +684,7 @@ pub struct ItemModBuilder {
 }
 
 impl ItemModBuilder {
+    #[allow(missing_docs)]
     pub fn new(name: impl Into<String>) -> Self {
         Self {
             ident: name.into(),
@@ -666,21 +694,25 @@ impl ItemModBuilder {
         }
     }
 
+    #[allow(missing_docs)]
     pub fn content(mut self, content: Vec<Item>) -> Self {
         self.content = Some(content);
         self
     }
 
+    #[allow(missing_docs)]
     pub fn leading_comment(mut self, comment: impl Into<Comment>) -> Self {
         self.leading_comments.push(comment.into());
         self
     }
 
+    #[allow(missing_docs)]
     pub fn trailing_comment(mut self, comment: impl Into<Comment>) -> Self {
         self.trailing_comments.push(comment.into());
         self
     }
 
+    #[allow(missing_docs)]
     pub fn build(self) -> ItemMod {
         ItemMod {
             ident: self.ident,
@@ -691,10 +723,12 @@ impl ItemModBuilder {
     }
 }
 
+#[allow(missing_docs)]
 pub fn static_item(name: impl Into<String>, ty: impl Into<String>, expr: impl Into<Expr>) -> ItemStaticBuilder {
     ItemStaticBuilder::new(name, ty, expr)
 }
 
+#[allow(missing_docs)]
 pub struct ItemStaticBuilder {
     ident: String,
     ty: String,
@@ -704,6 +738,7 @@ pub struct ItemStaticBuilder {
 }
 
 impl ItemStaticBuilder {
+    #[allow(missing_docs)]
     pub fn new(name: impl Into<String>, ty: impl Into<String>, expr: impl Into<Expr>) -> Self {
         Self {
             ident: name.into(),
@@ -714,16 +749,19 @@ impl ItemStaticBuilder {
         }
     }
 
+    #[allow(missing_docs)]
     pub fn leading_comment(mut self, comment: impl Into<Comment>) -> Self {
         self.leading_comments.push(comment.into());
         self
     }
 
+    #[allow(missing_docs)]
     pub fn trailing_comment(mut self, comment: impl Into<Comment>) -> Self {
         self.trailing_comments.push(comment.into());
         self
     }
 
+    #[allow(missing_docs)]
     pub fn build(self) -> ItemStatic {
         ItemStatic {
             ident: self.ident,
@@ -735,10 +773,12 @@ impl ItemStaticBuilder {
     }
 }
 
+#[allow(missing_docs)]
 pub fn trait_alias_item(name: impl Into<String>, bounds: Vec<String>) -> ItemTraitAliasBuilder {
     ItemTraitAliasBuilder::new(name, bounds)
 }
 
+#[allow(missing_docs)]
 pub struct ItemTraitAliasBuilder {
     ident: String,
     bounds: Vec<String>,
@@ -747,6 +787,7 @@ pub struct ItemTraitAliasBuilder {
 }
 
 impl ItemTraitAliasBuilder {
+    #[allow(missing_docs)]
     pub fn new(name: impl Into<String>, bounds: Vec<String>) -> Self {
         Self {
             ident: name.into(),
@@ -756,16 +797,19 @@ impl ItemTraitAliasBuilder {
         }
     }
 
+    #[allow(missing_docs)]
     pub fn leading_comment(mut self, comment: impl Into<Comment>) -> Self {
         self.leading_comments.push(comment.into());
         self
     }
 
+    #[allow(missing_docs)]
     pub fn trailing_comment(mut self, comment: impl Into<Comment>) -> Self {
         self.trailing_comments.push(comment.into());
         self
     }
 
+    #[allow(missing_docs)]
     pub fn build(self) -> ItemTraitAlias {
         ItemTraitAlias {
             ident: self.ident,
@@ -776,10 +820,12 @@ impl ItemTraitAliasBuilder {
     }
 }
 
+#[allow(missing_docs)]
 pub fn type_item(name: impl Into<String>, ty: impl Into<String>) -> ItemTypeBuilder {
     ItemTypeBuilder::new(name, ty)
 }
 
+#[allow(missing_docs)]
 pub struct ItemTypeBuilder {
     ident: String,
     ty: String,
@@ -788,6 +834,7 @@ pub struct ItemTypeBuilder {
 }
 
 impl ItemTypeBuilder {
+    #[allow(missing_docs)]
     pub fn new(name: impl Into<String>, ty: impl Into<String>) -> Self {
         Self {
             ident: name.into(),
@@ -797,16 +844,19 @@ impl ItemTypeBuilder {
         }
     }
 
+    #[allow(missing_docs)]
     pub fn leading_comment(mut self, comment: impl Into<Comment>) -> Self {
         self.leading_comments.push(comment.into());
         self
     }
 
+    #[allow(missing_docs)]
     pub fn trailing_comment(mut self, comment: impl Into<Comment>) -> Self {
         self.trailing_comments.push(comment.into());
         self
     }
 
+    #[allow(missing_docs)]
     pub fn build(self) -> ItemType {
         ItemType {
             ident: self.ident,
@@ -817,10 +867,12 @@ impl ItemTypeBuilder {
     }
 }
 
+#[allow(missing_docs)]
 pub fn union_item(name: impl Into<String>) -> ItemUnionBuilder {
     ItemUnionBuilder::new(name)
 }
 
+#[allow(missing_docs)]
 pub struct ItemUnionBuilder {
     ident: String,
     fields: Vec<Field>,
@@ -829,6 +881,7 @@ pub struct ItemUnionBuilder {
 }
 
 impl ItemUnionBuilder {
+    #[allow(missing_docs)]
     pub fn new(name: impl Into<String>) -> Self {
         Self {
             ident: name.into(),
@@ -838,21 +891,25 @@ impl ItemUnionBuilder {
         }
     }
 
+    #[allow(missing_docs)]
     pub fn field(mut self, field: Field) -> Self {
         self.fields.push(field);
         self
     }
 
+    #[allow(missing_docs)]
     pub fn leading_comment(mut self, comment: impl Into<Comment>) -> Self {
         self.leading_comments.push(comment.into());
         self
     }
 
+    #[allow(missing_docs)]
     pub fn trailing_comment(mut self, comment: impl Into<Comment>) -> Self {
         self.trailing_comments.push(comment.into());
         self
     }
 
+    #[allow(missing_docs)]
     pub fn build(self) -> ItemUnion {
         ItemUnion {
             ident: self.ident,
@@ -863,10 +920,12 @@ impl ItemUnionBuilder {
     }
 }
 
+#[allow(missing_docs)]
 pub fn use_item(path: impl Into<String>) -> ItemUseBuilder {
     ItemUseBuilder::new(path)
 }
 
+#[allow(missing_docs)]
 pub struct ItemUseBuilder {
     path: String,
     leading_comments: Vec<Comment>,
@@ -874,6 +933,7 @@ pub struct ItemUseBuilder {
 }
 
 impl ItemUseBuilder {
+    #[allow(missing_docs)]
     pub fn new(path: impl Into<String>) -> Self {
         Self {
             path: path.into(),
@@ -882,16 +942,19 @@ impl ItemUseBuilder {
         }
     }
 
+    #[allow(missing_docs)]
     pub fn leading_comment(mut self, comment: impl Into<Comment>) -> Self {
         self.leading_comments.push(comment.into());
         self
     }
 
+    #[allow(missing_docs)]
     pub fn trailing_comment(mut self, comment: impl Into<Comment>) -> Self {
         self.trailing_comments.push(comment.into());
         self
     }
 
+    #[allow(missing_docs)]
     pub fn build(self) -> ItemUse {
         ItemUse {
             path: self.path,
