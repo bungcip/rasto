@@ -32,25 +32,25 @@ pub enum Item {
     Impl(ItemImpl),
     /// A trait item: `trait Foo { ... }`.
     Trait(ItemTrait),
-    #[allow(missing_docs)]
+    /// A `const` item: `const FOO: u32 = 42;`.
     Const(ItemConst),
-    #[allow(missing_docs)]
+    /// An `extern crate` item: `extern crate semver;`.
     ExternCrate(ItemExternCrate),
-    #[allow(missing_docs)]
+    /// A foreign module: `extern "C" { ... }`.
     ForeignMod(ItemForeignMod),
-    #[allow(missing_docs)]
+    /// A macro definition: `macro_rules! ...`.
     Macro(ItemMacro),
-    #[allow(missing_docs)]
+    /// A module: `mod foo { ... }`.
     Mod(ItemMod),
-    #[allow(missing_docs)]
+    /// A `static` item: `static FOO: u32 = 42;`.
     Static(ItemStatic),
-    #[allow(missing_docs)]
+    /// A trait alias: `trait Foo = Bar;`.
     TraitAlias(ItemTraitAlias),
-    #[allow(missing_docs)]
+    /// A type alias: `type Foo = Bar;`.
     Type(ItemType),
-    #[allow(missing_docs)]
+    /// A `union` item: `union Foo { ... }`.
     Union(ItemUnion),
-    #[allow(missing_docs)]
+    /// A `use` item: `use std::collections::HashMap;`.
     Use(ItemUse),
 }
 
