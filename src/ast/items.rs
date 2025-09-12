@@ -16,7 +16,7 @@ use crate::ast::item_union::ItemUnion;
 use crate::ast::item_use::ItemUse;
 use crate::ast::statements::Block;
 use crate::ast::types::Type;
-use crate::pretty_printer_v2::{Printer, PrettyPrintV2};
+use crate::pretty_printer::{Printer, PrettyPrinter};
 
 /// A top-level item in a Rust file.
 #[derive(Debug, Clone, PartialEq)]
@@ -95,7 +95,7 @@ impl ItemFn {
     pub fn to_string(&self) -> String {
         let mut buf = String::new();
         let mut printer = Printer::new(&mut buf);
-        self.pretty_print_v2(&mut printer).unwrap();
+        self.pretty_print(&mut printer).unwrap();
         printer.finish().unwrap();
         buf
     }
@@ -110,7 +110,7 @@ impl ItemStruct {
     pub fn to_string(&self) -> String {
         let mut buf = String::new();
         let mut printer = Printer::new(&mut buf);
-        self.pretty_print_v2(&mut printer).unwrap();
+        self.pretty_print(&mut printer).unwrap();
         printer.finish().unwrap();
         buf
     }
@@ -125,7 +125,7 @@ impl ItemEnum {
     pub fn to_string(&self) -> String {
         let mut buf = String::new();
         let mut printer = Printer::new(&mut buf);
-        self.pretty_print_v2(&mut printer).unwrap();
+        self.pretty_print(&mut printer).unwrap();
         printer.finish().unwrap();
         buf
     }
@@ -140,7 +140,7 @@ impl ItemImpl {
     pub fn to_string(&self) -> String {
         let mut buf = String::new();
         let mut printer = Printer::new(&mut buf);
-        self.pretty_print_v2(&mut printer).unwrap();
+        self.pretty_print(&mut printer).unwrap();
         printer.finish().unwrap();
         buf
     }
@@ -155,7 +155,7 @@ impl ItemTrait {
     pub fn to_string(&self) -> String {
         let mut buf = String::new();
         let mut printer = Printer::new(&mut buf);
-        self.pretty_print_v2(&mut printer).unwrap();
+        self.pretty_print(&mut printer).unwrap();
         printer.finish().unwrap();
         buf
     }

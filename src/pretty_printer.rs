@@ -19,8 +19,8 @@
 //!    writing the formatted output to a `Write` buffer. It uses the information
 //     from the scan pass to insert line breaks and indentation where necessary.
 //!
-//! The `PrettyPrintV2` trait is implemented by all AST nodes that can be
-//! pretty-printed. This trait provides a `pretty_print_v2` method that
+//! The `PrettyPrinter` trait is implemented by all AST nodes that can be
+//! pretty-printed. This trait provides a `pretty_print` method that
 //! converts the AST node into a sequence of tokens for the `Printer`.
 
 use crate::ast::*;
@@ -74,18 +74,18 @@ pub enum Token<'a> {
 }
 
 /// A trait for types that can be pretty-printed.
-pub trait PrettyPrintV2 {
+pub trait PrettyPrinter {
     /// Pretty-prints the value to the given printer.
     ///
     /// # Parameters
     ///
     /// - `printer`: The `Printer` to use for formatting.
-    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result;
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result;
 }
 
-impl<T: PrettyPrintV2 + ?Sized> PrettyPrintV2 for Box<T> {
-    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
-        (**self).pretty_print_v2(printer)
+impl<T: PrettyPrinter + ?Sized> PrettyPrinter for Box<T> {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        (**self).pretty_print(printer)
     }
 }
 
@@ -333,8 +333,8 @@ impl<'a> Printer<'a> {
     }
 }
 
-impl PrettyPrintV2 for Comment {
-    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+impl PrettyPrinter for Comment {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.hard_break();
         match self {
             Comment::Line(s) => printer.comment(format!("//{}", s)),
@@ -345,27 +345,27 @@ impl PrettyPrintV2 for Comment {
     }
 }
 
-impl PrettyPrintV2 for Path {
-    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+impl PrettyPrinter for Path {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         for (i, segment) in self.segments.iter().enumerate() {
             if i > 0 {
                 printer.string("::");
             }
-            segment.pretty_print_v2(printer)?;
+            segment.pretty_print(printer)?;
         }
         Ok(())
     }
 }
 
-impl PrettyPrintV2 for PathSegment {
-    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+impl PrettyPrinter for PathSegment {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string(&self.ident);
         Ok(())
     }
 }
 
-impl PrettyPrintV2 for Lit {
-    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+impl PrettyPrinter for Lit {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         match self {
             Lit::Str(s) => printer.string(format!("\"{}\"", s)),
             Lit::Int(i) => printer.string(i.to_string()),
@@ -375,8 +375,8 @@ impl PrettyPrintV2 for Lit {
     }
 }
 
-impl PrettyPrintV2 for BinOp {
-    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+impl PrettyPrinter for BinOp {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         match self {
             BinOp::Add => printer.string("+"),
             BinOp::Sub => printer.string("-"),
@@ -387,54 +387,54 @@ impl PrettyPrintV2 for BinOp {
     }
 }
 
-impl PrettyPrintV2 for ExprBinary {
-    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
-        self.left.pretty_print_v2(printer)?;
+impl PrettyPrinter for ExprBinary {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        self.left.pretty_print(printer)?;
         printer.break_();
-        self.op.pretty_print_v2(printer)?;
+        self.op.pretty_print(printer)?;
         printer.break_();
-        self.right.pretty_print_v2(printer)?;
+        self.right.pretty_print(printer)?;
         Ok(())
     }
 }
 
-impl PrettyPrintV2 for Expr {
-    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+impl PrettyPrinter for Expr {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         match self {
-            Expr::Lit(lit) => lit.pretty_print_v2(printer),
-            Expr::Binary(expr) => expr.pretty_print_v2(printer),
-            Expr::If(expr) => expr.pretty_print_v2(printer),
-            Expr::Block(expr) => expr.pretty_print_v2(printer),
-            Expr::Loop(expr) => expr.pretty_print_v2(printer),
-            Expr::While(expr) => expr.pretty_print_v2(printer),
-            Expr::For(expr) => expr.pretty_print_v2(printer),
-            Expr::Assign(expr) => expr.pretty_print_v2(printer),
-            Expr::MacroCall(expr) => expr.pretty_print_v2(printer),
-            Expr::Array(expr) => expr.pretty_print_v2(printer),
-            Expr::Async(expr) => expr.pretty_print_v2(printer),
-            Expr::Await(expr) => expr.pretty_print_v2(printer),
-            Expr::Break(expr) => expr.pretty_print_v2(printer),
-            Expr::Call(expr) => expr.pretty_print_v2(printer),
-            Expr::Cast(expr) => expr.pretty_print_v2(printer),
-            Expr::Closure(expr) => expr.pretty_print_v2(printer),
-            Expr::Const(expr) => expr.pretty_print_v2(printer),
-            Expr::Continue(expr) => expr.pretty_print_v2(printer),
-            Expr::Field(expr) => expr.pretty_print_v2(printer),
-            Expr::Index(expr) => expr.pretty_print_v2(printer),
-            Expr::Match(expr) => expr.pretty_print_v2(printer),
-            Expr::MethodCall(expr) => expr.pretty_print_v2(printer),
-            Expr::Paren(expr) => expr.pretty_print_v2(printer),
-            Expr::Range(expr) => expr.pretty_print_v2(printer),
-            Expr::Reference(expr) => expr.pretty_print_v2(printer),
-            Expr::Return(expr) => expr.pretty_print_v2(printer),
-            Expr::Struct(expr) => expr.pretty_print_v2(printer),
-            Expr::Tuple(expr) => expr.pretty_print_v2(printer),
+            Expr::Lit(lit) => lit.pretty_print(printer),
+            Expr::Binary(expr) => expr.pretty_print(printer),
+            Expr::If(expr) => expr.pretty_print(printer),
+            Expr::Block(expr) => expr.pretty_print(printer),
+            Expr::Loop(expr) => expr.pretty_print(printer),
+            Expr::While(expr) => expr.pretty_print(printer),
+            Expr::For(expr) => expr.pretty_print(printer),
+            Expr::Assign(expr) => expr.pretty_print(printer),
+            Expr::MacroCall(expr) => expr.pretty_print(printer),
+            Expr::Array(expr) => expr.pretty_print(printer),
+            Expr::Async(expr) => expr.pretty_print(printer),
+            Expr::Await(expr) => expr.pretty_print(printer),
+            Expr::Break(expr) => expr.pretty_print(printer),
+            Expr::Call(expr) => expr.pretty_print(printer),
+            Expr::Cast(expr) => expr.pretty_print(printer),
+            Expr::Closure(expr) => expr.pretty_print(printer),
+            Expr::Const(expr) => expr.pretty_print(printer),
+            Expr::Continue(expr) => expr.pretty_print(printer),
+            Expr::Field(expr) => expr.pretty_print(printer),
+            Expr::Index(expr) => expr.pretty_print(printer),
+            Expr::Match(expr) => expr.pretty_print(printer),
+            Expr::MethodCall(expr) => expr.pretty_print(printer),
+            Expr::Paren(expr) => expr.pretty_print(printer),
+            Expr::Range(expr) => expr.pretty_print(printer),
+            Expr::Reference(expr) => expr.pretty_print(printer),
+            Expr::Return(expr) => expr.pretty_print(printer),
+            Expr::Struct(expr) => expr.pretty_print(printer),
+            Expr::Tuple(expr) => expr.pretty_print(printer),
         }
     }
 }
 
-impl PrettyPrintV2 for ExprArray {
-    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+impl PrettyPrinter for ExprArray {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.begin(BreakStyle::Consistent, "[");
         printer.break_();
         for (i, elem) in self.elems.iter().enumerate() {
@@ -442,61 +442,61 @@ impl PrettyPrintV2 for ExprArray {
                 printer.string(", ");
                 printer.break_();
             }
-            elem.pretty_print_v2(printer)?;
+            elem.pretty_print(printer)?;
         }
         printer.end("]");
         Ok(())
     }
 }
 
-impl PrettyPrintV2 for ExprAsync {
-    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+impl PrettyPrinter for ExprAsync {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string("async ");
-        self.block.pretty_print_v2(printer)
+        self.block.pretty_print(printer)
     }
 }
 
-impl PrettyPrintV2 for ExprAwait {
-    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
-        self.expr.pretty_print_v2(printer)?;
+impl PrettyPrinter for ExprAwait {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        self.expr.pretty_print(printer)?;
         printer.string(".await");
         Ok(())
     }
 }
 
-impl PrettyPrintV2 for ExprBreak {
-    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+impl PrettyPrinter for ExprBreak {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string("break");
         Ok(())
     }
 }
 
-impl PrettyPrintV2 for ExprCall {
-    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
-        self.func.pretty_print_v2(printer)?;
+impl PrettyPrinter for ExprCall {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        self.func.pretty_print(printer)?;
         printer.begin(BreakStyle::Consistent, "(");
         for (i, arg) in self.args.iter().enumerate() {
             if i > 0 {
                 printer.string(", ");
             }
-            arg.pretty_print_v2(printer)?;
+            arg.pretty_print(printer)?;
         }
         printer.end(")");
         Ok(())
     }
 }
 
-impl PrettyPrintV2 for ExprCast {
-    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
-        self.expr.pretty_print_v2(printer)?;
+impl PrettyPrinter for ExprCast {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        self.expr.pretty_print(printer)?;
         printer.string(" as ");
-        self.ty.pretty_print_v2(printer)?;
+        self.ty.pretty_print(printer)?;
         Ok(())
     }
 }
 
-impl PrettyPrintV2 for ExprClosure {
-    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+impl PrettyPrinter for ExprClosure {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string("|");
         for (i, input) in self.inputs.iter().enumerate() {
             if i > 0 {
@@ -505,51 +505,51 @@ impl PrettyPrintV2 for ExprClosure {
             printer.string(input);
         }
         printer.string("| ");
-        self.body.pretty_print_v2(printer)
+        self.body.pretty_print(printer)
     }
 }
 
-impl PrettyPrintV2 for ExprConst {
-    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+impl PrettyPrinter for ExprConst {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string("const ");
-        self.block.pretty_print_v2(printer)
+        self.block.pretty_print(printer)
     }
 }
 
-impl PrettyPrintV2 for ExprContinue {
-    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+impl PrettyPrinter for ExprContinue {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string("continue");
         Ok(())
     }
 }
 
-impl PrettyPrintV2 for ExprField {
-    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
-        self.expr.pretty_print_v2(printer)?;
+impl PrettyPrinter for ExprField {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        self.expr.pretty_print(printer)?;
         printer.string(".");
         printer.string(&self.member);
         Ok(())
     }
 }
 
-impl PrettyPrintV2 for ExprIndex {
-    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
-        self.expr.pretty_print_v2(printer)?;
+impl PrettyPrinter for ExprIndex {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        self.expr.pretty_print(printer)?;
         printer.string("[");
-        self.index.pretty_print_v2(printer)?;
+        self.index.pretty_print(printer)?;
         printer.string("]");
         Ok(())
     }
 }
 
-impl PrettyPrintV2 for ExprMatch {
-    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+impl PrettyPrinter for ExprMatch {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string("match ");
-        self.expr.pretty_print_v2(printer)?;
+        self.expr.pretty_print(printer)?;
         printer.string(" {");
         printer.hard_break();
         for arm in &self.arms {
-            arm.pretty_print_v2(printer)?;
+            arm.pretty_print(printer)?;
             printer.string(",");
             printer.hard_break();
         }
@@ -558,21 +558,21 @@ impl PrettyPrintV2 for ExprMatch {
     }
 }
 
-impl PrettyPrintV2 for Arm {
-    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+impl PrettyPrinter for Arm {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string(&self.pat);
         if let Some(guard) = &self.guard {
             printer.string(" if ");
-            guard.pretty_print_v2(printer)?;
+            guard.pretty_print(printer)?;
         }
         printer.string(" => ");
-        self.body.pretty_print_v2(printer)
+        self.body.pretty_print(printer)
     }
 }
 
-impl PrettyPrintV2 for ExprMethodCall {
-    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
-        self.receiver.pretty_print_v2(printer)?;
+impl PrettyPrinter for ExprMethodCall {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        self.receiver.pretty_print(printer)?;
         printer.string(".");
         printer.string(&self.method);
         printer.begin(BreakStyle::Consistent, "(");
@@ -580,61 +580,61 @@ impl PrettyPrintV2 for ExprMethodCall {
             if i > 0 {
                 printer.string(", ");
             }
-            arg.pretty_print_v2(printer)?;
+            arg.pretty_print(printer)?;
         }
         printer.end(")");
         Ok(())
     }
 }
 
-impl PrettyPrintV2 for ExprParen {
-    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+impl PrettyPrinter for ExprParen {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string("(");
-        self.expr.pretty_print_v2(printer)?;
+        self.expr.pretty_print(printer)?;
         printer.string(")");
         Ok(())
     }
 }
 
-impl PrettyPrintV2 for ExprRange {
-    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+impl PrettyPrinter for ExprRange {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         if let Some(start) = &self.start {
-            start.pretty_print_v2(printer)?;
+            start.pretty_print(printer)?;
         }
         match self.limits {
             RangeLimits::HalfOpen => printer.string(".."),
             RangeLimits::Closed => printer.string("..="),
         }
         if let Some(end) = &self.end {
-            end.pretty_print_v2(printer)?;
+            end.pretty_print(printer)?;
         }
         Ok(())
     }
 }
 
-impl PrettyPrintV2 for ExprRef {
-    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+impl PrettyPrinter for ExprRef {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string("&");
         if self.is_mut {
             printer.string("mut ");
         }
-        self.expr.pretty_print_v2(printer)
+        self.expr.pretty_print(printer)
     }
 }
 
-impl PrettyPrintV2 for ExprReturn {
-    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+impl PrettyPrinter for ExprReturn {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string("return");
         if let Some(expr) = &self.expr {
             printer.string(" ");
-            expr.pretty_print_v2(printer)?;
+            expr.pretty_print(printer)?;
         }
         Ok(())
     }
 }
 
-impl PrettyPrintV2 for ExprStruct {
-    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+impl PrettyPrinter for ExprStruct {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string(&self.path);
         printer.string(" {");
         printer.break_();
@@ -643,7 +643,7 @@ impl PrettyPrintV2 for ExprStruct {
                 printer.string(",");
                 printer.break_();
             }
-            field.pretty_print_v2(printer)?;
+            field.pretty_print(printer)?;
         }
         printer.break_();
         printer.string("}");
@@ -651,65 +651,65 @@ impl PrettyPrintV2 for ExprStruct {
     }
 }
 
-impl PrettyPrintV2 for FieldValue {
-    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+impl PrettyPrinter for FieldValue {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string(&self.member);
         printer.string(": ");
-        self.value.pretty_print_v2(printer)
+        self.value.pretty_print(printer)
     }
 }
 
-impl PrettyPrintV2 for ExprTuple {
-    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+impl PrettyPrinter for ExprTuple {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.begin(BreakStyle::Consistent, "(");
         for (i, elem) in self.elems.iter().enumerate() {
             if i > 0 {
                 printer.string(", ");
             }
-            elem.pretty_print_v2(printer)?;
+            elem.pretty_print(printer)?;
         }
         printer.end(")");
         Ok(())
     }
 }
 
-impl PrettyPrintV2 for ItemFn {
-    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+impl PrettyPrinter for ItemFn {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         for comment in &self.leading_comments {
-            comment.pretty_print_v2(printer)?;
+            comment.pretty_print(printer)?;
         }
         printer.string("fn ");
-        self.sig.pretty_print_v2(printer)?;
+        self.sig.pretty_print(printer)?;
         printer.string(" ");
-        self.block.pretty_print_v2(printer)?;
+        self.block.pretty_print(printer)?;
         for comment in &self.trailing_comments {
-            comment.pretty_print_v2(printer)?;
+            comment.pretty_print(printer)?;
         }
         Ok(())
     }
 }
 
-impl PrettyPrintV2 for Signature {
-    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+impl PrettyPrinter for Signature {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string(&self.ident);
         printer.begin(BreakStyle::Consistent, "(");
         for (i, input) in self.inputs.iter().enumerate() {
             if i > 0 {
                 printer.string(", ");
             }
-            input.pretty_print_v2(printer)?;
+            input.pretty_print(printer)?;
         }
         printer.end(")");
         if let Some(output) = &self.output {
             printer.string(" -> ");
-            output.pretty_print_v2(printer)?;
+            output.pretty_print(printer)?;
         }
         Ok(())
     }
 }
 
-impl PrettyPrintV2 for Block {
-    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+impl PrettyPrinter for Block {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.begin(BreakStyle::Consistent, "{");
         let is_empty = self.stmts.is_empty()
             && self.leading_comments.is_empty()
@@ -718,13 +718,13 @@ impl PrettyPrintV2 for Block {
         if !is_empty {
             printer.hard_break();
             for comment in &self.leading_comments {
-                comment.pretty_print_v2(printer)?;
+                comment.pretty_print(printer)?;
             }
             for stmt in &self.stmts {
-                stmt.pretty_print_v2(printer)?;
+                stmt.pretty_print(printer)?;
             }
             for comment in &self.trailing_comments {
-                comment.pretty_print_v2(printer)?;
+                comment.pretty_print(printer)?;
             }
             printer.hard_break();
         }
@@ -734,64 +734,64 @@ impl PrettyPrintV2 for Block {
     }
 }
 
-impl PrettyPrintV2 for Stmt {
-    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+impl PrettyPrinter for Stmt {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         match self {
             Stmt::Expr(expr) => {
-                expr.pretty_print_v2(printer)?;
+                expr.pretty_print(printer)?;
                 printer.string(";");
             }
             Stmt::Let(stmt_let) => {
-                stmt_let.pretty_print_v2(printer)?;
+                stmt_let.pretty_print(printer)?;
             }
         }
         Ok(())
     }
 }
 
-impl PrettyPrintV2 for StmtLet {
-    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+impl PrettyPrinter for StmtLet {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string("let ");
         printer.string(&self.ident);
         if let Some(ty) = &self.ty {
             printer.string(": ");
-            ty.pretty_print_v2(printer)?;
+            ty.pretty_print(printer)?;
         }
         if let Some(expr) = &self.expr {
             printer.string(" = ");
-            expr.pretty_print_v2(printer)?;
+            expr.pretty_print(printer)?;
         }
         printer.string(";");
         Ok(())
     }
 }
 
-impl PrettyPrintV2 for Item {
-    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+impl PrettyPrinter for Item {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         match self {
-            Item::Fn(item_fn) => item_fn.pretty_print_v2(printer),
-            Item::Struct(item_struct) => item_struct.pretty_print_v2(printer),
-            Item::Enum(item_enum) => item_enum.pretty_print_v2(printer),
-            Item::Impl(item_impl) => item_impl.pretty_print_v2(printer),
-            Item::Trait(item_trait) => item_trait.pretty_print_v2(printer),
-            Item::Const(item_const) => item_const.pretty_print_v2(printer),
-            Item::ExternCrate(item_extern_crate) => item_extern_crate.pretty_print_v2(printer),
-            Item::ForeignMod(item_foreign_mod) => item_foreign_mod.pretty_print_v2(printer),
-            Item::Macro(item_macro) => item_macro.pretty_print_v2(printer),
-            Item::Mod(item_mod) => item_mod.pretty_print_v2(printer),
-            Item::Static(item_static) => item_static.pretty_print_v2(printer),
-            Item::TraitAlias(item_trait_alias) => item_trait_alias.pretty_print_v2(printer),
-            Item::Type(item_type) => item_type.pretty_print_v2(printer),
-            Item::Union(item_union) => item_union.pretty_print_v2(printer),
-            Item::Use(item_use) => item_use.pretty_print_v2(printer),
+            Item::Fn(item_fn) => item_fn.pretty_print(printer),
+            Item::Struct(item_struct) => item_struct.pretty_print(printer),
+            Item::Enum(item_enum) => item_enum.pretty_print(printer),
+            Item::Impl(item_impl) => item_impl.pretty_print(printer),
+            Item::Trait(item_trait) => item_trait.pretty_print(printer),
+            Item::Const(item_const) => item_const.pretty_print(printer),
+            Item::ExternCrate(item_extern_crate) => item_extern_crate.pretty_print(printer),
+            Item::ForeignMod(item_foreign_mod) => item_foreign_mod.pretty_print(printer),
+            Item::Macro(item_macro) => item_macro.pretty_print(printer),
+            Item::Mod(item_mod) => item_mod.pretty_print(printer),
+            Item::Static(item_static) => item_static.pretty_print(printer),
+            Item::TraitAlias(item_trait_alias) => item_trait_alias.pretty_print(printer),
+            Item::Type(item_type) => item_type.pretty_print(printer),
+            Item::Union(item_union) => item_union.pretty_print(printer),
+            Item::Use(item_use) => item_use.pretty_print(printer),
         }
     }
 }
 
-impl PrettyPrintV2 for ItemStruct {
-    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+impl PrettyPrinter for ItemStruct {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         for comment in &self.leading_comments {
-            comment.pretty_print_v2(printer)?;
+            comment.pretty_print(printer)?;
         }
         printer.string("struct ");
         printer.string(&self.ident);
@@ -799,31 +799,31 @@ impl PrettyPrintV2 for ItemStruct {
         printer.begin(BreakStyle::Consistent, "{");
         printer.break_();
         for field in &self.fields {
-            field.pretty_print_v2(printer)?;
+            field.pretty_print(printer)?;
             printer.string(",");
             printer.break_();
         }
         printer.end("}");
         for comment in &self.trailing_comments {
-            comment.pretty_print_v2(printer)?;
+            comment.pretty_print(printer)?;
         }
         Ok(())
     }
 }
 
-impl PrettyPrintV2 for Field {
-    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+impl PrettyPrinter for Field {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string(&self.ident);
         printer.string(": ");
-        self.ty.pretty_print_v2(printer)?;
+        self.ty.pretty_print(printer)?;
         Ok(())
     }
 }
 
-impl PrettyPrintV2 for ItemEnum {
-    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+impl PrettyPrinter for ItemEnum {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         for comment in &self.leading_comments {
-            comment.pretty_print_v2(printer)?;
+            comment.pretty_print(printer)?;
         }
         printer.string("enum ");
         printer.string(&self.ident);
@@ -831,51 +831,51 @@ impl PrettyPrintV2 for ItemEnum {
         printer.begin(BreakStyle::Consistent, "{");
         printer.break_();
         for variant in &self.variants {
-            variant.pretty_print_v2(printer)?;
+            variant.pretty_print(printer)?;
             printer.string(",");
             printer.break_();
         }
         printer.end("}");
         for comment in &self.trailing_comments {
-            comment.pretty_print_v2(printer)?;
+            comment.pretty_print(printer)?;
         }
         Ok(())
     }
 }
 
-impl PrettyPrintV2 for Variant {
-    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+impl PrettyPrinter for Variant {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string(&self.ident);
         Ok(())
     }
 }
 
-impl PrettyPrintV2 for ItemImpl {
-    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+impl PrettyPrinter for ItemImpl {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         for comment in &self.leading_comments {
-            comment.pretty_print_v2(printer)?;
+            comment.pretty_print(printer)?;
         }
         printer.string("impl ");
-        self.ty.pretty_print_v2(printer)?;
+        self.ty.pretty_print(printer)?;
         printer.string(" ");
         printer.begin(BreakStyle::Consistent, "{");
         printer.break_();
         for fun in &self.fns {
-            fun.pretty_print_v2(printer)?;
+            fun.pretty_print(printer)?;
             printer.break_();
         }
         printer.end("}");
         for comment in &self.trailing_comments {
-            comment.pretty_print_v2(printer)?;
+            comment.pretty_print(printer)?;
         }
         Ok(())
     }
 }
 
-impl PrettyPrintV2 for ItemTrait {
-    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+impl PrettyPrinter for ItemTrait {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         for comment in &self.leading_comments {
-            comment.pretty_print_v2(printer)?;
+            comment.pretty_print(printer)?;
         }
         printer.string("trait ");
         printer.string(&self.ident);
@@ -883,136 +883,136 @@ impl PrettyPrintV2 for ItemTrait {
         printer.begin(BreakStyle::Consistent, "{");
         printer.break_();
         for item in &self.items {
-            item.pretty_print_v2(printer)?;
+            item.pretty_print(printer)?;
             printer.break_();
         }
         printer.end("}");
         for comment in &self.trailing_comments {
-            comment.pretty_print_v2(printer)?;
+            comment.pretty_print(printer)?;
         }
         Ok(())
     }
 }
 
-impl PrettyPrintV2 for TraitItem {
-    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+impl PrettyPrinter for TraitItem {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         match self {
-            TraitItem::Fn(item_fn) => item_fn.pretty_print_v2(printer),
+            TraitItem::Fn(item_fn) => item_fn.pretty_print(printer),
         }
     }
 }
 
-impl PrettyPrintV2 for TraitItemFn {
-    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+impl PrettyPrinter for TraitItemFn {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         for comment in &self.leading_comments {
-            comment.pretty_print_v2(printer)?;
+            comment.pretty_print(printer)?;
         }
         printer.string("fn ");
-        self.sig.pretty_print_v2(printer)?;
+        self.sig.pretty_print(printer)?;
         if let Some(block) = &self.block {
             printer.string(" ");
-            block.pretty_print_v2(printer)?;
+            block.pretty_print(printer)?;
         } else {
             printer.string(";");
         }
         for comment in &self.trailing_comments {
-            comment.pretty_print_v2(printer)?;
+            comment.pretty_print(printer)?;
         }
         Ok(())
     }
 }
 
-impl PrettyPrintV2 for ExprIf {
-    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+impl PrettyPrinter for ExprIf {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string("if ");
-        self.cond.pretty_print_v2(printer)?;
+        self.cond.pretty_print(printer)?;
         printer.string(" ");
-        self.then_branch.pretty_print_v2(printer)?;
+        self.then_branch.pretty_print(printer)?;
         if let Some(else_branch) = &self.else_branch {
             printer.string(" else ");
-            else_branch.pretty_print_v2(printer)?;
+            else_branch.pretty_print(printer)?;
         }
         Ok(())
     }
 }
 
-impl PrettyPrintV2 for ExprBlock {
-    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
-        self.block.pretty_print_v2(printer)
+impl PrettyPrinter for ExprBlock {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        self.block.pretty_print(printer)
     }
 }
 
-impl PrettyPrintV2 for ExprLoop {
-    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+impl PrettyPrinter for ExprLoop {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string("loop ");
-        self.body.pretty_print_v2(printer)
+        self.body.pretty_print(printer)
     }
 }
 
-impl PrettyPrintV2 for ExprWhile {
-    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+impl PrettyPrinter for ExprWhile {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string("while ");
-        self.cond.pretty_print_v2(printer)?;
+        self.cond.pretty_print(printer)?;
         printer.string(" ");
-        self.body.pretty_print_v2(printer)
+        self.body.pretty_print(printer)
     }
 }
 
-impl PrettyPrintV2 for ExprFor {
-    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+impl PrettyPrinter for ExprFor {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string("for ");
         printer.string(&self.pat);
         printer.string(" in ");
-        self.expr.pretty_print_v2(printer)?;
+        self.expr.pretty_print(printer)?;
         printer.string(" ");
-        self.body.pretty_print_v2(printer)
+        self.body.pretty_print(printer)
     }
 }
 
-impl PrettyPrintV2 for ExprAssign {
-    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
-        self.left.pretty_print_v2(printer)?;
+impl PrettyPrinter for ExprAssign {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        self.left.pretty_print(printer)?;
         printer.string(" = ");
-        self.right.pretty_print_v2(printer)
+        self.right.pretty_print(printer)
     }
 }
 
-impl PrettyPrintV2 for ExprMacroCall {
-    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+impl PrettyPrinter for ExprMacroCall {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string(&self.ident);
         printer.string("!");
-        self.tokens.pretty_print_v2(printer)
+        self.tokens.pretty_print(printer)
     }
 }
 
-impl PrettyPrintV2 for TokenStream {
-    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+impl PrettyPrinter for TokenStream {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         for (i, token) in self.tokens.iter().enumerate() {
             if i > 0 {
                 printer.break_();
             }
-            token.pretty_print_v2(printer)?;
+            token.pretty_print(printer)?;
         }
         Ok(())
     }
 }
 
-impl PrettyPrintV2 for TokenTree {
-    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+impl PrettyPrinter for TokenTree {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         match self {
-            TokenTree::Group(group) => group.pretty_print_v2(printer),
+            TokenTree::Group(group) => group.pretty_print(printer),
             TokenTree::Ident(ident) => {
                 printer.string(ident);
                 Ok(())
             }
-            TokenTree::Punct(punct) => punct.pretty_print_v2(printer),
-            TokenTree::Literal(lit) => lit.pretty_print_v2(printer),
+            TokenTree::Punct(punct) => punct.pretty_print(printer),
+            TokenTree::Literal(lit) => lit.pretty_print(printer),
         }
     }
 }
 
-impl PrettyPrintV2 for Group {
-    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+impl PrettyPrinter for Group {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         let (open, close) = match self.delimiter {
             Delimiter::Parenthesis => ("(", ")"),
             Delimiter::Brace => ("{", "}"),
@@ -1020,14 +1020,14 @@ impl PrettyPrintV2 for Group {
             Delimiter::None => ("", ""),
         };
         printer.begin(BreakStyle::Consistent, open);
-        self.stream.pretty_print_v2(printer)?;
+        self.stream.pretty_print(printer)?;
         printer.end(close);
         Ok(())
     }
 }
 
-impl PrettyPrintV2 for Punct {
-    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+impl PrettyPrinter for Punct {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string(self.ch.to_string());
         if self.spacing == Spacing::Alone {
             printer.break_();
