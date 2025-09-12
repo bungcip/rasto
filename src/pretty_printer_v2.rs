@@ -642,6 +642,16 @@ impl PrettyPrintV2 for Item {
             Item::Enum(item_enum) => item_enum.pretty_print_v2(printer),
             Item::Impl(item_impl) => item_impl.pretty_print_v2(printer),
             Item::Trait(item_trait) => item_trait.pretty_print_v2(printer),
+            Item::Const(item_const) => item_const.pretty_print_v2(printer),
+            Item::ExternCrate(item_extern_crate) => item_extern_crate.pretty_print_v2(printer),
+            Item::ForeignMod(item_foreign_mod) => item_foreign_mod.pretty_print_v2(printer),
+            Item::Macro(item_macro) => item_macro.pretty_print_v2(printer),
+            Item::Mod(item_mod) => item_mod.pretty_print_v2(printer),
+            Item::Static(item_static) => item_static.pretty_print_v2(printer),
+            Item::TraitAlias(item_trait_alias) => item_trait_alias.pretty_print_v2(printer),
+            Item::Type(item_type) => item_type.pretty_print_v2(printer),
+            Item::Union(item_union) => item_union.pretty_print_v2(printer),
+            Item::Use(item_use) => item_use.pretty_print_v2(printer),
         }
     }
 }
