@@ -760,19 +760,28 @@ impl PrettyPrinter for Block {
 impl PrettyPrinter for Stmt {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         match self {
-            Stmt::Expr(expr) => {
-                expr.pretty_print(printer)?;
-                printer.string(";");
+            Stmt::Local(local) => {
+                local.pretty_print(printer)?;
             }
-            Stmt::Let(stmt_let) => {
-                stmt_let.pretty_print(printer)?;
+            Stmt::Item(item) => {
+                item.pretty_print(printer)?;
+            }
+            Stmt::Expr(expr, semi) => {
+                expr.pretty_print(printer)?;
+                if *semi {
+                    printer.string(";");
+                }
+            }
+            Stmt::MacCall(mac) => {
+                mac.pretty_print(printer)?;
+                printer.string(";");
             }
         }
         Ok(())
     }
 }
 
-impl PrettyPrinter for StmtLet {
+impl PrettyPrinter for Local {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string("let ");
         printer.string(&self.ident);

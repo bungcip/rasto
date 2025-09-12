@@ -1,4 +1,4 @@
-use rasto::ast::{builder::fn_def, Block, Expr, Lit, Stmt};
+use rasto::ast::{builder::*, Block, Expr, Lit, Stmt};
 
 #[test]
 fn test_fn_builder() {
@@ -8,9 +8,10 @@ fn test_fn_builder() {
         .output("bool")
         .block(Block {
             leading_comments: vec![],
-            stmts: vec![Stmt::Expr(Expr::Lit(Lit::Str(
-                "Hello, world!".to_string(),
-            )))],
+            stmts: vec![Stmt::Expr(
+                Expr::Lit(Lit::Str("Hello, world!".to_string())),
+                true,
+            )],
             trailing_comments: vec![],
         })
         .build();
@@ -18,6 +19,28 @@ fn test_fn_builder() {
     let actual = item_fn.to_string();
 
     insta::assert_snapshot!(actual);
+}
+
+#[test]
+fn test_stmt_builder() {
+    let local_stmt = stmt()
+        .local("x")
+        .ty("i32")
+        .expr(Expr::Lit(Lit::Int(42)))
+        .build();
+
+    assert_eq!(
+        local_stmt,
+        Stmt::Local(rasto::ast::Local {
+            ident: "x".to_string(),
+            ty: Some("i32".into()),
+            expr: Some(Expr::Lit(Lit::Int(42))),
+        })
+    );
+
+    let expr_stmt = stmt().expr(Expr::Lit(Lit::Int(42)), true);
+
+    assert_eq!(expr_stmt, Stmt::Expr(Expr::Lit(Lit::Int(42)), true));
 }
 
 #[test]

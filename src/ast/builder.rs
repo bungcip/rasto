@@ -14,7 +14,7 @@
 //!         fn_def("my_function")
 //!             .block(Block {
 //!                 leading_comments: vec![],
-//!                 stmts: vec![Stmt::Expr(expr().lit(Lit::Int(42)))],
+//!                 stmts: vec![Stmt::Expr(expr().lit(Lit::Int(42)), true)],
 //!                 trailing_comments: vec![],
 //!             })
 //!             .build(),
@@ -153,6 +153,76 @@ impl FnBuilder {
             block,
             trailing_comments: vec![],
         }
+    }
+}
+
+/// Creates a new `StmtBuilder` to construct statements.
+pub fn stmt() -> StmtBuilder {
+    StmtBuilder
+}
+
+/// A builder for constructing `Stmt` AST nodes.
+#[derive(Clone, Copy)]
+pub struct StmtBuilder;
+
+impl StmtBuilder {
+    /// Creates a local (`let`) binding statement.
+    pub fn local(self, name: impl Into<String>) -> LocalBuilder {
+        LocalBuilder::new(name)
+    }
+
+    /// Creates an item statement.
+    pub fn item(self, item: impl Into<Item>) -> Stmt {
+        Stmt::Item(item.into())
+    }
+
+    /// Creates an expression statement.
+    pub fn expr(self, expr: Expr, semi: bool) -> Stmt {
+        Stmt::Expr(expr, semi)
+    }
+
+    /// Creates a macro call statement.
+    pub fn mac_call(self, mac: ExprMacroCall) -> Stmt {
+        Stmt::MacCall(mac)
+    }
+}
+
+/// A builder for constructing a `Local` (let) AST node.
+pub struct LocalBuilder {
+    ident: String,
+    ty: Option<Type>,
+    expr: Option<Expr>,
+}
+
+impl LocalBuilder {
+    /// Creates a new `LocalBuilder` with the given variable name.
+    pub fn new(name: impl Into<String>) -> Self {
+        Self {
+            ident: name.into(),
+            ty: None,
+            expr: None,
+        }
+    }
+
+    /// Sets the type of the variable.
+    pub fn ty(mut self, ty: impl Into<Type>) -> Self {
+        self.ty = Some(ty.into());
+        self
+    }
+
+    /// Sets the expression to initialize the variable.
+    pub fn expr(mut self, expr: impl Into<Expr>) -> Self {
+        self.expr = Some(expr.into());
+        self
+    }
+
+    /// Builds the `Stmt::Local` AST node.
+    pub fn build(self) -> Stmt {
+        Stmt::Local(Local {
+            ident: self.ident,
+            ty: self.ty,
+            expr: self.expr,
+        })
     }
 }
 
