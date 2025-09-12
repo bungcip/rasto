@@ -13,7 +13,7 @@
 //!
 //! ```rust
 //! use rasto::ast::*;
-//! use rasto::pretty_printer_v2::*;
+//! use rasto::pretty_printer::*;
 //!
 //! fn main() {
 //!     let ast = Item::from(
@@ -35,7 +35,7 @@
 //!
 //!     let mut buf = String::new();
 //!     let mut printer = Printer::new(&mut buf);
-//!     ast.pretty_print_v2(&mut printer).unwrap();
+//!     ast.pretty_print(&mut printer).unwrap();
 //!     printer.finish().unwrap();
 //!
 //!     println!("{}", buf);
@@ -54,4 +54,4 @@
 //! ```
 
 pub mod ast;
-pub mod pretty_printer_v2;
+pub mod pretty_printer;

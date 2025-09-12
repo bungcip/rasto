@@ -4,7 +4,7 @@
 use crate::ast::expressions::{Path, PathSegment};
 use crate::ast::item_macro::ItemMacro;
 use crate::ast::Expr;
-use crate::pretty_printer_v2::{PrettyPrintV2, Printer};
+use crate::pretty_printer::{PrettyPrinter, Printer};
 use std::fmt;
 
 /// A Rust type.
@@ -113,12 +113,12 @@ impl From<&str> for Type {
     }
 }
 
-impl PrettyPrintV2 for Type {
-    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+impl PrettyPrinter for Type {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         match self {
-            Type::Array(array) => array.pretty_print_v2(printer),
-            Type::BareFn(bare_fn) => bare_fn.pretty_print_v2(printer),
-            Type::Group(group) => group.pretty_print_v2(printer),
+            Type::Array(array) => array.pretty_print(printer),
+            Type::BareFn(bare_fn) => bare_fn.pretty_print(printer),
+            Type::Group(group) => group.pretty_print(printer),
             Type::ImplTrait => {
                 printer.string("impl Trait");
                 Ok(())
@@ -127,23 +127,23 @@ impl PrettyPrintV2 for Type {
                 printer.string("_");
                 Ok(())
             }
-            Type::Macro(mac) => mac.pretty_print_v2(printer),
+            Type::Macro(mac) => mac.pretty_print(printer),
             Type::Never => {
                 printer.string("!");
                 Ok(())
             }
             Type::Paren(paren) => {
                 printer.string("(");
-                paren.pretty_print_v2(printer)?;
+                paren.pretty_print(printer)?;
                 printer.string(")");
                 Ok(())
             }
-            Type::Path(path) => path.pretty_print_v2(printer),
-            Type::Ptr(ptr) => ptr.pretty_print_v2(printer),
-            Type::Reference(reference) => reference.pretty_print_v2(printer),
+            Type::Path(path) => path.pretty_print(printer),
+            Type::Ptr(ptr) => ptr.pretty_print(printer),
+            Type::Reference(reference) => reference.pretty_print(printer),
             Type::Slice(slice) => {
                 printer.string("[");
-                slice.pretty_print_v2(printer)?;
+                slice.pretty_print(printer)?;
                 printer.string("]");
                 Ok(())
             }
@@ -157,7 +157,7 @@ impl PrettyPrintV2 for Type {
                     if i > 0 {
                         printer.string(", ");
                     }
-                    ty.pretty_print_v2(printer)?;
+                    ty.pretty_print(printer)?;
                 }
                 if tuple.len() == 1 {
                     printer.string(",");
@@ -169,55 +169,55 @@ impl PrettyPrintV2 for Type {
     }
 }
 
-impl PrettyPrintV2 for TypeArray {
-    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+impl PrettyPrinter for TypeArray {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string("[");
-        self.elem.pretty_print_v2(printer)?;
+        self.elem.pretty_print(printer)?;
         printer.string("; ");
-        self.len.pretty_print_v2(printer)?;
+        self.len.pretty_print(printer)?;
         printer.string("]");
         Ok(())
     }
 }
 
-impl PrettyPrintV2 for TypeBareFn {
-    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+impl PrettyPrinter for TypeBareFn {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string("fn(");
         for (i, ty) in self.inputs.iter().enumerate() {
             if i > 0 {
                 printer.string(", ");
             }
-            ty.pretty_print_v2(printer)?;
+            ty.pretty_print(printer)?;
         }
         printer.string(")");
         if let Some(output) = &self.output {
             printer.string(" -> ");
-            output.pretty_print_v2(printer)?;
+            output.pretty_print(printer)?;
         }
         Ok(())
     }
 }
 
-impl PrettyPrintV2 for TypePath {
-    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
-        self.path.pretty_print_v2(printer)
+impl PrettyPrinter for TypePath {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        self.path.pretty_print(printer)
     }
 }
 
-impl PrettyPrintV2 for TypePtr {
-    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+impl PrettyPrinter for TypePtr {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string("*");
         if self.mutable {
             printer.string("mut ");
         } else {
             printer.string("const ");
         }
-        self.elem.pretty_print_v2(printer)
+        self.elem.pretty_print(printer)
     }
 }
 
-impl PrettyPrintV2 for TypeReference {
-    fn pretty_print_v2<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+impl PrettyPrinter for TypeReference {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string("&");
         if let Some(lifetime) = &self.lifetime {
             printer.string(lifetime);
@@ -226,6 +226,6 @@ impl PrettyPrintV2 for TypeReference {
         if self.mutable {
             printer.string("mut ");
         }
-        self.elem.pretty_print_v2(printer)
+        self.elem.pretty_print(printer)
     }
 }

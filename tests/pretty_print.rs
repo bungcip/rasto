@@ -1,11 +1,11 @@
 use rasto::ast::builder::{file, fn_def};
 use rasto::ast::*;
-use rasto::pretty_printer_v2::{PrettyPrintV2, Printer};
+use rasto::pretty_printer::{PrettyPrinter, Printer};
 
 fn pretty_print_item(item: Item) -> String {
     let mut buf = String::new();
     let mut printer = Printer::new(&mut buf);
-    item.pretty_print_v2(&mut printer).unwrap();
+    item.pretty_print(&mut printer).unwrap();
     printer.finish().unwrap();
     buf
 }
@@ -18,7 +18,7 @@ fn pretty_print_file(file: File) -> String {
             printer.hard_break();
             printer.hard_break();
         }
-        item.pretty_print_v2(&mut printer).unwrap();
+        item.pretty_print(&mut printer).unwrap();
     }
     printer.finish().unwrap();
     buf
@@ -78,7 +78,7 @@ fn test_fn() {
 fn pretty_print_expr(expr: Expr) -> String {
     let mut buf = String::new();
     let mut printer = Printer::new(&mut buf);
-    expr.pretty_print_v2(&mut printer).unwrap();
+    expr.pretty_print(&mut printer).unwrap();
     printer.finish().unwrap();
     buf
 }
