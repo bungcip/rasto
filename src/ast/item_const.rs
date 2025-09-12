@@ -1,3 +1,4 @@
+use crate::ast::attributes::Attribute;
 use crate::ast::comments::Comment;
 use crate::ast::expressions::Expr;
 use crate::ast::types::Type;
@@ -7,6 +8,8 @@ use std::fmt;
 /// A `const` item: `const MAX: u16 = 234342;`
 #[derive(Debug, Clone, PartialEq)]
 pub struct ItemConst {
+    /// Attributes that appear before the const item.
+    pub attrs: Vec<Attribute>,
     /// Comments that appear before the const item.
     pub leading_comments: Vec<Comment>,
     /// The name of the const item.
@@ -32,6 +35,10 @@ impl ItemConst {
 
 impl PrettyPrinter for ItemConst {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        for attr in &self.attrs {
+            attr.pretty_print(printer)?;
+            printer.hard_break();
+        }
         for comment in &self.leading_comments {
             comment.pretty_print(printer)?;
         }

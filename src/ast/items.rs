@@ -3,6 +3,7 @@
 //! Items are the primary components of a Rust program, such as functions, structs, enums,
 //! impl blocks, and traits. They are the top-level declarations that make up a crate.
 
+use crate::ast::attributes::Attribute;
 use crate::ast::comments::Comment;
 use crate::ast::item_const::ItemConst;
 use crate::ast::item_extern_crate::ItemExternCrate;
@@ -53,9 +54,22 @@ pub enum Item {
     Use(ItemUse),
 }
 
+impl Item {
+    /// Pretty-prints the item to a string.
+    pub fn to_string(&self) -> String {
+        let mut buf = String::new();
+        let mut printer = Printer::new(&mut buf);
+        self.pretty_print(&mut printer).unwrap();
+        printer.finish().unwrap();
+        buf
+    }
+}
+
 /// A trait item: `trait Foo { ... }`.
 #[derive(Debug, Clone, PartialEq)]
 pub struct ItemTrait {
+    /// Attributes that appear before the trait.
+    pub attrs: Vec<Attribute>,
     /// Comments that appear before the trait.
     pub leading_comments: Vec<Comment>,
     /// The name of the trait.
@@ -76,6 +90,8 @@ pub enum TraitItem {
 /// A function item within a trait.
 #[derive(Debug, Clone, PartialEq)]
 pub struct TraitItemFn {
+    /// Attributes that appear before the function.
+    pub attrs: Vec<Attribute>,
     /// Comments that appear before the function.
     pub leading_comments: Vec<Comment>,
     /// The function signature.
@@ -164,6 +180,8 @@ impl ItemTrait {
 /// A struct item: `struct Foo { ... }`.
 #[derive(Debug, Clone, PartialEq)]
 pub struct ItemStruct {
+    /// Attributes that appear before the struct.
+    pub attrs: Vec<Attribute>,
     /// Comments that appear before the struct.
     pub leading_comments: Vec<Comment>,
     /// The name of the struct.
@@ -177,6 +195,8 @@ pub struct ItemStruct {
 /// A field of a struct.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Field {
+    /// Attributes that appear before the field.
+    pub attrs: Vec<Attribute>,
     /// The name of the field.
     pub ident: String,
     /// The type of the field.
@@ -186,6 +206,8 @@ pub struct Field {
 /// An enum item: `enum Foo { ... }`.
 #[derive(Debug, Clone, PartialEq)]
 pub struct ItemEnum {
+    /// Attributes that appear before the enum.
+    pub attrs: Vec<Attribute>,
     /// Comments that appear before the enum.
     pub leading_comments: Vec<Comment>,
     /// The name of the enum.
@@ -199,6 +221,8 @@ pub struct ItemEnum {
 /// A variant of an enum.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Variant {
+    /// Attributes that appear before the variant.
+    pub attrs: Vec<Attribute>,
     /// The name of the variant.
     pub ident: String,
 }
@@ -206,6 +230,8 @@ pub struct Variant {
 /// An `impl` block: `impl Foo { ... }`.
 #[derive(Debug, Clone, PartialEq)]
 pub struct ItemImpl {
+    /// Attributes that appear before the `impl` block.
+    pub attrs: Vec<Attribute>,
     /// Comments that appear before the `impl` block.
     pub leading_comments: Vec<Comment>,
     /// The type the `impl` block is for.
@@ -219,6 +245,8 @@ pub struct ItemImpl {
 /// A function item: `fn foo() { ... }`.
 #[derive(Debug, Clone, PartialEq)]
 pub struct ItemFn {
+    /// Attributes that appear before the function.
+    pub attrs: Vec<Attribute>,
     /// Comments that appear before the function.
     pub leading_comments: Vec<Comment>,
     /// The function signature.

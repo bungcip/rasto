@@ -1,3 +1,4 @@
+use crate::ast::attributes::Attribute;
 use crate::ast::comments::Comment;
 use crate::ast::types::Type;
 use crate::pretty_printer::{PrettyPrinter, Printer};
@@ -6,6 +7,8 @@ use std::fmt;
 /// A `type` item: `type MyResult<T> = Result<T, MyError>;`
 #[derive(Debug, Clone, PartialEq)]
 pub struct ItemType {
+    /// Attributes that appear before the type item.
+    pub attrs: Vec<Attribute>,
     /// Comments that appear before the type item.
     pub leading_comments: Vec<Comment>,
     /// The name of the type alias.
@@ -29,6 +32,10 @@ impl ItemType {
 
 impl PrettyPrinter for ItemType {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        for attr in &self.attrs {
+            attr.pretty_print(printer)?;
+            printer.hard_break();
+        }
         for comment in &self.leading_comments {
             comment.pretty_print(printer)?;
         }
