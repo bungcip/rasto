@@ -675,6 +675,10 @@ impl PrettyPrinter for ExprTuple {
 
 impl PrettyPrinter for ItemFn {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        for attr in &self.attrs {
+            attr.pretty_print(printer)?;
+            printer.hard_break();
+        }
         for comment in &self.leading_comments {
             comment.pretty_print(printer)?;
         }
@@ -790,6 +794,10 @@ impl PrettyPrinter for Item {
 
 impl PrettyPrinter for ItemStruct {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        for attr in &self.attrs {
+            attr.pretty_print(printer)?;
+            printer.hard_break();
+        }
         for comment in &self.leading_comments {
             comment.pretty_print(printer)?;
         }
@@ -813,6 +821,10 @@ impl PrettyPrinter for ItemStruct {
 
 impl PrettyPrinter for Field {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        for attr in &self.attrs {
+            attr.pretty_print(printer)?;
+            printer.hard_break();
+        }
         printer.string(&self.ident);
         printer.string(": ");
         self.ty.pretty_print(printer)?;
@@ -822,6 +834,10 @@ impl PrettyPrinter for Field {
 
 impl PrettyPrinter for ItemEnum {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        for attr in &self.attrs {
+            attr.pretty_print(printer)?;
+            printer.hard_break();
+        }
         for comment in &self.leading_comments {
             comment.pretty_print(printer)?;
         }
@@ -845,6 +861,10 @@ impl PrettyPrinter for ItemEnum {
 
 impl PrettyPrinter for Variant {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        for attr in &self.attrs {
+            attr.pretty_print(printer)?;
+            printer.hard_break();
+        }
         printer.string(&self.ident);
         Ok(())
     }
@@ -852,6 +872,10 @@ impl PrettyPrinter for Variant {
 
 impl PrettyPrinter for ItemImpl {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        for attr in &self.attrs {
+            attr.pretty_print(printer)?;
+            printer.hard_break();
+        }
         for comment in &self.leading_comments {
             comment.pretty_print(printer)?;
         }
@@ -874,6 +898,10 @@ impl PrettyPrinter for ItemImpl {
 
 impl PrettyPrinter for ItemTrait {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        for attr in &self.attrs {
+            attr.pretty_print(printer)?;
+            printer.hard_break();
+        }
         for comment in &self.leading_comments {
             comment.pretty_print(printer)?;
         }
@@ -904,6 +932,10 @@ impl PrettyPrinter for TraitItem {
 
 impl PrettyPrinter for TraitItemFn {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        for attr in &self.attrs {
+            attr.pretty_print(printer)?;
+            printer.hard_break();
+        }
         for comment in &self.leading_comments {
             comment.pretty_print(printer)?;
         }

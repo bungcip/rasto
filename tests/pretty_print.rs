@@ -28,14 +28,17 @@ fn pretty_print_file(file: File) -> String {
 fn test_file() {
     let ast = file()
         .item(Item::Struct(ItemStruct {
+            attrs: vec![],
             leading_comments: vec![Comment::Line(" A simple struct.".to_string())],
             ident: "Foo".to_string(),
             fields: vec![
                 Field {
+                    attrs: vec![],
                     ident: "field1".to_string(),
                     ty: "i32".into(),
                 },
                 Field {
+                    attrs: vec![],
                     ident: "field2".to_string(),
                     ty: "String".into(),
                 },
@@ -274,13 +277,16 @@ fn test_expr_tuple() {
 #[test]
 fn test_long_enum() {
     let ast = Item::Enum(ItemEnum {
+        attrs: vec![],
         leading_comments: vec![],
         ident: "MyLongLongLongLongLongEnum".to_string(),
         variants: vec![
             Variant {
+                attrs: vec![],
                 ident: "AVeryLongVariantNameThatShouldCauseALineBreak".to_string(),
             },
             Variant {
+                attrs: vec![],
                 ident: "AnotherVeryLongVariantNameThatShouldAlsoCauseALineBreak".to_string(),
             },
         ],
@@ -293,9 +299,11 @@ fn test_long_enum() {
 #[test]
 fn test_single_field_struct() {
     let ast = Item::Struct(ItemStruct {
+        attrs: vec![],
         leading_comments: vec![],
         ident: "MyStruct".to_string(),
         fields: vec![Field {
+            attrs: vec![],
             ident: "field".to_string(),
             ty: "i32".into(),
         }],
@@ -308,14 +316,17 @@ fn test_single_field_struct() {
 #[test]
 fn test_nested_struct() {
     let ast = Item::Struct(ItemStruct {
+        attrs: vec![],
         leading_comments: vec![],
         ident: "Outer".to_string(),
         fields: vec![
             Field {
+                attrs: vec![],
                 ident: "inner".to_string(),
                 ty: "Inner".into(),
             },
             Field {
+                attrs: vec![],
                 ident: "another_field".to_string(),
                 ty: "i32".into(),
             },
@@ -329,6 +340,7 @@ fn test_nested_struct() {
 #[test]
 fn test_long_binary_expression() {
     let ast = Item::Fn(ItemFn {
+        attrs: vec![],
         leading_comments: vec![],
         sig: Signature {
             ident: "foo".to_string(),
@@ -357,9 +369,11 @@ fn test_long_binary_expression() {
 #[test]
 fn test_trait() {
     let ast = Item::Trait(ItemTrait {
+        attrs: vec![],
         leading_comments: vec![Comment::Line(" A simple trait.".to_string())],
         ident: "MyTrait".to_string(),
         items: vec![TraitItem::Fn(TraitItemFn {
+            attrs: vec![],
             leading_comments: vec![],
             sig: Signature {
                 ident: "my_func".to_string(),
@@ -487,13 +501,16 @@ fn test_macro_call_expression() {
 #[test]
 fn test_enum() {
     let ast = Item::Enum(ItemEnum {
+        attrs: vec![],
         leading_comments: vec![Comment::Line(" A simple enum.".to_string())],
         ident: "MyEnum".to_string(),
         variants: vec![
             Variant {
+                attrs: vec![],
                 ident: "Variant1".to_string(),
             },
             Variant {
+                attrs: vec![],
                 ident: "Variant2".to_string(),
             },
         ],
@@ -506,6 +523,7 @@ fn test_enum() {
 #[test]
 fn test_impl() {
     let ast = Item::Impl(ItemImpl {
+        attrs: vec![],
         leading_comments: vec![Comment::Line(" A simple impl.".to_string())],
         ty: "MyStruct".into(),
         fns: vec![fn_def("new")
@@ -599,14 +617,17 @@ fn test_binary_expression() {
 #[test]
 fn test_struct() {
     let ast = Item::Struct(ItemStruct {
+        attrs: vec![],
         leading_comments: vec![Comment::Line(" A simple struct.".to_string())],
         ident: "Foo".to_string(),
         fields: vec![
             Field {
+                attrs: vec![],
                 ident: "field1".to_string(),
                 ty: "i32".into(),
             },
             Field {
+                attrs: vec![],
                 ident: "field2".to_string(),
                 ty: "String".into(),
             },

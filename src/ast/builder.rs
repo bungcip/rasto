@@ -143,6 +143,7 @@ impl FnBuilder {
         let block = self.block.expect("block is required");
 
         ItemFn {
+            attrs: vec![],
             leading_comments: vec![],
             sig: Signature {
                 ident: self.ident,
@@ -548,6 +549,7 @@ impl ItemConstBuilder {
     #[allow(missing_docs)]
     pub fn build(self) -> ItemConst {
         ItemConst {
+            attrs: vec![],
             ident: self.ident,
             ty: self.ty,
             expr: self.expr,
@@ -594,6 +596,7 @@ impl ItemExternCrateBuilder {
     #[allow(missing_docs)]
     pub fn build(self) -> ItemExternCrate {
         ItemExternCrate {
+            attrs: vec![],
             ident: self.ident,
             leading_comments: self.leading_comments,
             trailing_comments: self.trailing_comments,
@@ -646,6 +649,7 @@ impl ItemForeignModBuilder {
     #[allow(missing_docs)]
     pub fn build(self) -> ItemForeignMod {
         ItemForeignMod {
+            attrs: vec![],
             abi: self.abi,
             items: self.items,
             leading_comments: self.leading_comments,
@@ -691,6 +695,7 @@ impl ItemMacroBuilder {
     #[allow(missing_docs)]
     pub fn build(self) -> ItemMacro {
         ItemMacro {
+            attrs: vec![],
             expr: Box::new(self.expr),
             leading_comments: self.leading_comments,
             trailing_comments: self.trailing_comments,
@@ -743,6 +748,7 @@ impl ItemModBuilder {
     #[allow(missing_docs)]
     pub fn build(self) -> ItemMod {
         ItemMod {
+            attrs: vec![],
             ident: self.ident,
             content: self.content,
             leading_comments: self.leading_comments,
@@ -792,6 +798,7 @@ impl ItemStaticBuilder {
     #[allow(missing_docs)]
     pub fn build(self) -> ItemStatic {
         ItemStatic {
+            attrs: vec![],
             ident: self.ident,
             ty: self.ty,
             expr: self.expr,
@@ -840,6 +847,7 @@ impl ItemTraitAliasBuilder {
     #[allow(missing_docs)]
     pub fn build(self) -> ItemTraitAlias {
         ItemTraitAlias {
+            attrs: vec![],
             ident: self.ident,
             bounds: self.bounds,
             leading_comments: self.leading_comments,
@@ -887,6 +895,7 @@ impl ItemTypeBuilder {
     #[allow(missing_docs)]
     pub fn build(self) -> ItemType {
         ItemType {
+            attrs: vec![],
             ident: self.ident,
             ty: self.ty,
             leading_comments: self.leading_comments,
@@ -940,6 +949,7 @@ impl ItemUnionBuilder {
     #[allow(missing_docs)]
     pub fn build(self) -> ItemUnion {
         ItemUnion {
+            attrs: vec![],
             ident: self.ident,
             fields: self.fields,
             leading_comments: self.leading_comments,
@@ -985,6 +995,7 @@ impl ItemUseBuilder {
     #[allow(missing_docs)]
     pub fn build(self) -> ItemUse {
         ItemUse {
+            attrs: vec![],
             path: self.path,
             leading_comments: self.leading_comments,
             trailing_comments: self.trailing_comments,

@@ -79,10 +79,12 @@ fn test_type_item() {
 fn test_union_item() {
     let item = union_item("MyUnion")
         .field(Field {
+            attrs: vec![],
             ident: "f1".to_string(),
             ty: Type::from("u32"),
         })
         .field(Field {
+            attrs: vec![],
             ident: "f2".to_string(),
             ty: Type::from("f32"),
         })

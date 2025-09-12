@@ -1,3 +1,4 @@
+use crate::ast::attributes::Attribute;
 use crate::ast::comments::Comment;
 use crate::pretty_printer::{PrettyPrinter, Printer};
 use std::fmt;
@@ -5,6 +6,8 @@ use std::fmt;
 /// A `use` item: `use std::collections::HashMap;`
 #[derive(Debug, Clone, PartialEq)]
 pub struct ItemUse {
+    /// Attributes that appear before the use item.
+    pub attrs: Vec<Attribute>,
     /// Comments that appear before the use item.
     pub leading_comments: Vec<Comment>,
     /// The path being used.
@@ -26,6 +29,10 @@ impl ItemUse {
 
 impl PrettyPrinter for ItemUse {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        for attr in &self.attrs {
+            attr.pretty_print(printer)?;
+            printer.hard_break();
+        }
         for comment in &self.leading_comments {
             comment.pretty_print(printer)?;
         }

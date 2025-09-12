@@ -18,6 +18,7 @@
 //! fn main() {
 //!     let ast = Item::from(
 //!         ItemFn {
+//!             attrs: vec![],
 //!             leading_comments: vec![Comment::Line(" A simple function.".to_string())],
 //!             sig: Signature {
 //!                 ident: "foo".to_string(),
