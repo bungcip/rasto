@@ -9,7 +9,7 @@ pub struct ItemMacro {
     /// Comments that appear before the macro invocation.
     pub leading_comments: Vec<Comment>,
     /// The macro invocation expression.
-    pub expr: Expr,
+    pub expr: Box<Expr>,
     /// Comments that appear after the macro invocation.
     pub trailing_comments: Vec<Comment>,
 }

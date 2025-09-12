@@ -33,17 +33,19 @@ fn test_file() {
             fields: vec![
                 Field {
                     ident: "field1".to_string(),
-                    ty: "i32".to_string(),
+                    ty: "i32".into(),
                 },
                 Field {
                     ident: "field2".to_string(),
-                    ty: "String".to_string(),
+                    ty: "String".into(),
                 },
             ],
             trailing_comments: vec![],
         }))
         .item(
             fn_def("foo")
+                .input("i32")
+                .output("i32")
                 .block(Block {
                     leading_comments: vec![],
                     stmts: vec![Stmt::Expr(Expr::Lit(Lit::Int(42)))],
@@ -60,6 +62,8 @@ fn test_file() {
 fn test_fn() {
     let ast = Item::Fn(
         fn_def("foo")
+            .input("i32")
+            .output("i32")
             .block(Block {
                 leading_comments: vec![Comment::Block(" An inner comment ".to_string())],
                 stmts: vec![Stmt::Expr(Expr::Lit(Lit::Int(42)))],
@@ -126,7 +130,7 @@ fn test_expr_call() {
 fn test_expr_cast() {
     let ast = Expr::Cast(ExprCast {
         expr: Box::new(Expr::Lit(Lit::Str("x".to_string()))),
-        ty: "u32".to_string(),
+        ty: "u32".into(),
     });
     insta::assert_snapshot!(pretty_print_expr(ast));
 }
@@ -293,7 +297,7 @@ fn test_single_field_struct() {
         ident: "MyStruct".to_string(),
         fields: vec![Field {
             ident: "field".to_string(),
-            ty: "i32".to_string(),
+            ty: "i32".into(),
         }],
         trailing_comments: vec![],
     });
@@ -309,11 +313,11 @@ fn test_nested_struct() {
         fields: vec![
             Field {
                 ident: "inner".to_string(),
-                ty: "Inner".to_string(),
+                ty: "Inner".into(),
             },
             Field {
                 ident: "another_field".to_string(),
-                ty: "i32".to_string(),
+                ty: "i32".into(),
             },
         ],
         trailing_comments: vec![],
@@ -328,6 +332,8 @@ fn test_long_binary_expression() {
         leading_comments: vec![],
         sig: Signature {
             ident: "foo".to_string(),
+            inputs: vec![],
+            output: None,
         },
         block: Block {
             leading_comments: vec![],
@@ -357,6 +363,8 @@ fn test_trait() {
             leading_comments: vec![],
             sig: Signature {
                 ident: "my_func".to_string(),
+                inputs: vec![],
+                output: None,
             },
             block: None,
             trailing_comments: vec![],
@@ -499,7 +507,7 @@ fn test_enum() {
 fn test_impl() {
     let ast = Item::Impl(ItemImpl {
         leading_comments: vec![Comment::Line(" A simple impl.".to_string())],
-        ident: "MyStruct".to_string(),
+        ty: "MyStruct".into(),
         fns: vec![fn_def("new")
             .block(Block {
                 leading_comments: vec![],
@@ -521,7 +529,7 @@ fn test_let_statement() {
                 leading_comments: vec![],
                 stmts: vec![Stmt::Let(StmtLet {
                     ident: "x".to_string(),
-                    ty: Some("i32".to_string()),
+                    ty: Some("i32".into()),
                     expr: Some(Expr::Lit(Lit::Int(42))),
                 })],
                 trailing_comments: vec![],
@@ -596,11 +604,11 @@ fn test_struct() {
         fields: vec![
             Field {
                 ident: "field1".to_string(),
-                ty: "i32".to_string(),
+                ty: "i32".into(),
             },
             Field {
                 ident: "field2".to_string(),
-                ty: "String".to_string(),
+                ty: "String".into(),
             },
         ],
         trailing_comments: vec![],

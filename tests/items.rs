@@ -1,9 +1,9 @@
-use rasto::ast::*;
-use rasto::ast::builder::*;
+use rasto::ast::builder::{const_item, extern_crate_item, fn_def, foreign_mod_item, macro_item, mod_item, static_item, trait_alias_item, type_item, union_item, use_item};
+use rasto::ast::{expr, Block, Field, Item, TokenStream, Type};
 
 #[test]
 fn test_const_item() {
-    let item = const_item("MAX", "u16", expr().lit(234342)).build();
+    let item = const_item("MAX", Type::from("u16"), expr().lit(234342)).build();
     insta::assert_snapshot!(item.to_string());
 }
 
@@ -59,7 +59,7 @@ fn test_mod_item_with_content() {
 
 #[test]
 fn test_static_item() {
-    let item = static_item("COUNTER", "u32", expr().lit(0)).build();
+    let item = static_item("COUNTER", Type::from("u32"), expr().lit(0)).build();
     insta::assert_snapshot!(item.to_string());
 }
 
@@ -71,7 +71,7 @@ fn test_trait_alias_item() {
 
 #[test]
 fn test_type_item() {
-    let item = type_item("MyResult<T>", "Result<T, MyError>").build();
+    let item = type_item("MyResult<T>", Type::from("Result<T, MyError>")).build();
     insta::assert_snapshot!(item.to_string());
 }
 
@@ -80,11 +80,11 @@ fn test_union_item() {
     let item = union_item("MyUnion")
         .field(Field {
             ident: "f1".to_string(),
-            ty: "u32".to_string(),
+            ty: Type::from("u32"),
         })
         .field(Field {
             ident: "f2".to_string(),
-            ty: "f32".to_string(),
+            ty: Type::from("f32"),
         })
         .build();
     insta::assert_snapshot!(item.to_string());
