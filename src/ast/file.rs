@@ -1,6 +1,7 @@
 //! Defines the top-level AST node for a Rust file.
 
 use crate::ast::items::Item;
+use crate::pretty_printer::{PrettyPrinter, Printer};
 
 /// Represents a Rust source file.
 ///
@@ -20,6 +21,10 @@ impl File {
     ///
     /// A `String` containing the formatted Rust code.
     pub fn to_string(&self) -> String {
-        todo!();
+        let mut buf = String::new();
+        let mut printer = Printer::new(&mut buf);
+        self.pretty_print(&mut printer).unwrap();
+        printer.finish().unwrap();
+        buf
     }
 }
