@@ -345,6 +345,16 @@ impl PrettyPrinter for Comment {
     }
 }
 
+impl PrettyPrinter for UnOp {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        match self {
+            UnOp::Not => printer.string("!"),
+            UnOp::Neg => printer.string("-"),
+        }
+        Ok(())
+    }
+}
+
 impl PrettyPrinter for Path {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         for (i, segment) in self.segments.iter().enumerate() {
@@ -398,6 +408,14 @@ impl PrettyPrinter for ExprBinary {
     }
 }
 
+impl PrettyPrinter for ExprUnary {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        self.op.pretty_print(printer)?;
+        self.expr.pretty_print(printer)?;
+        Ok(())
+    }
+}
+
 impl PrettyPrinter for Expr {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         match self {
@@ -429,6 +447,7 @@ impl PrettyPrinter for Expr {
             Expr::Return(expr) => expr.pretty_print(printer),
             Expr::Struct(expr) => expr.pretty_print(printer),
             Expr::Tuple(expr) => expr.pretty_print(printer),
+            Expr::Unary(expr) => expr.pretty_print(printer),
         }
     }
 }

@@ -177,6 +177,19 @@ impl ExprBuilder {
         })
     }
 
+    /// Creates a unary operation expression.
+    ///
+    /// # Parameters
+    ///
+    /// - `op`: The unary operator.
+    /// - `expr`: The expression.
+    pub fn unary(self, op: UnOp, expr: Expr) -> Expr {
+        Expr::Unary(ExprUnary {
+            op,
+            expr: Box::new(expr),
+        })
+    }
+
     /// Creates an assignment expression.
     ///
     /// # Parameters
