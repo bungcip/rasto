@@ -22,14 +22,11 @@ pub struct ItemStatic {
     pub trailing_comments: Vec<Comment>,
 }
 
-impl ItemStatic {
-    /// Pretty-prints the static item to a string.
-    pub fn to_string(&self) -> String {
-        let mut buf = String::new();
-        let mut printer = Printer::new(&mut buf);
-        self.pretty_print(&mut printer).unwrap();
-        printer.finish().unwrap();
-        buf
+impl fmt::Display for ItemStatic {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let mut printer = Printer::new(f);
+        self.pretty_print(&mut printer)?;
+        printer.finish()
     }
 }
 

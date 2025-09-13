@@ -410,6 +410,9 @@ impl PrettyPrinter for Path {
 impl PrettyPrinter for PathSegment {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string(&self.ident);
+        if let Some(args) = &self.args {
+            args.pretty_print(printer)?;
+        }
         Ok(())
     }
 }
@@ -821,6 +824,7 @@ impl PrettyPrinter for ItemFn {
 impl PrettyPrinter for Signature {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string(&self.ident);
+        self.generics.pretty_print(printer)?;
         printer.begin(BreakStyle::Consistent, "(");
         for (i, input) in self.inputs.iter().enumerate() {
             if i > 0 {
@@ -950,13 +954,16 @@ impl PrettyPrinter for ItemStruct {
         }
         printer.string("struct ");
         printer.string(&self.ident);
+        self.generics.pretty_print(printer)?;
         printer.string(" ");
         printer.begin(BreakStyle::Consistent, "{");
-        printer.break_();
-        for field in &self.fields {
-            field.pretty_print(printer)?;
-            printer.string(",");
-            printer.break_();
+        if !self.fields.is_empty() {
+            printer.hard_break();
+            for field in &self.fields {
+                field.pretty_print(printer)?;
+                printer.string(",");
+                printer.hard_break();
+            }
         }
         printer.end("}");
         for comment in &self.trailing_comments {
@@ -990,13 +997,16 @@ impl PrettyPrinter for ItemEnum {
         }
         printer.string("enum ");
         printer.string(&self.ident);
+        self.generics.pretty_print(printer)?;
         printer.string(" ");
         printer.begin(BreakStyle::Consistent, "{");
-        printer.break_();
-        for variant in &self.variants {
-            variant.pretty_print(printer)?;
-            printer.string(",");
-            printer.break_();
+        if !self.variants.is_empty() {
+            printer.hard_break();
+            for variant in &self.variants {
+                variant.pretty_print(printer)?;
+                printer.string(",");
+                printer.hard_break();
+            }
         }
         printer.end("}");
         for comment in &self.trailing_comments {
@@ -1026,14 +1036,18 @@ impl PrettyPrinter for ItemImpl {
         for comment in &self.leading_comments {
             comment.pretty_print(printer)?;
         }
-        printer.string("impl ");
+        printer.string("impl");
+        self.generics.pretty_print(printer)?;
+        printer.string(" ");
         self.ty.pretty_print(printer)?;
         printer.string(" ");
         printer.begin(BreakStyle::Consistent, "{");
-        printer.break_();
-        for fun in &self.fns {
-            fun.pretty_print(printer)?;
-            printer.break_();
+        if !self.fns.is_empty() {
+            printer.hard_break();
+            for fun in &self.fns {
+                fun.pretty_print(printer)?;
+                printer.hard_break();
+            }
         }
         printer.end("}");
         for comment in &self.trailing_comments {
@@ -1054,12 +1068,15 @@ impl PrettyPrinter for ItemTrait {
         }
         printer.string("trait ");
         printer.string(&self.ident);
+        self.generics.pretty_print(printer)?;
         printer.string(" ");
         printer.begin(BreakStyle::Consistent, "{");
-        printer.break_();
-        for item in &self.items {
-            item.pretty_print(printer)?;
-            printer.break_();
+        if !self.items.is_empty() {
+            printer.hard_break();
+            for item in &self.items {
+                item.pretty_print(printer)?;
+                printer.hard_break();
+            }
         }
         printer.end("}");
         for comment in &self.trailing_comments {

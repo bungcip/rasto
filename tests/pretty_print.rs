@@ -23,6 +23,7 @@ fn test_file() {
             attrs: vec![],
             leading_comments: vec![Comment::Line(" A simple struct.".to_string())],
             ident: "Foo".to_string(),
+            generics: Default::default(),
             fields: vec![
                 Field {
                     attrs: vec![],
@@ -205,10 +206,7 @@ fn test_expr_match() {
         expr: Box::new(Expr::Lit("x".into())),
         arms: vec![
             Arm {
-                pat: pat().tuple(vec![
-                    pat().ident("Some", false),
-                    pat().ident("y", false),
-                ]),
+                pat: pat().tuple(vec![pat().ident("Some", false), pat().ident("y", false)]),
                 guard: None,
                 body: Box::new(Expr::Lit(1.into())),
             },
@@ -299,6 +297,7 @@ fn test_long_enum() {
         attrs: vec![],
         leading_comments: vec![],
         ident: "MyLongLongLongLongLongEnum".to_string(),
+        generics: Default::default(),
         variants: vec![
             Variant {
                 attrs: vec![],
@@ -321,6 +320,7 @@ fn test_single_field_struct() {
         attrs: vec![],
         leading_comments: vec![],
         ident: "MyStruct".to_string(),
+        generics: Default::default(),
         fields: vec![Field {
             attrs: vec![],
             ident: "field".to_string(),
@@ -338,6 +338,7 @@ fn test_nested_struct() {
         attrs: vec![],
         leading_comments: vec![],
         ident: "Outer".to_string(),
+        generics: Default::default(),
         fields: vec![
             Field {
                 attrs: vec![],
@@ -363,6 +364,7 @@ fn test_long_binary_expression() {
         leading_comments: vec![],
         sig: Signature {
             ident: "foo".to_string(),
+            generics: Default::default(),
             inputs: vec![],
             output: None,
         },
@@ -394,11 +396,13 @@ fn test_trait() {
         attrs: vec![],
         leading_comments: vec![Comment::Line(" A simple trait.".to_string())],
         ident: "MyTrait".to_string(),
+        generics: Default::default(),
         items: vec![TraitItem::Fn(TraitItemFn {
             attrs: vec![],
             leading_comments: vec![],
             sig: Signature {
                 ident: "my_func".to_string(),
+                generics: Default::default(),
                 inputs: vec![],
                 output: None,
             },
@@ -541,6 +545,7 @@ fn test_enum() {
         attrs: vec![],
         leading_comments: vec![Comment::Line(" A simple enum.".to_string())],
         ident: "MyEnum".to_string(),
+        generics: Default::default(),
         variants: vec![
             Variant {
                 attrs: vec![],
@@ -562,6 +567,7 @@ fn test_impl() {
     let ast = Item::Impl(ItemImpl {
         attrs: vec![],
         leading_comments: vec![Comment::Line(" A simple impl.".to_string())],
+        generics: Default::default(),
         ty: "MyStruct".into(),
         fns: vec![
             fn_def("new")
@@ -686,6 +692,7 @@ fn test_item_statement() {
                     attrs: vec![],
                     leading_comments: vec![],
                     ident: "MyStruct".to_string(),
+                    generics: Default::default(),
                     fields: vec![],
                     trailing_comments: vec![],
                 }))],
@@ -730,14 +737,37 @@ fn test_all_literals() {
                 leading_comments: vec![],
                 stmts: vec![
                     stmt().local("s").expr(Expr::Lit("hello".into())).build(),
-                    stmt().local("bs").expr(Expr::Lit(Lit::ByteStr(LitByteStr::new(b"hello")))).build(),
-                    stmt().local("cs").expr(Expr::Lit(Lit::CStr(LitCStr::new("hello")))).build(),
-                    stmt().local("b").expr(Expr::Lit(Lit::Byte(LitByte::new(b'h')))).build(),
-                    stmt().local("c").expr(Expr::Lit(Lit::Char(LitChar::new('h')))).build(),
+                    stmt()
+                        .local("bs")
+                        .expr(Expr::Lit(Lit::ByteStr(LitByteStr::new(b"hello"))))
+                        .build(),
+                    stmt()
+                        .local("cs")
+                        .expr(Expr::Lit(Lit::CStr(LitCStr::new("hello"))))
+                        .build(),
+                    stmt()
+                        .local("b")
+                        .expr(Expr::Lit(Lit::Byte(LitByte::new(b'h'))))
+                        .build(),
+                    stmt()
+                        .local("c")
+                        .expr(Expr::Lit(Lit::Char(LitChar::new('h'))))
+                        .build(),
                     stmt().local("i").expr(Expr::Lit(42.into())).build(),
-                    stmt().local("i_suffix").expr(Expr::Lit(Lit::Int(LitInt::new(42).with_suffix("u32")))).build(),
-                    stmt().local("f").expr(Expr::Lit(Lit::Float(LitFloat::new("1.23")))).build(),
-                    stmt().local("f_suffix").expr(Expr::Lit(Lit::Float(LitFloat::new("1.23").with_suffix("f32")))).build(),
+                    stmt()
+                        .local("i_suffix")
+                        .expr(Expr::Lit(Lit::Int(LitInt::new(42).with_suffix("u32"))))
+                        .build(),
+                    stmt()
+                        .local("f")
+                        .expr(Expr::Lit(Lit::Float(LitFloat::new("1.23"))))
+                        .build(),
+                    stmt()
+                        .local("f_suffix")
+                        .expr(Expr::Lit(Lit::Float(
+                            LitFloat::new("1.23").with_suffix("f32"),
+                        )))
+                        .build(),
                     stmt().local("t").expr(Expr::Lit(true.into())).build(),
                 ],
                 trailing_comments: vec![],
@@ -754,6 +784,7 @@ fn test_struct() {
         attrs: vec![],
         leading_comments: vec![Comment::Line(" A simple struct.".to_string())],
         ident: "Foo".to_string(),
+        generics: Default::default(),
         fields: vec![
             Field {
                 attrs: vec![],

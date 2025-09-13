@@ -3,4 +3,6 @@ source: tests/pretty_print.rs
 expression: pretty_print_item(ast)
 ---
 // A simple trait.
-trait MyTrait { fn my_func(); }
+trait MyTrait {
+fn my_func();
+}

@@ -3,4 +3,6 @@ source: tests/pretty_print.rs
 expression: pretty_print_item(ast)
 ---
 // A simple impl.
-impl MyStruct { fn new() {} }
+impl MyStruct {
+fn new() {}
+}

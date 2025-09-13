@@ -8,6 +8,7 @@ pub mod attributes;
 pub mod comments;
 pub mod expressions;
 pub mod file;
+pub mod generics;
 /// Defines the AST node for a `const` item.
 pub mod item_const;
 /// Defines the AST node for an `extern crate` item.
@@ -59,4 +60,5 @@ pub use patterns::*;
 
 pub mod builder;
 pub use builder::*;
+pub use generics::*;
 pub use tokens::*;

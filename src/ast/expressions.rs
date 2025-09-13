@@ -4,7 +4,7 @@
 //! This module provides the data structures for all kinds of expressions, such as binary operations,
 //! function calls, and control flow expressions like `if` and `match`.
 
-use crate::ast::{Pat, TokenStream, literals::Lit, statements::Block};
+use crate::ast::{Pat, TokenStream, generics::GenericArgs, literals::Lit, statements::Block};
 
 /// Represents a Rust expression.
 #[derive(Debug, Clone, PartialEq)]
@@ -357,16 +357,17 @@ pub struct ExprMacroCall {
 }
 
 /// A path expression: `foo::bar::baz`.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct Path {
     /// The segments of the path.
     pub segments: Vec<PathSegment>,
 }
 
 /// A segment of a path.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct PathSegment {
     /// The identifier of the segment.
     pub ident: String,
-    // Note: We are not including generics for now for simplicity.
+    /// The generic arguments of the segment.
+    pub args: Option<GenericArgs>,
 }
