@@ -101,3 +101,9 @@ impl PrettyPrinter for MetaNameValue {
         self.value.pretty_print(printer)
     }
 }
+
+impl From<&str> for Meta {
+    fn from(value: &str) -> Meta {
+        Meta::Path(value.into())
+    }
+}

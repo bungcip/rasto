@@ -28,7 +28,7 @@ use rasto::ast::{Comment, PatIdent};
 #[test]
 fn test_fn_builder_with_metadata() {
     let item_fn = fn_def("foo")
-        .attr(attr().meta(meta().path("test")).build())
+        .attr(attr().meta("test"))
         .leading_comment(Comment::Line(" a leading comment".to_string()))
         .trailing_comment(Comment::Line(" a trailing comment".to_string()))
         .input(pat().ident("a", false))
@@ -36,7 +36,7 @@ fn test_fn_builder_with_metadata() {
         .output("bool")
         .block(
             block()
-                .statement(stmt().expr(Expr::Lit(Lit::Str(LitStr::new("Hello, world!")))))
+                .statement(stmt().expr(expr().lit("Hello, world!")))
                 .has_trailing_semicolon(true),
         )
         .build();
@@ -59,7 +59,7 @@ fn test_stmt_builder() {
     let local_stmt = stmt()
         .local(pat().ident("x", false))
         .ty("i32")
-        .expr(Expr::Lit(Lit::Int(LitInt::new(42))))
+        .expr(expr().lit(42))
         .build();
 
     assert_eq!(
@@ -74,7 +74,7 @@ fn test_stmt_builder() {
         })
     );
 
-    let expr_stmt = stmt().expr(Expr::Lit(Lit::Int(LitInt::new(42))));
+    let expr_stmt = stmt().expr(expr().lit(42));
 
     assert_eq!(
         expr_stmt,
@@ -87,7 +87,7 @@ fn test_unary_builder() {
     use rasto::ast::builder::expr;
     use rasto::ast::{Expr, ExprUnary, Lit, UnOp};
 
-    let expr = expr().unary(UnOp::Neg, expr().lit(Lit::Int(LitInt::new(42))));
+    let expr = expr().unary(UnOp::Neg, expr().lit(42));
 
     assert_eq!(
         expr,

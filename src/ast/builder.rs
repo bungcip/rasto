@@ -1717,6 +1717,12 @@ impl AttributeBuilder {
     }
 }
 
+impl From<AttributeBuilder> for Attribute {
+    fn from(value: AttributeBuilder) -> Self {
+        value.build()
+    }
+}
+
 /// Creates a new `MetaBuilder` to construct a meta item.
 pub fn meta() -> MetaBuilder {
     MetaBuilder
