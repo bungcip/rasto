@@ -1,5 +1,3 @@
-use crate::ast::attributes::Attribute;
-use crate::ast::comments::Comment;
 use crate::ast::metadata::Md;
 use crate::ast::generics::GenericParams;
 use crate::ast::types::Type;

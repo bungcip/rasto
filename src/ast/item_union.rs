@@ -1,7 +1,7 @@
 use crate::ast::generics::GenericParams;
 use crate::ast::items::Field;
 use crate::ast::metadata::Md;
-use crate::pretty_printer::{PrettyPrinter, Printer};
+use crate::pretty_printer::{BreakStyle, PrettyPrinter, Printer};
 use std::fmt;
 use thin_vec::ThinVec;
 

@@ -187,6 +187,10 @@ pub struct Variant {
 pub struct ItemImpl {
     /// The type the `impl` block is for.
     pub ty: Type,
+
+    /// generic
+    pub generics: GenericParams,
+
     /// The functions within the `impl` block.
     pub fns: ThinVec<ItemFn>,
     /// Metadata about the `impl` block.

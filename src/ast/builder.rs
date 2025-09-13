@@ -84,7 +84,7 @@ pub fn trait_def(name: impl Into<String>) -> TraitBuilder {
 pub struct TraitBuilder {
     ident: String,
     generics: GenericParams,
-    items: Vec<TraitItem>,
+    items: ThinVec<TraitItem>,
 }
 
 impl TraitBuilder {
@@ -97,7 +97,7 @@ impl TraitBuilder {
         Self {
             ident: name.into(),
             generics: GenericParams::new(),
-            items: vec![],
+            items: thin_vec![],
         }
     }
 
@@ -128,12 +128,10 @@ impl TraitBuilder {
     /// An `ItemTrait` instance.
     pub fn build(self) -> ItemTrait {
         ItemTrait {
-            attrs: vec![],
-            leading_comments: vec![],
             ident: self.ident,
             generics: self.generics,
             items: self.items,
-            trailing_comments: vec![],
+            md: None,
         }
     }
 }
@@ -155,7 +153,7 @@ pub fn impl_block(ty: impl Into<Type>) -> ImplBuilder {
 pub struct ImplBuilder {
     generics: GenericParams,
     ty: Type,
-    fns: Vec<ItemFn>,
+    fns: ThinVec<ItemFn>,
 }
 
 impl ImplBuilder {
@@ -168,7 +166,7 @@ impl ImplBuilder {
         Self {
             generics: GenericParams::new(),
             ty: ty.into(),
-            fns: vec![],
+            fns: thin_vec![],
         }
     }
 
@@ -199,12 +197,10 @@ impl ImplBuilder {
     /// An `ItemImpl` instance.
     pub fn build(self) -> ItemImpl {
         ItemImpl {
-            attrs: vec![],
-            leading_comments: vec![],
             generics: self.generics,
             ty: self.ty,
             fns: self.fns,
-            trailing_comments: vec![],
+            md: None,
         }
     }
 }
@@ -226,7 +222,8 @@ pub fn enum_def(name: impl Into<String>) -> EnumBuilder {
 pub struct EnumBuilder {
     ident: String,
     generics: GenericParams,
-    variants: Vec<Variant>,
+    variants: ThinVec<Variant>,
+    md: Option<Box<Md>>,
 }
 
 impl EnumBuilder {
@@ -239,7 +236,8 @@ impl EnumBuilder {
         Self {
             ident: name.into(),
             generics: GenericParams::new(),
-            variants: vec![],
+            variants: thin_vec![],
+            md: None,
         }
     }
 
@@ -260,8 +258,8 @@ impl EnumBuilder {
     /// - `name`: The name of the variant.
     pub fn variant(mut self, name: impl Into<String>) -> Self {
         self.variants.push(Variant {
-            attrs: vec![],
             ident: name.into(),
+            md: None,
         });
         self
     }
@@ -273,12 +271,10 @@ impl EnumBuilder {
     /// An `ItemEnum` instance.
     pub fn build(self) -> ItemEnum {
         ItemEnum {
-            attrs: vec![],
-            leading_comments: vec![],
             ident: self.ident,
             generics: self.generics,
             variants: self.variants,
-            trailing_comments: vec![],
+            md: self.md,
         }
     }
 }
@@ -300,7 +296,7 @@ pub fn struct_def(name: impl Into<String>) -> StructBuilder {
 pub struct StructBuilder {
     ident: String,
     generics: GenericParams,
-    fields: Vec<Field>,
+    fields: ThinVec<Field>,
 }
 
 impl StructBuilder {
@@ -313,7 +309,7 @@ impl StructBuilder {
         Self {
             ident: name.into(),
             generics: GenericParams::new(),
-            fields: vec![],
+            fields: thin_vec![],
         }
     }
 
@@ -335,9 +331,9 @@ impl StructBuilder {
     /// - `ty`: The type of the field.
     pub fn field(mut self, name: impl Into<String>, ty: impl Into<Type>) -> Self {
         self.fields.push(Field {
-            attrs: vec![],
             ident: name.into(),
             ty: ty.into(),
+            md: None,
         });
         self
     }
@@ -349,12 +345,10 @@ impl StructBuilder {
     /// An `ItemStruct` instance.
     pub fn build(self) -> ItemStruct {
         ItemStruct {
-            attrs: vec![],
-            leading_comments: vec![],
             ident: self.ident,
             generics: self.generics,
             fields: self.fields,
-            trailing_comments: vec![],
+            md: None,
         }
     }
 }
@@ -391,10 +385,11 @@ impl FnBuilder {
     pub fn new(name: impl Into<String>) -> Self {
         Self {
             ident: name.into(),
-            inputs: vec![],
+            inputs: thin_vec![],
             output: None,
             block: None,
             md: None,
+            generics: GenericParams::new(),
         }
     }
 
@@ -1468,9 +1463,9 @@ pub fn union_item(name: impl Into<String>) -> ItemUnionBuilder {
 /// A builder for constructing an `ItemUnion` AST node.
 pub struct ItemUnionBuilder {
     ident: String,
-    fields: Vec<Field>,
-    leading_comments: Vec<Comment>,
-    trailing_comments: Vec<Comment>,
+    fields: ThinVec<Field>,
+    generics: GenericParams,
+    md: Option<Box<Md>>,
 }
 
 impl ItemUnionBuilder {
@@ -1479,7 +1474,7 @@ impl ItemUnionBuilder {
         Self {
             ident: name.into(),
             generics: GenericParams::new(),
-            fields: vec![],
+            fields: thin_vec![],
             md: None,
         }
     }
@@ -1497,9 +1492,9 @@ impl ItemUnionBuilder {
     /// Adds a field to the `union`.
     pub fn field(mut self, name: impl Into<String>, ty: impl Into<Type>) -> Self {
         self.fields.push(Field {
-            attrs: vec![],
             ident: name.into(),
             ty: ty.into(),
+            md: None,
         });
         self
     }
