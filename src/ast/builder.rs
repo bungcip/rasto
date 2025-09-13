@@ -1124,3 +1124,12 @@ impl ItemUseBuilder {
         }
     }
 }
+
+impl Into<Pat> for &str {
+    fn into(self) -> Pat {
+        Pat::Ident(PatIdent { 
+            ident: self.into(),
+            is_mut: false,
+        })
+    }
+}

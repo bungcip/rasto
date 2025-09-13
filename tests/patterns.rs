@@ -16,7 +16,7 @@ fn pretty_print(item: &impl PrettyPrinter) -> String {
 fn test_let_statement_with_ident_pattern() {
     let let_stmt = stmt()
         .local(pat().ident("x", false))
-        .expr(expr().lit(Lit::Int(42)))
+        .expr(expr().lit(Lit::Int(LitInt::new(42))))
         .build();
 
     insta::assert_snapshot!(pretty_print(&let_stmt), @"let x = 42;");
@@ -26,7 +26,7 @@ fn test_let_statement_with_ident_pattern() {
 fn test_let_statement_with_mut_ident_pattern() {
     let let_stmt = stmt()
         .local(pat().ident("x", true))
-        .expr(expr().lit(Lit::Int(42)))
+        .expr(expr().lit(Lit::Int(LitInt::new(42))))
         .build();
 
     insta::assert_snapshot!(pretty_print(&let_stmt), @"let mut x = 42;");
@@ -36,7 +36,7 @@ fn test_let_statement_with_mut_ident_pattern() {
 fn test_for_expression_with_ident_pattern() {
     let for_expr = expr().for_loop(
         pat().ident("x", false),
-        expr().lit(Lit::Int(10)),
+        expr().lit(10),
         Block {
             leading_comments: vec![],
             stmts: vec![],
@@ -50,11 +50,11 @@ fn test_for_expression_with_ident_pattern() {
 #[test]
 fn test_match_expression_with_rest_pattern() {
     let match_expr = expr().match_expr(
-        expr().lit(Lit::Int(10)),
+        expr().lit(10),
         vec![Arm {
             pat: pat().rest(),
             guard: None,
-            body: Box::new(expr().lit(Lit::Int(42))),
+            body: Box::new(expr().lit(42)),
         }],
     );
 
@@ -76,7 +76,7 @@ fn test_let_statement_with_wildcard_pattern() {
 fn test_let_statement_with_tuple_pattern() {
     let let_stmt = stmt()
         .local(pat().tuple(vec![pat().ident("x", false), pat().ident("y", false)]))
-        .expr(expr().tuple(vec![expr().lit(Lit::Int(1)), expr().lit(Lit::Int(2))]))
+        .expr(expr().tuple(vec![expr().lit(1), expr().lit(2)]))
         .build();
 
     insta::assert_snapshot!(pretty_print(&let_stmt), @"let (x, y) = (1, 2);");
