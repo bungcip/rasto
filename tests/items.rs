@@ -1,5 +1,8 @@
-use rasto::ast::builder::{const_item, extern_crate_item, fn_def, foreign_mod_item, macro_item, mod_item, static_item, trait_alias_item, type_item, union_item, use_item};
-use rasto::ast::{expr, Block, Field, Item, TokenStream, Type};
+use rasto::ast::builder::{
+    const_item, extern_crate_item, fn_def, foreign_mod_item, macro_item, mod_item, static_item,
+    trait_alias_item, type_item, union_item, use_item,
+};
+use rasto::ast::{Block, Field, Item, TokenStream, Type, expr};
 
 #[test]
 fn test_const_item() {
@@ -65,7 +68,11 @@ fn test_static_item() {
 
 #[test]
 fn test_trait_alias_item() {
-    let item = trait_alias_item("ShareableIterator", vec!["Iterator".to_string(), "Sync".to_string()]).build();
+    let item = trait_alias_item(
+        "ShareableIterator",
+        vec!["Iterator".to_string(), "Sync".to_string()],
+    )
+    .build();
     insta::assert_snapshot!(item.to_string());
 }
 

@@ -4,7 +4,7 @@
 //! This module provides the data structures for all kinds of expressions, such as binary operations,
 //! function calls, and control flow expressions like `if` and `match`.
 
-use crate::ast::{literals::Lit, statements::Block, TokenStream};
+use crate::ast::{Pat, TokenStream, literals::Lit, statements::Block};
 
 /// Represents a Rust expression.
 #[derive(Debug, Clone, PartialEq)]
@@ -147,7 +147,7 @@ pub struct ExprCast {
 #[derive(Debug, Clone, PartialEq)]
 pub struct ExprClosure {
     /// The input parameters of the closure.
-    pub inputs: Vec<String>,
+    pub inputs: Vec<Pat>,
     /// The body of the closure.
     pub body: Box<Expr>,
 }
@@ -194,7 +194,7 @@ pub struct ExprMatch {
 #[derive(Debug, Clone, PartialEq)]
 pub struct Arm {
     /// The pattern to match against.
-    pub pat: String,
+    pub pat: Pat,
     /// An optional guard expression.
     pub guard: Option<Box<Expr>>,
     /// The body of the arm.
@@ -331,7 +331,7 @@ pub struct ExprWhile {
 #[derive(Debug, Clone, PartialEq)]
 pub struct ExprFor {
     /// The pattern to bind the elements of the iterator.
-    pub pat: String,
+    pub pat: Pat,
     /// The expression to iterate over.
     pub expr: Box<Expr>,
     /// The body of the loop.

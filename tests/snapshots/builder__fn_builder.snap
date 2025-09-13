@@ -2,6 +2,6 @@
 source: tests/builder.rs
 expression: actual
 ---
-fn foo(i32, String) -> bool {
+fn foo(a, b) -> bool {
 "Hello, world!";
 }

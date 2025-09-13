@@ -1,6 +1,8 @@
-use rasto::ast::builder::{file, fn_def, stmt};
+use rasto::ast::builder::{file, fn_def, pat, stmt};
 use rasto::ast::*;
 use rasto::pretty_printer::{PrettyPrinter, Printer};
+
+mod patterns;
 
 fn pretty_print_item(item: Item) -> String {
     let mut buf = String::new();
@@ -37,7 +39,7 @@ fn test_file() {
         }))
         .item(
             fn_def("foo")
-                .input("i32")
+                .input(pat().ident("a", false))
                 .output("i32")
                 .block(Block {
                     leading_comments: vec![],
@@ -55,7 +57,7 @@ fn test_file() {
 fn test_fn() {
     let ast = Item::Fn(
         fn_def("foo")
-            .input("i32")
+            .input(pat().ident("a", false))
             .output("i32")
             .block(Block {
                 leading_comments: vec![Comment::Block(" An inner comment ".to_string())],
@@ -155,7 +157,7 @@ fn test_expr_cast() {
 #[test]
 fn test_expr_closure() {
     let ast = Expr::Closure(ExprClosure {
-        inputs: vec!["a".to_string(), "b".to_string()],
+        inputs: vec![pat().ident("a", false), pat().ident("b", false)],
         body: Box::new(Expr::Lit(1.into())),
     });
     insta::assert_snapshot!(pretty_print_expr(ast));
@@ -203,12 +205,15 @@ fn test_expr_match() {
         expr: Box::new(Expr::Lit("x".into())),
         arms: vec![
             Arm {
-                pat: "Some(y)".to_string(),
+                pat: pat().tuple(vec![
+                    pat().ident("Some", false),
+                    pat().ident("y", false),
+                ]),
                 guard: None,
                 body: Box::new(Expr::Lit(1.into())),
             },
             Arm {
-                pat: "None".to_string(),
+                pat: pat().ident("None", false),
                 guard: Some(Box::new(Expr::Lit(true.into()))),
                 body: Box::new(Expr::Lit(2.into())),
             },
@@ -463,7 +468,7 @@ fn test_for_expression() {
                 leading_comments: vec![],
                 stmts: vec![Stmt::Expr(
                     Expr::For(ExprFor {
-                        pat: "x".to_string(),
+                        pat: pat().ident("x", false),
                         expr: Box::new(Expr::Lit(1.into())),
                         body: Block {
                             leading_comments: vec![],
@@ -558,13 +563,15 @@ fn test_impl() {
         attrs: vec![],
         leading_comments: vec![Comment::Line(" A simple impl.".to_string())],
         ty: "MyStruct".into(),
-        fns: vec![fn_def("new")
-            .block(Block {
-                leading_comments: vec![],
-                stmts: vec![],
-                trailing_comments: vec![],
-            })
-            .build()],
+        fns: vec![
+            fn_def("new")
+                .block(Block {
+                    leading_comments: vec![],
+                    stmts: vec![],
+                    trailing_comments: vec![],
+                })
+                .build(),
+        ],
         trailing_comments: vec![],
     });
 
@@ -577,11 +584,13 @@ fn test_let_statement() {
         fn_def("foo")
             .block(Block {
                 leading_comments: vec![],
-                stmts: vec![stmt()
-                    .local("x")
-                    .ty("i32")
-                    .expr(Expr::Lit(42.into()))
-                    .build()],
+                stmts: vec![
+                    stmt()
+                        .local(pat().ident("x", false))
+                        .ty("i32")
+                        .expr(Expr::Lit(42.into()))
+                        .build(),
+                ],
                 trailing_comments: vec![],
             })
             .build(),

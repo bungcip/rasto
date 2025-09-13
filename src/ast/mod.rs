@@ -4,13 +4,9 @@
 //! It includes nodes for expressions, statements, items, literals, and more. The AST is used
 //! by the pretty-printer to generate formatted Rust code.
 
-pub mod expressions;
-pub mod literals;
 pub mod attributes;
 pub mod comments;
-pub mod statements;
-pub mod items;
-pub mod tokens;
+pub mod expressions;
 pub mod file;
 /// Defines the AST node for a `const` item.
 pub mod item_const;
@@ -32,13 +28,14 @@ pub mod item_type;
 pub mod item_union;
 /// Defines the AST node for a `use` item.
 pub mod item_use;
+pub mod items;
+pub mod literals;
+pub mod statements;
+pub mod tokens;
 
+pub use attributes::*;
 pub use comments::*;
 pub use expressions::*;
-pub use literals::*;
-pub use attributes::*;
-pub use statements::*;
-pub use items::*;
 pub use file::*;
 pub use item_const::*;
 pub use item_extern_crate::*;
@@ -50,9 +47,15 @@ pub use item_trait_alias::*;
 pub use item_type::*;
 pub use item_union::*;
 pub use item_use::*;
+pub use items::*;
+pub use literals::*;
+pub use statements::*;
 
 pub mod types;
 pub use types::*;
+
+pub mod patterns;
+pub use patterns::*;
 
 pub mod builder;
 pub use builder::*;

@@ -3,8 +3,8 @@ use rasto::ast::{builder::*, Block, Expr, Lit, LitInt, LitStr, Stmt};
 #[test]
 fn test_fn_builder() {
     let item_fn = fn_def("foo")
-        .input("i32")
-        .input("String")
+        .input(pat().ident("a", false))
+        .input(pat().ident("b", false))
         .output("bool")
         .block(Block {
             leading_comments: vec![],
@@ -21,10 +21,12 @@ fn test_fn_builder() {
     insta::assert_snapshot!(actual);
 }
 
+use rasto::ast::PatIdent;
+
 #[test]
 fn test_stmt_builder() {
     let local_stmt = stmt()
-        .local("x")
+        .local(pat().ident("x", false))
         .ty("i32")
         .expr(Expr::Lit(Lit::Int(LitInt::new(42))))
         .build();
@@ -32,7 +34,10 @@ fn test_stmt_builder() {
     assert_eq!(
         local_stmt,
         Stmt::Local(rasto::ast::Local {
-            ident: "x".to_string(),
+            pat: rasto::ast::Pat::Ident(PatIdent {
+                ident: "x".to_string(),
+                is_mut: false
+            }),
             ty: Some("i32".into()),
             expr: Some(Expr::Lit(Lit::Int(LitInt::new(42)))),
         })

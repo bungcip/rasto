@@ -15,9 +15,10 @@ use crate::ast::item_trait_alias::ItemTraitAlias;
 use crate::ast::item_type::ItemType;
 use crate::ast::item_union::ItemUnion;
 use crate::ast::item_use::ItemUse;
+use crate::ast::patterns::Pat;
 use crate::ast::statements::Block;
 use crate::ast::types::Type;
-use crate::pretty_printer::{Printer, PrettyPrinter};
+use crate::pretty_printer::{PrettyPrinter, Printer};
 
 /// A top-level item in a Rust file.
 #[derive(Debug, Clone, PartialEq)]
@@ -264,7 +265,7 @@ pub struct Signature {
     /// The name of the function.
     pub ident: String,
     /// The arguments of the function.
-    pub inputs: Vec<Type>,
+    pub inputs: Vec<Pat>,
     /// The return type of the function.
     pub output: Option<Type>,
 }
