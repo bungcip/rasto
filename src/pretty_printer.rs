@@ -345,12 +345,7 @@ impl PrettyPrinter for Comment {
 
 impl PrettyPrinter for AssociatedType {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
-        if let Some(md) = &self.md {
-            for attr in &md.attrs {
-                attr.pretty_print(printer)?;
-                printer.hard_break();
-            }
-        }
+        metadata::pp_begin(&self.md, printer)?;
         printer.string("type ");
         printer.string(&self.ident);
         self.generics.pretty_print(printer)?;
@@ -845,24 +840,12 @@ impl PrettyPrinter for ExprTuple {
 
 impl PrettyPrinter for ItemFn {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
-        if let Some(md) = &self.md {
-            for attr in &md.attrs {
-                attr.pretty_print(printer)?;
-                printer.hard_break();
-            }
-            for comment in &md.leading_comments {
-                comment.pretty_print(printer)?;
-            }
-        }
+        metadata::pp_begin(&self.md, printer)?;
         printer.string("fn ");
         self.sig.pretty_print(printer)?;
         printer.string(" ");
         self.block.pretty_print(printer)?;
-        if let Some(md) = &self.md {
-            for comment in &md.trailing_comments {
-                comment.pretty_print(printer)?;
-            }
-        }
+        metadata::pp_end(&self.md, printer)?;
         Ok(())
     }
 }
@@ -992,15 +975,7 @@ impl PrettyPrinter for File {
 
 impl PrettyPrinter for ItemStruct {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
-        if let Some(md) = &self.md {
-            for attr in &md.attrs {
-                attr.pretty_print(printer)?;
-                printer.hard_break();
-            }
-            for comment in &md.leading_comments {
-                comment.pretty_print(printer)?;
-            }
-        }
+        metadata::pp_begin(&self.md, printer)?;
         printer.string("struct ");
         printer.string(&self.ident);
         self.generics.pretty_print(printer)?;
@@ -1015,23 +990,14 @@ impl PrettyPrinter for ItemStruct {
             }
         }
         printer.end("}");
-        if let Some(md) = &self.md {
-            for comment in &md.trailing_comments {
-                comment.pretty_print(printer)?;
-            }
-        }
+        metadata::pp_end(&self.md, printer)?;
         Ok(())
     }
 }
 
 impl PrettyPrinter for Field {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
-        if let Some(md) = &self.md {
-            for attr in &md.attrs {
-                attr.pretty_print(printer)?;
-                printer.hard_break();
-            }
-        }
+        metadata::pp_begin(&self.md, printer)?;
         printer.string(&self.ident);
         printer.string(": ");
         self.ty.pretty_print(printer)?;
@@ -1041,15 +1007,7 @@ impl PrettyPrinter for Field {
 
 impl PrettyPrinter for ItemEnum {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
-        if let Some(md) = &self.md {
-            for attr in &md.attrs {
-                attr.pretty_print(printer)?;
-                printer.hard_break();
-            }
-            for comment in &md.leading_comments {
-                comment.pretty_print(printer)?;
-            }
-        }
+        metadata::pp_begin(&self.md, printer)?;
         printer.string("enum ");
         printer.string(&self.ident);
         self.generics.pretty_print(printer)?;
@@ -1064,23 +1022,14 @@ impl PrettyPrinter for ItemEnum {
             }
         }
         printer.end("}");
-        if let Some(md) = &self.md {
-            for comment in &md.trailing_comments {
-                comment.pretty_print(printer)?;
-            }
-        }
+        metadata::pp_end(&self.md, printer)?;
         Ok(())
     }
 }
 
 impl PrettyPrinter for Variant {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
-        if let Some(md) = &self.md {
-            for attr in &md.attrs {
-                attr.pretty_print(printer)?;
-                printer.hard_break();
-            }
-        }
+        metadata::pp_begin(&self.md, printer)?;
         printer.string(&self.ident);
         Ok(())
     }
@@ -1088,15 +1037,7 @@ impl PrettyPrinter for Variant {
 
 impl PrettyPrinter for ItemImpl {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
-        if let Some(md) = &self.md {
-            for attr in &md.attrs {
-                attr.pretty_print(printer)?;
-                printer.hard_break();
-            }
-            for comment in &md.leading_comments {
-                comment.pretty_print(printer)?;
-            }
-        }
+        metadata::pp_begin(&self.md, printer)?;
         printer.string("impl");
         self.generics.pretty_print(printer)?;
         printer.string(" ");
@@ -1111,26 +1052,14 @@ impl PrettyPrinter for ItemImpl {
             }
         }
         printer.end("}");
-        if let Some(md) = &self.md {
-            for comment in &md.trailing_comments {
-                comment.pretty_print(printer)?;
-            }
-        }
+        metadata::pp_end(&self.md, printer)?;
         Ok(())
     }
 }
 
 impl PrettyPrinter for ItemTrait {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
-        if let Some(md) = &self.md {
-            for attr in &md.attrs {
-                attr.pretty_print(printer)?;
-                printer.hard_break();
-            }
-            for comment in &md.leading_comments {
-                comment.pretty_print(printer)?;
-            }
-        }
+        metadata::pp_begin(&self.md, printer)?;
         printer.string("trait ");
         printer.string(&self.ident);
         self.generics.pretty_print(printer)?;
@@ -1151,11 +1080,7 @@ impl PrettyPrinter for ItemTrait {
             }
         }
         printer.end("}");
-        if let Some(md) = &self.md {
-            for comment in &md.trailing_comments {
-                comment.pretty_print(printer)?;
-            }
-        }
+        metadata::pp_end(&self.md, printer)?;
         Ok(())
     }
 }
@@ -1170,15 +1095,7 @@ impl PrettyPrinter for TraitItem {
 
 impl PrettyPrinter for TraitItemFn {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
-        if let Some(md) = &self.md {
-            for attr in &md.attrs {
-                attr.pretty_print(printer)?;
-                printer.hard_break();
-            }
-            for comment in &md.leading_comments {
-                comment.pretty_print(printer)?;
-            }
-        }
+        metadata::pp_begin(&self.md, printer)?;
         printer.string("fn ");
         self.sig.pretty_print(printer)?;
         if let Some(block) = &self.block {
@@ -1187,11 +1104,7 @@ impl PrettyPrinter for TraitItemFn {
         } else {
             printer.string(";");
         }
-        if let Some(md) = &self.md {
-            for comment in &md.trailing_comments {
-                comment.pretty_print(printer)?;
-            }
-        }
+        metadata::pp_end(&self.md, printer)?;
         Ok(())
     }
 }

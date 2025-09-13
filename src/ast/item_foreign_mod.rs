@@ -1,5 +1,5 @@
 use crate::ast::items::Item;
-use crate::ast::metadata::Md;
+use crate::ast::metadata::{self, Md};
 use crate::pretty_printer::{BreakStyle, PrettyPrinter, Printer};
 use std::fmt;
 use thin_vec::ThinVec;
@@ -25,15 +25,7 @@ impl fmt::Display for ItemForeignMod {
 
 impl PrettyPrinter for ItemForeignMod {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
-        if let Some(md) = &self.md {
-            for attr in &md.attrs {
-                attr.pretty_print(printer)?;
-                printer.hard_break();
-            }
-            for comment in &md.leading_comments {
-                comment.pretty_print(printer)?;
-            }
-        }
+        metadata::pp_begin(&self.md, printer)?;
         printer.string("extern ");
         printer.string(format!("\"{}\"", self.abi));
         printer.begin(BreakStyle::Consistent, " {");
@@ -43,11 +35,7 @@ impl PrettyPrinter for ItemForeignMod {
             printer.hard_break();
         }
         printer.end("}");
-        if let Some(md) = &self.md {
-            for comment in &md.trailing_comments {
-                comment.pretty_print(printer)?;
-            }
-        }
+        metadata::pp_end(&self.md, printer)?;
         Ok(())
     }
 }

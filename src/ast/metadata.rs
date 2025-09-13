@@ -1,6 +1,9 @@
 //! Defines the metadata for an AST node.
+use core::fmt;
+
 use crate::ast::attributes::Attribute;
 use crate::ast::comments::Comment;
+use crate::pretty_printer::{PrettyPrinter, Printer};
 use thin_vec::ThinVec;
 
 /// Metadata for an AST node, including attributes and comments.
@@ -12,4 +15,28 @@ pub struct Md {
     pub leading_comments: ThinVec<Comment>,
     /// Comments that appear after the node.
     pub trailing_comments: ThinVec<Comment>,
+}
+
+///
+pub fn pp_begin<'a>(md: &'a Option<Box<Md>>, printer: &mut Printer<'a>) -> fmt::Result {
+    if let Some(md) = &md {
+        for attr in &md.attrs {
+            attr.pretty_print(printer)?;
+            printer.hard_break();
+        }
+        for comment in &md.leading_comments {
+            comment.pretty_print(printer)?;
+        }
+    }
+    Ok(())
+}
+
+///
+pub fn pp_end<'a>(md: &'a Option<Box<Md>>, printer: &mut Printer<'a>) -> fmt::Result {
+    if let Some(md) = &md {
+        for comment in &md.trailing_comments {
+            comment.pretty_print(printer)?;
+        }
+    }
+    Ok(())
 }
