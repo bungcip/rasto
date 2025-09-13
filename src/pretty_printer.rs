@@ -325,20 +325,49 @@ impl PrettyPrinter for Comment {
         match self {
             Comment::Line(s) => printer.string(format!("//{s}")),
             Comment::Block(s) => {
-                printer.string(format!("/*"));
+                printer.string("/*");
                 let mut first = true;
                 for line in s.split('\n') {
-                    if first == true {
+                    if first {
                         first = false
                     } else {
                         printer.hard_break();
                     }
                     printer.string(line);
                 }
-                printer.string(format!("*/"));
+                printer.string("*/");
             }
         }
         printer.hard_break();
+        Ok(())
+    }
+}
+
+impl PrettyPrinter for AssociatedType {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        if let Some(md) = &self.md {
+            for attr in &md.attrs {
+                attr.pretty_print(printer)?;
+                printer.hard_break();
+            }
+        }
+        printer.string("type ");
+        printer.string(&self.ident);
+        self.generics.pretty_print(printer)?;
+        if !self.bounds.is_empty() {
+            printer.string(": ");
+            for (i, bound) in self.bounds.iter().enumerate() {
+                if i > 0 {
+                    printer.string(" + ");
+                }
+                bound.pretty_print(printer)?;
+            }
+        }
+        if let Some(default) = &self.default {
+            printer.string(" = ");
+            default.pretty_print(printer)?;
+        }
+        printer.string(";");
         Ok(())
     }
 }
@@ -1107,6 +1136,13 @@ impl PrettyPrinter for ItemTrait {
         self.generics.pretty_print(printer)?;
         printer.string(" ");
         printer.begin(BreakStyle::Consistent, "{");
+        if !self.associated_types.is_empty() {
+            printer.hard_break();
+            for associated_type in &self.associated_types {
+                associated_type.pretty_print(printer)?;
+                printer.hard_break();
+            }
+        }
         if !self.items.is_empty() {
             printer.hard_break();
             for item in &self.items {

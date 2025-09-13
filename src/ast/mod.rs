@@ -4,6 +4,8 @@
 //! It includes nodes for expressions, statements, items, literals, and more. The AST is used
 //! by the pretty-printer to generate formatted Rust code.
 
+/// Defines the AST node for an associated type in a trait.
+pub mod associated_type;
 pub mod attributes;
 pub mod comments;
 pub mod expressions;
@@ -21,6 +23,8 @@ pub mod item_macro;
 pub mod item_mod;
 /// Defines the AST node for a `static` item.
 pub mod item_static;
+/// Defines the AST node for a trait.
+pub mod item_trait;
 /// Defines the AST node for a trait alias.
 pub mod item_trait_alias;
 /// Defines the AST node for a type alias.
@@ -35,6 +39,7 @@ pub mod metadata;
 pub mod statements;
 pub mod tokens;
 
+pub use associated_type::*;
 pub use attributes::*;
 pub use comments::*;
 pub use expressions::*;
@@ -45,6 +50,7 @@ pub use item_foreign_mod::*;
 pub use item_macro::*;
 pub use item_mod::*;
 pub use item_static::*;
+pub use item_trait::*;
 pub use item_trait_alias::*;
 pub use item_type::*;
 pub use item_union::*;

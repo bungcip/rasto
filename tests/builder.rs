@@ -1,5 +1,4 @@
-use rasto::ast::{builder::*, Expr, Lit, LitInt, LitStr, Stmt};
-
+use rasto::ast::{Expr, Lit, LitInt, LitStr, Stmt, builder::*};
 
 #[test]
 fn test_fn_builder() {
@@ -76,10 +75,7 @@ fn test_stmt_builder() {
 
     let expr_stmt = stmt().expr(expr().lit(42));
 
-    assert_eq!(
-        expr_stmt,
-        Stmt::Expr(Expr::Lit(Lit::Int(LitInt::new(42))))
-    );
+    assert_eq!(expr_stmt, Stmt::Expr(Expr::Lit(Lit::Int(LitInt::new(42)))));
 }
 
 #[test]
