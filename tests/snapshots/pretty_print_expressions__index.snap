@@ -1,7 +1,0 @@
----
-source: tests/pretty_print_expressions.rs
-expression: s
----
-fn test_fn()  {
-    "arr"["i"];
-}

@@ -1,7 +1,0 @@
----
-source: tests/attributes.rs
-expression: item.to_string()
----
-#[test]
-#[derive(Debug, Clone)]
-fn my_func() {}
