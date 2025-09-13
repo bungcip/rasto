@@ -10,6 +10,7 @@ use crate::ast::item_foreign_mod::ItemForeignMod;
 use crate::ast::item_macro::ItemMacro;
 use crate::ast::item_mod::ItemMod;
 use crate::ast::item_static::ItemStatic;
+use crate::ast::item_trait::ItemTrait;
 use crate::ast::item_trait_alias::ItemTraitAlias;
 use crate::ast::item_type::ItemType;
 use crate::ast::item_union::ItemUnion;
@@ -63,19 +64,6 @@ impl fmt::Display for Item {
         self.pretty_print(&mut printer)?;
         printer.finish()
     }
-}
-
-/// A trait item: `trait Foo { ... }`.
-#[derive(Debug, Clone, PartialEq)]
-pub struct ItemTrait {
-    /// The name of the trait.
-    pub ident: String,
-    /// The generic parameters of the trait.
-    pub generics: GenericParams,
-    /// The items within the trait.
-    pub items: ThinVec<TraitItem>,
-    /// Metadata about the trait.
-    pub md: Option<Box<Md>>,
 }
 
 /// An item within a trait definition.

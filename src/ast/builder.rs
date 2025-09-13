@@ -24,7 +24,7 @@
 //! ```
 
 use crate::ast::*;
-use thin_vec::{thin_vec, ThinVec};
+use thin_vec::{ThinVec, thin_vec};
 
 /// Creates a new `FileBuilder` to construct a `File` AST node.
 ///
@@ -84,6 +84,7 @@ pub fn trait_def(name: impl Into<String>) -> TraitBuilder {
 pub struct TraitBuilder {
     ident: String,
     generics: GenericParams,
+    associated_types: ThinVec<AssociatedType>,
     items: ThinVec<TraitItem>,
 }
 
@@ -97,6 +98,7 @@ impl TraitBuilder {
         Self {
             ident: name.into(),
             generics: GenericParams::new(),
+            associated_types: thin_vec![],
             items: thin_vec![],
         }
     }
@@ -121,6 +123,16 @@ impl TraitBuilder {
         self
     }
 
+    /// Adds an associated type to the trait.
+    ///
+    /// # Parameters
+    ///
+    /// - `associated_type`: The associated type to add.
+    pub fn associated_type(mut self, associated_type: impl Into<AssociatedType>) -> Self {
+        self.associated_types.push(associated_type.into());
+        self
+    }
+
     /// Builds the `ItemTrait` AST node.
     ///
     /// # Returns
@@ -130,6 +142,7 @@ impl TraitBuilder {
         ItemTrait {
             ident: self.ident,
             generics: self.generics,
+            associated_types: self.associated_types,
             items: self.items,
             md: None,
         }

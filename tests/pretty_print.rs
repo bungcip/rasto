@@ -21,7 +21,6 @@ fn pretty_print_comment(comment: Comment) -> String {
     buf
 }
 
-
 fn pretty_print_file(file: File) -> String {
     file.to_string()
 }
@@ -69,17 +68,17 @@ fn test_file() {
 }
 
 #[test]
-fn test_block_single_comment(){
+fn test_block_single_comment() {
     let single = Comment::Block("Block comment with single line".into());
     insta::assert_snapshot!(pretty_print_comment(single));
 }
 
 #[test]
-fn test_block_multiline_comment(){
-    let single = Comment::Block("Block comment with multi line 1\nBlock comment with multi line 2".into());
+fn test_block_multiline_comment() {
+    let single =
+        Comment::Block("Block comment with multi line 1\nBlock comment with multi line 2".into());
     insta::assert_snapshot!(pretty_print_comment(single));
 }
-
 
 #[test]
 fn test_fn() {
@@ -89,7 +88,9 @@ fn test_fn() {
             .output("i32")
             .block(
                 block()
-                    .leading_comment(Comment::Block(" Block comment with single line ".to_string()))
+                    .leading_comment(Comment::Block(
+                        " Block comment with single line ".to_string(),
+                    ))
                     .statement(Stmt::Expr(Expr::Lit(42.into())))
                     .has_trailing_semicolon(true),
             )
@@ -430,6 +431,7 @@ fn test_trait() {
         })),
         ident: "MyTrait".to_string(),
         generics: Default::default(),
+        associated_types: thin_vec![],
         items: thin_vec![TraitItem::Fn(TraitItemFn {
             md: None,
             sig: Signature {
@@ -596,13 +598,15 @@ fn test_impl() {
 fn test_let_statement() {
     let ast = Item::Fn(
         fn_def("foo")
-            .block(block().statement(
-                stmt()
-                    .local(pat().ident("x", false))
-                    .ty("i32")
-                    .expr(Expr::Lit(42.into()))
-                    .build(),
-            ))
+            .block(
+                block().statement(
+                    stmt()
+                        .local(pat().ident("x", false))
+                        .ty("i32")
+                        .expr(Expr::Lit(42.into()))
+                        .build(),
+                ),
+            )
             .build(),
     );
 

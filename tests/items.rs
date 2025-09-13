@@ -1,8 +1,8 @@
 use rasto::ast::{
-    Item, TokenStream, Type,
+    AssociatedType, Item, TokenStream, Type,
     builder::{
         const_item, extern_crate_item, fn_def, foreign_mod_item, macro_item, mod_item, static_item,
-        trait_alias_item, type_item, union_item, use_item,
+        trait_alias_item, trait_def, type_item, union_item, use_item,
     },
     expr,
 };
@@ -91,4 +91,16 @@ fn test_union_item() {
 fn test_use_item() {
     let item = use_item("std::collections::HashMap").build();
     insta::assert_snapshot!(item.to_string());
+}
+
+#[test]
+fn test_trait_with_associated_type() {
+    let item = trait_def("MyTrait").associated_type(AssociatedType {
+        ident: "MyType".to_string(),
+        generics: Default::default(),
+        bounds: thin_vec![],
+        default: None,
+        md: None,
+    });
+    insta::assert_snapshot!(item.build().to_string());
 }
