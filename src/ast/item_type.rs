@@ -1,5 +1,6 @@
 use crate::ast::attributes::Attribute;
 use crate::ast::comments::Comment;
+use crate::ast::generics::GenericParams;
 use crate::ast::types::Type;
 use crate::pretty_printer::{PrettyPrinter, Printer};
 use std::fmt;
@@ -13,20 +14,19 @@ pub struct ItemType {
     pub leading_comments: Vec<Comment>,
     /// The name of the type alias.
     pub ident: String,
+    /// The generic parameters of the type alias.
+    pub generics: GenericParams,
     /// The type being aliased.
     pub ty: Type,
     /// Comments that appear after the type item.
     pub trailing_comments: Vec<Comment>,
 }
 
-impl ItemType {
-    /// Pretty-prints the type item to a string.
-    pub fn to_string(&self) -> String {
-        let mut buf = String::new();
-        let mut printer = Printer::new(&mut buf);
-        self.pretty_print(&mut printer).unwrap();
-        printer.finish().unwrap();
-        buf
+impl fmt::Display for ItemType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let mut printer = Printer::new(f);
+        self.pretty_print(&mut printer)?;
+        printer.finish()
     }
 }
 
@@ -41,6 +41,7 @@ impl PrettyPrinter for ItemType {
         }
         printer.string("type ");
         printer.string(&self.ident);
+        self.generics.pretty_print(printer)?;
         printer.string(" = ");
         self.ty.pretty_print(printer)?;
         printer.string(";");

@@ -16,6 +16,7 @@ fn test_fn_with_attributes() {
         leading_comments: vec![],
         sig: Signature {
             ident: "my_func".to_string(),
+            generics: Default::default(),
             inputs: vec![],
             output: None,
         },

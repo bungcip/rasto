@@ -85,16 +85,8 @@ fn test_type_item() {
 #[test]
 fn test_union_item() {
     let item = union_item("MyUnion")
-        .field(Field {
-            attrs: vec![],
-            ident: "f1".to_string(),
-            ty: Type::from("u32"),
-        })
-        .field(Field {
-            attrs: vec![],
-            ident: "f2".to_string(),
-            ty: Type::from("f32"),
-        })
+        .field("f1", "u32")
+        .field("f2", "f32")
         .build();
     insta::assert_snapshot!(item.to_string());
 }

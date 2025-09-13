@@ -2,4 +2,6 @@
 source: tests/pretty_print.rs
 expression: pretty_print_item(ast)
 ---
-struct MyStruct { field: i32, }
+struct MyStruct {
+field: i32,
+}

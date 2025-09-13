@@ -1,4 +1,4 @@
-use rasto::ast::{builder::*, Block, Expr, Lit, LitInt, LitStr, Stmt};
+use rasto::ast::{Block, Expr, Lit, LitInt, LitStr, Stmt, builder::*};
 
 #[test]
 fn test_fn_builder() {

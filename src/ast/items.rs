@@ -5,6 +5,7 @@
 
 use crate::ast::attributes::Attribute;
 use crate::ast::comments::Comment;
+use crate::ast::generics::GenericParams;
 use crate::ast::item_const::ItemConst;
 use crate::ast::item_extern_crate::ItemExternCrate;
 use crate::ast::item_foreign_mod::ItemForeignMod;
@@ -19,6 +20,7 @@ use crate::ast::patterns::Pat;
 use crate::ast::statements::Block;
 use crate::ast::types::Type;
 use crate::pretty_printer::{PrettyPrinter, Printer};
+use std::fmt;
 
 /// A top-level item in a Rust file.
 #[derive(Debug, Clone, PartialEq)]
@@ -55,14 +57,11 @@ pub enum Item {
     Use(ItemUse),
 }
 
-impl Item {
-    /// Pretty-prints the item to a string.
-    pub fn to_string(&self) -> String {
-        let mut buf = String::new();
-        let mut printer = Printer::new(&mut buf);
-        self.pretty_print(&mut printer).unwrap();
-        printer.finish().unwrap();
-        buf
+impl fmt::Display for Item {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let mut printer = Printer::new(f);
+        self.pretty_print(&mut printer)?;
+        printer.finish()
     }
 }
 
@@ -75,6 +74,8 @@ pub struct ItemTrait {
     pub leading_comments: Vec<Comment>,
     /// The name of the trait.
     pub ident: String,
+    /// The generic parameters of the trait.
+    pub generics: GenericParams,
     /// The items within the trait.
     pub items: Vec<TraitItem>,
     /// Comments that appear after the trait.
@@ -103,78 +104,43 @@ pub struct TraitItemFn {
     pub trailing_comments: Vec<Comment>,
 }
 
-impl ItemFn {
-    /// Pretty-prints the function to a string.
-    ///
-    /// # Returns
-    ///
-    /// A `String` containing the formatted function.
-    pub fn to_string(&self) -> String {
-        let mut buf = String::new();
-        let mut printer = Printer::new(&mut buf);
-        self.pretty_print(&mut printer).unwrap();
-        printer.finish().unwrap();
-        buf
+impl fmt::Display for ItemFn {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let mut printer = Printer::new(f);
+        self.pretty_print(&mut printer)?;
+        printer.finish()
     }
 }
 
-impl ItemStruct {
-    /// Pretty-prints the struct to a string.
-    ///
-    /// # Returns
-    ///
-    /// A `String` containing the formatted struct.
-    pub fn to_string(&self) -> String {
-        let mut buf = String::new();
-        let mut printer = Printer::new(&mut buf);
-        self.pretty_print(&mut printer).unwrap();
-        printer.finish().unwrap();
-        buf
+impl fmt::Display for ItemStruct {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let mut printer = Printer::new(f);
+        self.pretty_print(&mut printer)?;
+        printer.finish()
     }
 }
 
-impl ItemEnum {
-    /// Pretty-prints the enum to a string.
-    ///
-    /// # Returns
-    ///
-    /// A `String` containing the formatted enum.
-    pub fn to_string(&self) -> String {
-        let mut buf = String::new();
-        let mut printer = Printer::new(&mut buf);
-        self.pretty_print(&mut printer).unwrap();
-        printer.finish().unwrap();
-        buf
+impl fmt::Display for ItemEnum {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let mut printer = Printer::new(f);
+        self.pretty_print(&mut printer)?;
+        printer.finish()
     }
 }
 
-impl ItemImpl {
-    /// Pretty-prints the `impl` block to a string.
-    ///
-    /// # Returns
-    ///
-    /// A `String` containing the formatted `impl` block.
-    pub fn to_string(&self) -> String {
-        let mut buf = String::new();
-        let mut printer = Printer::new(&mut buf);
-        self.pretty_print(&mut printer).unwrap();
-        printer.finish().unwrap();
-        buf
+impl fmt::Display for ItemImpl {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let mut printer = Printer::new(f);
+        self.pretty_print(&mut printer)?;
+        printer.finish()
     }
 }
 
-impl ItemTrait {
-    /// Pretty-prints the trait to a string.
-    ///
-    /// # Returns
-    ///
-    /// A `String` containing the formatted trait.
-    pub fn to_string(&self) -> String {
-        let mut buf = String::new();
-        let mut printer = Printer::new(&mut buf);
-        self.pretty_print(&mut printer).unwrap();
-        printer.finish().unwrap();
-        buf
+impl fmt::Display for ItemTrait {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let mut printer = Printer::new(f);
+        self.pretty_print(&mut printer)?;
+        printer.finish()
     }
 }
 
@@ -187,6 +153,8 @@ pub struct ItemStruct {
     pub leading_comments: Vec<Comment>,
     /// The name of the struct.
     pub ident: String,
+    /// The generic parameters of the struct.
+    pub generics: GenericParams,
     /// The fields of the struct.
     pub fields: Vec<Field>,
     /// Comments that appear after the struct.
@@ -213,6 +181,8 @@ pub struct ItemEnum {
     pub leading_comments: Vec<Comment>,
     /// The name of the enum.
     pub ident: String,
+    /// The generic parameters of the enum.
+    pub generics: GenericParams,
     /// The variants of the enum.
     pub variants: Vec<Variant>,
     /// Comments that appear after the enum.
@@ -235,6 +205,8 @@ pub struct ItemImpl {
     pub attrs: Vec<Attribute>,
     /// Comments that appear before the `impl` block.
     pub leading_comments: Vec<Comment>,
+    /// The generic parameters of the `impl` block.
+    pub generics: GenericParams,
     /// The type the `impl` block is for.
     pub ty: Type,
     /// The functions within the `impl` block.
@@ -264,6 +236,8 @@ pub struct Signature {
     // The `fn` token would go here.
     /// The name of the function.
     pub ident: String,
+    /// The generic parameters of the function.
+    pub generics: GenericParams,
     /// The arguments of the function.
     pub inputs: Vec<Pat>,
     /// The return type of the function.

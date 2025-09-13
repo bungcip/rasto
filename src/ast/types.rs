@@ -109,6 +109,7 @@ impl From<&str> for Type {
             path: Path {
                 segments: vec![PathSegment {
                     ident: s.to_string(),
+                    args: None,
                 }],
             },
         })

@@ -2,4 +2,7 @@
 source: tests/pretty_print.rs
 expression: pretty_print_item(ast)
 ---
-struct Outer { inner: Inner, another_field: i32, }
+struct Outer {
+inner: Inner,
+another_field: i32,
+}

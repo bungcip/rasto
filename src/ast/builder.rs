@@ -65,6 +65,298 @@ impl FileBuilder {
     }
 }
 
+/// Creates a new `TraitBuilder` to construct a trait definition.
+///
+/// # Parameters
+///
+/// - `name`: The name of the trait.
+///
+/// # Returns
+///
+/// A `TraitBuilder` instance.
+pub fn trait_def(name: impl Into<String>) -> TraitBuilder {
+    TraitBuilder::new(name)
+}
+
+/// A builder for constructing an `ItemTrait` (trait definition) AST node.
+pub struct TraitBuilder {
+    ident: String,
+    generics: GenericParams,
+    items: Vec<TraitItem>,
+}
+
+impl TraitBuilder {
+    /// Creates a new `TraitBuilder` with the given trait name.
+    ///
+    /// # Parameters
+    ///
+    /// - `name`: The name of the trait.
+    pub fn new(name: impl Into<String>) -> Self {
+        Self {
+            ident: name.into(),
+            generics: GenericParams::new(),
+            items: vec![],
+        }
+    }
+
+    /// Adds a generic parameter to the trait.
+    ///
+    /// # Parameters
+    ///
+    /// - `param`: The generic parameter to add.
+    pub fn generic(mut self, param: impl Into<GenericParam>) -> Self {
+        self.generics.params.push(param.into());
+        self
+    }
+
+    /// Adds an item to the trait.
+    ///
+    /// # Parameters
+    ///
+    /// - `item`: The item to add.
+    pub fn item(mut self, item: impl Into<TraitItem>) -> Self {
+        self.items.push(item.into());
+        self
+    }
+
+    /// Builds the `ItemTrait` AST node.
+    ///
+    /// # Returns
+    ///
+    /// An `ItemTrait` instance.
+    pub fn build(self) -> ItemTrait {
+        ItemTrait {
+            attrs: vec![],
+            leading_comments: vec![],
+            ident: self.ident,
+            generics: self.generics,
+            items: self.items,
+            trailing_comments: vec![],
+        }
+    }
+}
+
+/// Creates a new `ImplBuilder` to construct an impl block.
+///
+/// # Parameters
+///
+/// - `ty`: The type the impl block is for.
+///
+/// # Returns
+///
+/// A `ImplBuilder` instance.
+pub fn impl_block(ty: impl Into<Type>) -> ImplBuilder {
+    ImplBuilder::new(ty)
+}
+
+/// A builder for constructing an `ItemImpl` (impl block) AST node.
+pub struct ImplBuilder {
+    generics: GenericParams,
+    ty: Type,
+    fns: Vec<ItemFn>,
+}
+
+impl ImplBuilder {
+    /// Creates a new `ImplBuilder` with the given type.
+    ///
+    /// # Parameters
+    ///
+    /// - `ty`: The type the impl block is for.
+    pub fn new(ty: impl Into<Type>) -> Self {
+        Self {
+            generics: GenericParams::new(),
+            ty: ty.into(),
+            fns: vec![],
+        }
+    }
+
+    /// Adds a generic parameter to the impl block.
+    ///
+    /// # Parameters
+    ///
+    /// - `param`: The generic parameter to add.
+    pub fn generic(mut self, param: impl Into<GenericParam>) -> Self {
+        self.generics.params.push(param.into());
+        self
+    }
+
+    /// Adds a function to the impl block.
+    ///
+    /// # Parameters
+    ///
+    /// - `func`: The function to add.
+    pub fn function(mut self, func: ItemFn) -> Self {
+        self.fns.push(func);
+        self
+    }
+
+    /// Builds the `ItemImpl` AST node.
+    ///
+    /// # Returns
+    ///
+    /// An `ItemImpl` instance.
+    pub fn build(self) -> ItemImpl {
+        ItemImpl {
+            attrs: vec![],
+            leading_comments: vec![],
+            generics: self.generics,
+            ty: self.ty,
+            fns: self.fns,
+            trailing_comments: vec![],
+        }
+    }
+}
+
+/// Creates a new `EnumBuilder` to construct an enum definition.
+///
+/// # Parameters
+///
+/// - `name`: The name of the enum.
+///
+/// # Returns
+///
+/// A `EnumBuilder` instance.
+pub fn enum_def(name: impl Into<String>) -> EnumBuilder {
+    EnumBuilder::new(name)
+}
+
+/// A builder for constructing an `ItemEnum` (enum definition) AST node.
+pub struct EnumBuilder {
+    ident: String,
+    generics: GenericParams,
+    variants: Vec<Variant>,
+}
+
+impl EnumBuilder {
+    /// Creates a new `EnumBuilder` with the given enum name.
+    ///
+    /// # Parameters
+    ///
+    /// - `name`: The name of the enum.
+    pub fn new(name: impl Into<String>) -> Self {
+        Self {
+            ident: name.into(),
+            generics: GenericParams::new(),
+            variants: vec![],
+        }
+    }
+
+    /// Adds a generic parameter to the enum.
+    ///
+    /// # Parameters
+    ///
+    /// - `param`: The generic parameter to add.
+    pub fn generic(mut self, param: impl Into<GenericParam>) -> Self {
+        self.generics.params.push(param.into());
+        self
+    }
+
+    /// Adds a variant to the enum.
+    ///
+    /// # Parameters
+    ///
+    /// - `name`: The name of the variant.
+    pub fn variant(mut self, name: impl Into<String>) -> Self {
+        self.variants.push(Variant {
+            attrs: vec![],
+            ident: name.into(),
+        });
+        self
+    }
+
+    /// Builds the `ItemEnum` AST node.
+    ///
+    /// # Returns
+    ///
+    /// An `ItemEnum` instance.
+    pub fn build(self) -> ItemEnum {
+        ItemEnum {
+            attrs: vec![],
+            leading_comments: vec![],
+            ident: self.ident,
+            generics: self.generics,
+            variants: self.variants,
+            trailing_comments: vec![],
+        }
+    }
+}
+
+/// Creates a new `StructBuilder` to construct a struct definition.
+///
+/// # Parameters
+///
+/// - `name`: The name of the struct.
+///
+/// # Returns
+///
+/// A `StructBuilder` instance.
+pub fn struct_def(name: impl Into<String>) -> StructBuilder {
+    StructBuilder::new(name)
+}
+
+/// A builder for constructing an `ItemStruct` (struct definition) AST node.
+pub struct StructBuilder {
+    ident: String,
+    generics: GenericParams,
+    fields: Vec<Field>,
+}
+
+impl StructBuilder {
+    /// Creates a new `StructBuilder` with the given struct name.
+    ///
+    /// # Parameters
+    ///
+    /// - `name`: The name of the struct.
+    pub fn new(name: impl Into<String>) -> Self {
+        Self {
+            ident: name.into(),
+            generics: GenericParams::new(),
+            fields: vec![],
+        }
+    }
+
+    /// Adds a generic parameter to the struct.
+    ///
+    /// # Parameters
+    ///
+    /// - `param`: The generic parameter to add.
+    pub fn generic(mut self, param: impl Into<GenericParam>) -> Self {
+        self.generics.params.push(param.into());
+        self
+    }
+
+    /// Adds a field to the struct.
+    ///
+    /// # Parameters
+    ///
+    /// - `name`: The name of the field.
+    /// - `ty`: The type of the field.
+    pub fn field(mut self, name: impl Into<String>, ty: impl Into<Type>) -> Self {
+        self.fields.push(Field {
+            attrs: vec![],
+            ident: name.into(),
+            ty: ty.into(),
+        });
+        self
+    }
+
+    /// Builds the `ItemStruct` AST node.
+    ///
+    /// # Returns
+    ///
+    /// An `ItemStruct` instance.
+    pub fn build(self) -> ItemStruct {
+        ItemStruct {
+            attrs: vec![],
+            leading_comments: vec![],
+            ident: self.ident,
+            generics: self.generics,
+            fields: self.fields,
+            trailing_comments: vec![],
+        }
+    }
+}
+
 /// Creates a new `FnBuilder` to construct a function definition.
 ///
 /// # Parameters
@@ -81,6 +373,7 @@ pub fn fn_def(name: impl Into<String>) -> FnBuilder {
 /// A builder for constructing an `ItemFn` (function definition) AST node.
 pub struct FnBuilder {
     ident: String,
+    generics: GenericParams,
     inputs: Vec<Pat>,
     output: Option<Type>,
     block: Option<Block>,
@@ -95,10 +388,21 @@ impl FnBuilder {
     pub fn new(name: impl Into<String>) -> Self {
         Self {
             ident: name.into(),
+            generics: GenericParams::new(),
             inputs: vec![],
             output: None,
             block: None,
         }
+    }
+
+    /// Adds a generic parameter to the function.
+    ///
+    /// # Parameters
+    ///
+    /// - `param`: The generic parameter to add.
+    pub fn generic(mut self, param: impl Into<GenericParam>) -> Self {
+        self.generics.params.push(param.into());
+        self
     }
 
     /// Adds an input parameter to the function.
@@ -148,6 +452,7 @@ impl FnBuilder {
             leading_comments: vec![],
             sig: Signature {
                 ident: self.ident,
+                generics: self.generics,
                 inputs: self.inputs,
                 output: self.output,
             },
@@ -986,6 +1291,7 @@ pub fn type_item(name: impl Into<String>, ty: impl Into<Type>) -> ItemTypeBuilde
 /// A builder for constructing an `ItemType` AST node.
 pub struct ItemTypeBuilder {
     ident: String,
+    generics: GenericParams,
     ty: Type,
     leading_comments: Vec<Comment>,
     trailing_comments: Vec<Comment>,
@@ -996,10 +1302,21 @@ impl ItemTypeBuilder {
     pub fn new(name: impl Into<String>, ty: impl Into<Type>) -> Self {
         Self {
             ident: name.into(),
+            generics: GenericParams::new(),
             ty: ty.into(),
             leading_comments: vec![],
             trailing_comments: vec![],
         }
+    }
+
+    /// Adds a generic parameter to the type alias.
+    ///
+    /// # Parameters
+    ///
+    /// - `param`: The generic parameter to add.
+    pub fn generic(mut self, param: impl Into<GenericParam>) -> Self {
+        self.generics.params.push(param.into());
+        self
     }
 
     /// Adds a leading comment to the type alias.
@@ -1019,6 +1336,7 @@ impl ItemTypeBuilder {
         ItemType {
             attrs: vec![],
             ident: self.ident,
+            generics: self.generics,
             ty: self.ty,
             leading_comments: self.leading_comments,
             trailing_comments: self.trailing_comments,
@@ -1034,6 +1352,7 @@ pub fn union_item(name: impl Into<String>) -> ItemUnionBuilder {
 /// A builder for constructing an `ItemUnion` AST node.
 pub struct ItemUnionBuilder {
     ident: String,
+    generics: GenericParams,
     fields: Vec<Field>,
     leading_comments: Vec<Comment>,
     trailing_comments: Vec<Comment>,
@@ -1044,15 +1363,30 @@ impl ItemUnionBuilder {
     pub fn new(name: impl Into<String>) -> Self {
         Self {
             ident: name.into(),
+            generics: GenericParams::new(),
             fields: vec![],
             leading_comments: vec![],
             trailing_comments: vec![],
         }
     }
 
+    /// Adds a generic parameter to the union.
+    ///
+    /// # Parameters
+    ///
+    /// - `param`: The generic parameter to add.
+    pub fn generic(mut self, param: impl Into<GenericParam>) -> Self {
+        self.generics.params.push(param.into());
+        self
+    }
+
     /// Adds a field to the `union`.
-    pub fn field(mut self, field: Field) -> Self {
-        self.fields.push(field);
+    pub fn field(mut self, name: impl Into<String>, ty: impl Into<Type>) -> Self {
+        self.fields.push(Field {
+            attrs: vec![],
+            ident: name.into(),
+            ty: ty.into(),
+        });
         self
     }
 
@@ -1073,6 +1407,7 @@ impl ItemUnionBuilder {
         ItemUnion {
             attrs: vec![],
             ident: self.ident,
+            generics: self.generics,
             fields: self.fields,
             leading_comments: self.leading_comments,
             trailing_comments: self.trailing_comments,
@@ -1125,10 +1460,10 @@ impl ItemUseBuilder {
     }
 }
 
-impl Into<Pat> for &str {
-    fn into(self) -> Pat {
-        Pat::Ident(PatIdent { 
-            ident: self.into(),
+impl From<&str> for Pat {
+    fn from(s: &str) -> Self {
+        Pat::Ident(PatIdent {
+            ident: s.to_string(),
             is_mut: false,
         })
     }

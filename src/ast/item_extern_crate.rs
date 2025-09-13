@@ -16,14 +16,11 @@ pub struct ItemExternCrate {
     pub trailing_comments: Vec<Comment>,
 }
 
-impl ItemExternCrate {
-    /// Pretty-prints the extern crate item to a string.
-    pub fn to_string(&self) -> String {
-        let mut buf = String::new();
-        let mut printer = Printer::new(&mut buf);
-        self.pretty_print(&mut printer).unwrap();
-        printer.finish().unwrap();
-        buf
+impl fmt::Display for ItemExternCrate {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let mut printer = Printer::new(f);
+        self.pretty_print(&mut printer)?;
+        printer.finish()
     }
 }
 
