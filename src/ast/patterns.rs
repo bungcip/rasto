@@ -3,6 +3,8 @@
 //! Patterns are used in `let` bindings, function parameters, and `match` expressions to destructure
 //! data. They are a powerful feature of Rust that allows for expressive and concise code.
 
+use thin_vec::ThinVec;
+
 /// Represents a pattern in a `let` binding, function parameter, or `match` arm.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Pat {
@@ -13,7 +15,7 @@ pub enum Pat {
     /// An identifier pattern, e.g., `x` or `mut x`.
     Ident(PatIdent),
     /// A tuple pattern, e.g., `(a, b)`.
-    Tuple(Vec<Pat>),
+    Tuple(ThinVec<Pat>),
 }
 
 /// An identifier pattern, which can be mutable.

@@ -100,13 +100,42 @@ impl LitChar {
     }
 }
 
+/// The suffix of an integer literal, e.g., `u32`.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum IntSuffix {
+    /// `u8` suffix.
+    U8,
+    /// `i8` suffix.
+    I8,
+    /// `u16` suffix.
+    U16,
+    /// `i16` suffix.
+    I16,
+    /// `u32` suffix.
+    U32,
+    /// `i32` suffix.
+    I32,
+    /// `u64` suffix.
+    U64,
+    /// `i64` suffix.
+    I64,
+    /// `u128` suffix.
+    U128,
+    /// `i128` suffix.
+    I128,
+    /// `usize` suffix.
+    Usize,
+    /// `isize` suffix.
+    Isize,
+}
+
 /// An integer literal, e.g., `42`.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct LitInt {
     /// The value of the integer literal.
     pub value: u128,
     /// The suffix of the integer literal, e.g., `u32`.
-    pub suffix: Option<String>,
+    pub suffix: Option<IntSuffix>,
 }
 
 impl LitInt {
@@ -119,10 +148,19 @@ impl LitInt {
     }
 
     /// Adds a suffix to the `LitInt`.
-    pub fn with_suffix(mut self, suffix: &str) -> Self {
-        self.suffix = Some(suffix.to_string());
+    pub fn with_suffix(mut self, suffix: IntSuffix) -> Self {
+        self.suffix = Some(suffix);
         self
     }
+}
+
+/// The suffix of a float literal, e.g., `f64`.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum FloatSuffix {
+    /// `f32` suffix.
+    F32,
+    /// `f64` suffix.
+    F64,
 }
 
 /// A float literal, e.g., `1.23`.
@@ -131,7 +169,7 @@ pub struct LitFloat {
     /// The value of the float literal.
     pub value: String,
     /// The suffix of the float literal, e.g., `f64`.
-    pub suffix: Option<String>,
+    pub suffix: Option<FloatSuffix>,
 }
 
 impl LitFloat {
@@ -144,8 +182,8 @@ impl LitFloat {
     }
 
     /// Adds a suffix to the `LitFloat`.
-    pub fn with_suffix(mut self, suffix: &str) -> Self {
-        self.suffix = Some(suffix.to_string());
+    pub fn with_suffix(mut self, suffix: FloatSuffix) -> Self {
+        self.suffix = Some(suffix);
         self
     }
 }

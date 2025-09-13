@@ -8,6 +8,7 @@ use crate::ast::expressions::{Expr, ExprMacroCall};
 use crate::ast::items::Item;
 use crate::ast::patterns::Pat;
 use crate::ast::types::Type;
+use thin_vec::ThinVec;
 
 /// A block of code, enclosed in curly braces: `{ ... }`.
 ///
@@ -15,11 +16,11 @@ use crate::ast::types::Type;
 #[derive(Debug, Clone, PartialEq)]
 pub struct Block {
     /// Comments that appear at the beginning of the block, before any statements.
-    pub leading_comments: Vec<Comment>,
+    pub leading_comments: ThinVec<Comment>,
     /// The statements within the block.
-    pub stmts: Vec<Stmt>,
+    pub stmts: ThinVec<Stmt>,
     /// Comments that appear at the end of the block, after all statements.
-    pub trailing_comments: Vec<Comment>,
+    pub trailing_comments: ThinVec<Comment>,
 }
 
 /// A statement in a block.

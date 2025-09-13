@@ -1,6 +1,5 @@
-use crate::ast::attributes::Attribute;
-use crate::ast::comments::Comment;
 use crate::ast::expressions::Expr;
+use crate::ast::metadata::Md;
 use crate::ast::types::Type;
 use crate::pretty_printer::{PrettyPrinter, Printer};
 use std::fmt;
@@ -8,18 +7,14 @@ use std::fmt;
 /// A `static` item: `static COUNTER: u32 = 0;`
 #[derive(Debug, Clone, PartialEq)]
 pub struct ItemStatic {
-    /// Attributes that appear before the static item.
-    pub attrs: Vec<Attribute>,
-    /// Comments that appear before the static item.
-    pub leading_comments: Vec<Comment>,
     /// The name of the static item.
     pub ident: String,
     /// The type of the static item.
     pub ty: Type,
     /// The value of the static item.
     pub expr: Box<Expr>,
-    /// Comments that appear after the static item.
-    pub trailing_comments: Vec<Comment>,
+    /// Metadata about the static item.
+    pub md: Option<Box<Md>>,
 }
 
 impl fmt::Display for ItemStatic {
@@ -32,12 +27,14 @@ impl fmt::Display for ItemStatic {
 
 impl PrettyPrinter for ItemStatic {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
-        for attr in &self.attrs {
-            attr.pretty_print(printer)?;
-            printer.hard_break();
-        }
-        for comment in &self.leading_comments {
-            comment.pretty_print(printer)?;
+        if let Some(md) = &self.md {
+            for attr in &md.attrs {
+                attr.pretty_print(printer)?;
+                printer.hard_break();
+            }
+            for comment in &md.leading_comments {
+                comment.pretty_print(printer)?;
+            }
         }
         printer.string("static ");
         printer.string(&self.ident);
@@ -46,8 +43,10 @@ impl PrettyPrinter for ItemStatic {
         printer.string(" = ");
         self.expr.pretty_print(printer)?;
         printer.string(";");
-        for comment in &self.trailing_comments {
-            comment.pretty_print(printer)?;
+        if let Some(md) = &self.md {
+            for comment in &md.trailing_comments {
+                comment.pretty_print(printer)?;
+            }
         }
         Ok(())
     }

@@ -5,12 +5,13 @@
 //! or grouped token streams.
 
 use crate::ast::literals::Lit;
+use thin_vec::ThinVec;
 
 /// A stream of tokens, representing the input to a macro.
 #[derive(Debug, Clone, PartialEq)]
 pub struct TokenStream {
     /// The sequence of token trees in the stream.
-    pub tokens: Vec<TokenTree>,
+    pub tokens: ThinVec<TokenTree>,
 }
 
 /// A single token or a delimited sequence of token trees (e.g., `[1, (), ..]`).

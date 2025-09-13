@@ -1,0 +1,11 @@
+---
+source: tests/builder.rs
+expression: actual
+---
+#[test]
+
+// a leading comment
+fn foo(a, b) -> bool {
+"Hello, world!";
+}
+// a trailing comment

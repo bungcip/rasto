@@ -1,21 +1,17 @@
-use crate::ast::attributes::Attribute;
-use crate::ast::comments::Comment;
+use crate::ast::metadata::Md;
 use crate::pretty_printer::{PrettyPrinter, Printer};
 use std::fmt;
+use thin_vec::ThinVec;
 
 /// A trait alias item: `pub trait ShareableIterator = Iterator + Sync;`
 #[derive(Debug, Clone, PartialEq)]
 pub struct ItemTraitAlias {
-    /// Attributes that appear before the trait alias.
-    pub attrs: Vec<Attribute>,
-    /// Comments that appear before the trait alias.
-    pub leading_comments: Vec<Comment>,
     /// The name of the trait alias.
     pub ident: String,
     /// The bounds of the trait alias.
-    pub bounds: Vec<String>,
-    /// Comments that appear after the trait alias.
-    pub trailing_comments: Vec<Comment>,
+    pub bounds: ThinVec<String>,
+    /// Metadata about the trait alias.
+    pub md: Option<Box<Md>>,
 }
 
 impl fmt::Display for ItemTraitAlias {
@@ -28,12 +24,14 @@ impl fmt::Display for ItemTraitAlias {
 
 impl PrettyPrinter for ItemTraitAlias {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
-        for attr in &self.attrs {
-            attr.pretty_print(printer)?;
-            printer.hard_break();
-        }
-        for comment in &self.leading_comments {
-            comment.pretty_print(printer)?;
+        if let Some(md) = &self.md {
+            for attr in &md.attrs {
+                attr.pretty_print(printer)?;
+                printer.hard_break();
+            }
+            for comment in &md.leading_comments {
+                comment.pretty_print(printer)?;
+            }
         }
         printer.string("trait ");
         printer.string(&self.ident);
@@ -45,8 +43,10 @@ impl PrettyPrinter for ItemTraitAlias {
             printer.string(bound);
         }
         printer.string(";");
-        for comment in &self.trailing_comments {
-            comment.pretty_print(printer)?;
+        if let Some(md) = &self.md {
+            for comment in &md.trailing_comments {
+                comment.pretty_print(printer)?;
+            }
         }
         Ok(())
     }

@@ -2,6 +2,7 @@
 
 use crate::ast::items::Item;
 use crate::pretty_printer::{PrettyPrinter, Printer};
+use thin_vec::ThinVec;
 use std::fmt;
 
 /// Represents a Rust source file.
@@ -12,7 +13,7 @@ use std::fmt;
 #[derive(Debug, Clone, PartialEq)]
 pub struct File {
     /// The top-level items in the file.
-    pub items: Vec<Item>,
+    pub items: ThinVec<Item>,
 }
 
 impl fmt::Display for File {

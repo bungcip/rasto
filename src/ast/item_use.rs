@@ -1,19 +1,14 @@
-use crate::ast::attributes::Attribute;
-use crate::ast::comments::Comment;
+use crate::ast::metadata::Md;
 use crate::pretty_printer::{PrettyPrinter, Printer};
 use std::fmt;
 
 /// A `use` item: `use std::collections::HashMap;`
 #[derive(Debug, Clone, PartialEq)]
 pub struct ItemUse {
-    /// Attributes that appear before the use item.
-    pub attrs: Vec<Attribute>,
-    /// Comments that appear before the use item.
-    pub leading_comments: Vec<Comment>,
     /// The path being used.
     pub path: String,
-    /// Comments that appear after the use item.
-    pub trailing_comments: Vec<Comment>,
+    /// Metadata about the use item.
+    pub md: Option<Box<Md>>,
 }
 
 impl fmt::Display for ItemUse {
@@ -26,18 +21,22 @@ impl fmt::Display for ItemUse {
 
 impl PrettyPrinter for ItemUse {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
-        for attr in &self.attrs {
-            attr.pretty_print(printer)?;
-            printer.hard_break();
-        }
-        for comment in &self.leading_comments {
-            comment.pretty_print(printer)?;
+        if let Some(md) = &self.md {
+            for attr in &md.attrs {
+                attr.pretty_print(printer)?;
+                printer.hard_break();
+            }
+            for comment in &md.leading_comments {
+                comment.pretty_print(printer)?;
+            }
         }
         printer.string("use ");
         printer.string(&self.path);
         printer.string(";");
-        for comment in &self.trailing_comments {
-            comment.pretty_print(printer)?;
+        if let Some(md) = &self.md {
+            for comment in &md.trailing_comments {
+                comment.pretty_print(printer)?;
+            }
         }
         Ok(())
     }

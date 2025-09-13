@@ -3,8 +3,6 @@
 //! Items are the primary components of a Rust program, such as functions, structs, enums,
 //! impl blocks, and traits. They are the top-level declarations that make up a crate.
 
-use crate::ast::attributes::Attribute;
-use crate::ast::comments::Comment;
 use crate::ast::generics::GenericParams;
 use crate::ast::item_const::ItemConst;
 use crate::ast::item_extern_crate::ItemExternCrate;
@@ -16,10 +14,12 @@ use crate::ast::item_trait_alias::ItemTraitAlias;
 use crate::ast::item_type::ItemType;
 use crate::ast::item_union::ItemUnion;
 use crate::ast::item_use::ItemUse;
+use crate::ast::metadata::Md;
 use crate::ast::patterns::Pat;
 use crate::ast::statements::Block;
 use crate::ast::types::Type;
 use crate::pretty_printer::{PrettyPrinter, Printer};
+use thin_vec::ThinVec;
 use std::fmt;
 
 /// A top-level item in a Rust file.
@@ -68,18 +68,14 @@ impl fmt::Display for Item {
 /// A trait item: `trait Foo { ... }`.
 #[derive(Debug, Clone, PartialEq)]
 pub struct ItemTrait {
-    /// Attributes that appear before the trait.
-    pub attrs: Vec<Attribute>,
-    /// Comments that appear before the trait.
-    pub leading_comments: Vec<Comment>,
     /// The name of the trait.
     pub ident: String,
     /// The generic parameters of the trait.
     pub generics: GenericParams,
     /// The items within the trait.
-    pub items: Vec<TraitItem>,
-    /// Comments that appear after the trait.
-    pub trailing_comments: Vec<Comment>,
+    pub items: ThinVec<TraitItem>,
+    /// Metadata about the trait.
+    pub md: Option<Box<Md>>,
 }
 
 /// An item within a trait definition.
@@ -92,16 +88,12 @@ pub enum TraitItem {
 /// A function item within a trait.
 #[derive(Debug, Clone, PartialEq)]
 pub struct TraitItemFn {
-    /// Attributes that appear before the function.
-    pub attrs: Vec<Attribute>,
-    /// Comments that appear before the function.
-    pub leading_comments: Vec<Comment>,
     /// The function signature.
     pub sig: Signature,
     /// An optional default implementation of the function.
     pub block: Option<Block>,
-    /// Comments that appear after the function.
-    pub trailing_comments: Vec<Comment>,
+    /// Metadata about the function.
+    pub md: Option<Box<Md>>,
 }
 
 impl fmt::Display for ItemFn {
@@ -147,87 +139,69 @@ impl fmt::Display for ItemTrait {
 /// A struct item: `struct Foo { ... }`.
 #[derive(Debug, Clone, PartialEq)]
 pub struct ItemStruct {
-    /// Attributes that appear before the struct.
-    pub attrs: Vec<Attribute>,
-    /// Comments that appear before the struct.
-    pub leading_comments: Vec<Comment>,
     /// The name of the struct.
     pub ident: String,
     /// The generic parameters of the struct.
     pub generics: GenericParams,
     /// The fields of the struct.
-    pub fields: Vec<Field>,
-    /// Comments that appear after the struct.
-    pub trailing_comments: Vec<Comment>,
+    pub fields: ThinVec<Field>,
+    /// Metadata about the struct.
+    pub md: Option<Box<Md>>,
 }
 
 /// A field of a struct.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Field {
-    /// Attributes that appear before the field.
-    pub attrs: Vec<Attribute>,
     /// The name of the field.
     pub ident: String,
     /// The type of the field.
     pub ty: Type,
+    /// Metadata about the field.
+    pub md: Option<Box<Md>>,
 }
 
 /// An enum item: `enum Foo { ... }`.
 #[derive(Debug, Clone, PartialEq)]
 pub struct ItemEnum {
-    /// Attributes that appear before the enum.
-    pub attrs: Vec<Attribute>,
-    /// Comments that appear before the enum.
-    pub leading_comments: Vec<Comment>,
     /// The name of the enum.
     pub ident: String,
     /// The generic parameters of the enum.
     pub generics: GenericParams,
     /// The variants of the enum.
-    pub variants: Vec<Variant>,
-    /// Comments that appear after the enum.
-    pub trailing_comments: Vec<Comment>,
+    pub variants: ThinVec<Variant>,
+    /// Metadata about the enum.
+    pub md: Option<Box<Md>>,
 }
 
 /// A variant of an enum.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Variant {
-    /// Attributes that appear before the variant.
-    pub attrs: Vec<Attribute>,
     /// The name of the variant.
     pub ident: String,
+    /// Metadata about the variant.
+    pub md: Option<Box<Md>>,
 }
 
 /// An `impl` block: `impl Foo { ... }`.
 #[derive(Debug, Clone, PartialEq)]
 pub struct ItemImpl {
-    /// Attributes that appear before the `impl` block.
-    pub attrs: Vec<Attribute>,
-    /// Comments that appear before the `impl` block.
-    pub leading_comments: Vec<Comment>,
-    /// The generic parameters of the `impl` block.
-    pub generics: GenericParams,
     /// The type the `impl` block is for.
     pub ty: Type,
     /// The functions within the `impl` block.
-    pub fns: Vec<ItemFn>,
-    /// Comments that appear after the `impl` block.
-    pub trailing_comments: Vec<Comment>,
+    pub fns: ThinVec<ItemFn>,
+    /// Metadata about the `impl` block.
+    pub md: Option<Box<Md>>,
 }
 
 /// A function item: `fn foo() { ... }`.
 #[derive(Debug, Clone, PartialEq)]
 pub struct ItemFn {
-    /// Attributes that appear before the function.
-    pub attrs: Vec<Attribute>,
-    /// Comments that appear before the function.
-    pub leading_comments: Vec<Comment>,
     /// The function signature.
     pub sig: Signature,
     /// The function body.
     pub block: Block,
-    /// Comments that appear after the function.
-    pub trailing_comments: Vec<Comment>,
+    /// Metadata about the function.
+    pub md: Option<Box<Md>>,
 }
 
 /// A function signature.
@@ -239,7 +213,7 @@ pub struct Signature {
     /// The generic parameters of the function.
     pub generics: GenericParams,
     /// The arguments of the function.
-    pub inputs: Vec<Pat>,
+    pub inputs: ThinVec<Pat>,
     /// The return type of the function.
     pub output: Option<Type>,
 }

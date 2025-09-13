@@ -31,6 +31,7 @@ pub mod item_union;
 pub mod item_use;
 pub mod items;
 pub mod literals;
+pub mod metadata;
 pub mod statements;
 pub mod tokens;
 
@@ -50,6 +51,7 @@ pub use item_union::*;
 pub use item_use::*;
 pub use items::*;
 pub use literals::*;
+pub use metadata::*;
 pub use statements::*;
 
 pub mod types;
