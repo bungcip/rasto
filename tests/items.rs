@@ -1,5 +1,5 @@
 use rasto::ast::{
-    Block, Item, TokenStream, Type,
+    Item, TokenStream, Type,
     builder::{
         const_item, extern_crate_item, fn_def, foreign_mod_item, macro_item, mod_item, static_item,
         trait_alias_item, type_item, union_item, use_item,
@@ -20,18 +20,12 @@ fn test_extern_crate_item() {
     insta::assert_snapshot!(item.to_string());
 }
 
+use rasto::ast::builder::block;
+
 #[test]
 fn test_foreign_mod_item() {
     let item = foreign_mod_item("C")
-        .item(Item::Fn(
-            fn_def("foo")
-                .block(Block {
-                    leading_comments: thin_vec![],
-                    stmts: thin_vec![],
-                    trailing_comments: thin_vec![],
-                })
-                .build(),
-        ))
+        .item(Item::Fn(fn_def("foo").block(block()).build()))
         .build();
     insta::assert_snapshot!(item.to_string());
 }
@@ -57,15 +51,7 @@ fn test_mod_item() {
 #[test]
 fn test_mod_item_with_content() {
     let item = mod_item("my_module")
-        .content(thin_vec![Item::Fn(
-            fn_def("foo")
-                .block(Block {
-                    leading_comments: thin_vec![],
-                    stmts: thin_vec![],
-                    trailing_comments: thin_vec![],
-                })
-                .build(),
-        )])
+        .content(thin_vec![Item::Fn(fn_def("foo").block(block()).build())])
         .build();
     insta::assert_snapshot!(item.to_string());
 }

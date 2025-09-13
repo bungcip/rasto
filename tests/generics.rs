@@ -14,11 +14,7 @@ fn test_fn_with_generics() {
         .generic(LifetimeParam {
             ident: "a".to_string(),
         })
-        .block(rasto::ast::Block {
-            stmts: thin_vec![],
-            leading_comments: thin_vec![],
-            trailing_comments: thin_vec![],
-        })
+        .block(block())
         .build();
 
     insta::assert_snapshot!(func.to_string(), @r###"

@@ -1,5 +1,4 @@
-use rasto::ast::{Block, Expr, Lit, LitInt, LitStr, Meta, Stmt, builder::*};
-use thin_vec::thin_vec;
+use rasto::ast::{builder::*, Expr, Lit, LitInt, LitStr, Meta, Stmt};
 
 #[test]
 fn test_fn_builder() {
@@ -7,19 +6,18 @@ fn test_fn_builder() {
         .input(pat().ident("a", false))
         .input(pat().ident("b", false))
         .output("bool")
-        .block(Block {
-            leading_comments: thin_vec![],
-            stmts: thin_vec![Stmt::Expr(
-                Expr::Lit(Lit::Str(LitStr::new("Hello, world!"))),
-                true,
-            )],
-            trailing_comments: thin_vec![],
-        })
+        .block(
+            block().statement(stmt().expr(Expr::Lit(Lit::Str(LitStr::new("Hello, world!"))), true)),
+        )
         .build();
 
     let actual = item_fn.to_string();
 
-    insta::assert_snapshot!(actual);
+    insta::assert_snapshot!(actual, @r#"
+    fn foo(a, b) -> bool {
+    "Hello, world!";
+    }
+    "#);
 }
 
 use rasto::ast::{Attribute, Comment, PatIdent};
@@ -33,19 +31,22 @@ fn test_fn_builder_with_metadata() {
         .input(pat().ident("a", false))
         .input(pat().ident("b", false))
         .output("bool")
-        .block(Block {
-            leading_comments: thin_vec![],
-            stmts: thin_vec![Stmt::Expr(
-                Expr::Lit(Lit::Str(LitStr::new("Hello, world!"))),
-                true,
-            )],
-            trailing_comments: thin_vec![],
-        })
+        .block(
+            block().statement(stmt().expr(Expr::Lit(Lit::Str(LitStr::new("Hello, world!"))), true)),
+        )
         .build();
 
     let actual = item_fn.to_string();
 
-    insta::assert_snapshot!(actual);
+    insta::assert_snapshot!(actual, @r#"
+    #[test]
+
+    // a leading comment
+    fn foo(a, b) -> bool {
+    "Hello, world!";
+    }
+    // a trailing comment
+    "#);
 }
 
 #[test]
