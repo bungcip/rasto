@@ -8,7 +8,9 @@ fn test_fn_builder() {
         .input(pat().ident("b", false))
         .output("bool")
         .block(
-            block().statement(stmt().expr(Expr::Lit(Lit::Str(LitStr::new("Hello, world!"))), true)),
+            block()
+                .statement(stmt().expr(Expr::Lit(Lit::Str(LitStr::new("Hello, world!")))))
+                .has_trailing_semicolon(true),
         )
         .build();
 
@@ -33,7 +35,9 @@ fn test_fn_builder_with_metadata() {
         .input(pat().ident("b", false))
         .output("bool")
         .block(
-            block().statement(stmt().expr(Expr::Lit(Lit::Str(LitStr::new("Hello, world!"))), true)),
+            block()
+                .statement(stmt().expr(Expr::Lit(Lit::Str(LitStr::new("Hello, world!")))))
+                .has_trailing_semicolon(true),
         )
         .build();
 
@@ -70,11 +74,11 @@ fn test_stmt_builder() {
         })
     );
 
-    let expr_stmt = stmt().expr(Expr::Lit(Lit::Int(LitInt::new(42))), true);
+    let expr_stmt = stmt().expr(Expr::Lit(Lit::Int(LitInt::new(42))));
 
     assert_eq!(
         expr_stmt,
-        Stmt::Expr(Expr::Lit(Lit::Int(LitInt::new(42))), true)
+        Stmt::Expr(Expr::Lit(Lit::Int(LitInt::new(42))))
     );
 }
 

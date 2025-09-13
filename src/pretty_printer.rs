@@ -875,8 +875,12 @@ impl PrettyPrinter for Block {
             for comment in &self.leading_comments {
                 comment.pretty_print(printer)?;
             }
-            for stmt in &self.stmts {
+            let num_stmts = self.stmts.len();
+            for (i, stmt) in self.stmts.iter().enumerate() {
                 stmt.pretty_print(printer)?;
+                if i == num_stmts - 1 && self.has_trailing_semicolon {
+                    printer.string(";");
+                }
             }
             for comment in &self.trailing_comments {
                 comment.pretty_print(printer)?;
@@ -898,11 +902,8 @@ impl PrettyPrinter for Stmt {
             Stmt::Item(item) => {
                 item.pretty_print(printer)?;
             }
-            Stmt::Expr(expr, semi) => {
+            Stmt::Expr(expr) => {
                 expr.pretty_print(printer)?;
-                if *semi {
-                    printer.string(";");
-                }
             }
             Stmt::MacCall(mac) => {
                 mac.pretty_print(printer)?;

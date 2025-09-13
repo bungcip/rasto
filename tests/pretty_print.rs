@@ -47,7 +47,11 @@ fn test_file() {
             fn_def("foo")
                 .input(pat().ident("a", false))
                 .output("i32")
-                .block(block().statement(Stmt::Expr(Expr::Lit(42.into()), true)))
+                .block(
+                    block()
+                        .statement(Stmt::Expr(Expr::Lit(42.into())))
+                        .has_trailing_semicolon(true),
+                )
                 .build(),
         )
         .build();
@@ -64,7 +68,8 @@ fn test_fn() {
             .block(
                 block()
                     .leading_comment(Comment::Block(" An inner comment ".to_string()))
-                    .statement(Stmt::Expr(Expr::Lit(42.into()), true)),
+                    .statement(Stmt::Expr(Expr::Lit(42.into())))
+                    .has_trailing_semicolon(true),
             )
             .build(),
     );
@@ -76,7 +81,8 @@ fn test_fn() {
 fn test_block_with_comments() {
     let ast = block()
         .leading_comment(Comment::Line(" leading comment".to_string()))
-        .statement(Stmt::Expr(Expr::Lit(42.into()), true))
+        .statement(Stmt::Expr(Expr::Lit(42.into())))
+        .has_trailing_semicolon(true)
         .trailing_comment(Comment::Line(" trailing comment".to_string()))
         .build();
 
@@ -130,8 +136,12 @@ fn test_expr_array() {
 
 #[test]
 fn test_expr_async() {
-    let ast =
-        Expr::Async(ExprAsync { block: block().statement(Stmt::Expr(Expr::Lit(1.into()), true)).build() });
+    let ast = Expr::Async(ExprAsync {
+        block: block()
+            .statement(Stmt::Expr(Expr::Lit(1.into())))
+            .has_trailing_semicolon(true)
+            .build(),
+    });
     insta::assert_snapshot!(pretty_print_expr(ast));
 }
 
@@ -178,8 +188,12 @@ fn test_expr_closure() {
 
 #[test]
 fn test_expr_const() {
-    let ast =
-        Expr::Const(ExprConst { block: block().statement(Stmt::Expr(Expr::Lit(1.into()), true)).build() });
+    let ast = Expr::Const(ExprConst {
+        block: block()
+            .statement(Stmt::Expr(Expr::Lit(1.into())))
+            .has_trailing_semicolon(true)
+            .build(),
+    });
     insta::assert_snapshot!(pretty_print_expr(ast));
 }
 
@@ -365,18 +379,19 @@ fn test_nested_struct() {
 fn test_long_binary_expression() {
     let ast = Item::Fn(
         fn_def("foo")
-            .block(block().statement(Stmt::Expr(
-                Expr::Binary(ExprBinary {
-                    left: Box::new(Expr::Lit(
-                        "a_very_long_string_that_should_cause_a_line_break".into(),
-                    )),
-                    op: BinOp::Add,
-                    right: Box::new(Expr::Lit(
-                        "another_very_long_string_that_should_also_cause_a_line_break".into(),
-                    )),
-                }),
-                true,
-            )))
+            .block(
+                block()
+                    .statement(Stmt::Expr(Expr::Binary(ExprBinary {
+                        left: Box::new(Expr::Lit(
+                            "a_very_long_string_that_should_cause_a_line_break".into(),
+                        )),
+                        op: BinOp::Add,
+                        right: Box::new(Expr::Lit(
+                            "another_very_long_string_that_should_also_cause_a_line_break".into(),
+                        )),
+                    })))
+                    .has_trailing_semicolon(true),
+            )
             .build(),
     );
 
@@ -412,12 +427,16 @@ fn test_trait() {
 fn test_loop_expression() {
     let ast = Item::Fn(
         fn_def("foo")
-            .block(block().statement(Stmt::Expr(
-                Expr::Loop(ExprLoop {
-                    body: block().statement(Stmt::Expr(Expr::Lit(1.into()), true)).build(),
-                }),
-                true,
-            )))
+            .block(
+                block()
+                    .statement(Stmt::Expr(Expr::Loop(ExprLoop {
+                        body: block()
+                            .statement(Stmt::Expr(Expr::Lit(1.into())))
+                            .has_trailing_semicolon(true)
+                            .build(),
+                    })))
+                    .has_trailing_semicolon(true),
+            )
             .build(),
     );
 
@@ -428,13 +447,17 @@ fn test_loop_expression() {
 fn test_while_expression() {
     let ast = Item::Fn(
         fn_def("foo")
-            .block(block().statement(Stmt::Expr(
-                Expr::While(ExprWhile {
-                    cond: Box::new(Expr::Lit(1.into())),
-                    body: block().statement(Stmt::Expr(Expr::Lit(2.into()), true)).build(),
-                }),
-                true,
-            )))
+            .block(
+                block()
+                    .statement(Stmt::Expr(Expr::While(ExprWhile {
+                        cond: Box::new(Expr::Lit(1.into())),
+                        body: block()
+                            .statement(Stmt::Expr(Expr::Lit(2.into())))
+                            .has_trailing_semicolon(true)
+                            .build(),
+                    })))
+                    .has_trailing_semicolon(true),
+            )
             .build(),
     );
 
@@ -445,14 +468,18 @@ fn test_while_expression() {
 fn test_for_expression() {
     let ast = Item::Fn(
         fn_def("foo")
-            .block(block().statement(Stmt::Expr(
-                Expr::For(ExprFor {
-                    pat: pat().ident("x", false),
-                    expr: Box::new(Expr::Lit(1.into())),
-                    body: block().statement(Stmt::Expr(Expr::Lit(2.into()), true)).build(),
-                }),
-                true,
-            )))
+            .block(
+                block()
+                    .statement(Stmt::Expr(Expr::For(ExprFor {
+                        pat: pat().ident("x", false),
+                        expr: Box::new(Expr::Lit(1.into())),
+                        body: block()
+                            .statement(Stmt::Expr(Expr::Lit(2.into())))
+                            .has_trailing_semicolon(true)
+                            .build(),
+                    })))
+                    .has_trailing_semicolon(true),
+            )
             .build(),
     );
 
@@ -463,13 +490,14 @@ fn test_for_expression() {
 fn test_assign_expression() {
     let ast = Item::Fn(
         fn_def("foo")
-            .block(block().statement(Stmt::Expr(
-                Expr::Assign(ExprAssign {
-                    left: Box::new(Expr::Lit("x".into())),
-                    right: Box::new(Expr::Lit(1.into())),
-                }),
-                true,
-            )))
+            .block(
+                block()
+                    .statement(Stmt::Expr(Expr::Assign(ExprAssign {
+                        left: Box::new(Expr::Lit("x".into())),
+                        right: Box::new(Expr::Lit(1.into())),
+                    })))
+                    .has_trailing_semicolon(true),
+            )
             .build(),
     );
 
@@ -480,20 +508,21 @@ fn test_assign_expression() {
 fn test_macro_call_expression() {
     let ast = Item::Fn(
         fn_def("foo")
-            .block(block().statement(Stmt::Expr(
-                Expr::MacroCall(ExprMacroCall {
-                    ident: "println".to_string(),
-                    tokens: TokenStream {
-                        tokens: thin_vec![TokenTree::Group(Group {
-                            delimiter: Delimiter::Parenthesis,
-                            stream: TokenStream {
-                                tokens: thin_vec![TokenTree::Literal("hello".into())],
-                            },
-                        })],
-                    },
-                }),
-                true,
-            )))
+            .block(
+                block()
+                    .statement(Stmt::Expr(Expr::MacroCall(ExprMacroCall {
+                        ident: "println".to_string(),
+                        tokens: TokenStream {
+                            tokens: thin_vec![TokenTree::Group(Group {
+                                delimiter: Delimiter::Parenthesis,
+                                stream: TokenStream {
+                                    tokens: thin_vec![TokenTree::Literal("hello".into())],
+                                },
+                            })],
+                        },
+                    })))
+                    .has_trailing_semicolon(true),
+            )
             .build(),
     );
 
@@ -562,24 +591,30 @@ fn test_let_statement() {
 fn test_if_expression() {
     let ast = Item::Fn(
         fn_def("foo")
-            .block(block().statement(Stmt::Expr(
-                Expr::If(ExprIf {
-                    cond: Box::new(Expr::Lit(1.into())),
-                    then_branch: block().statement(Stmt::Expr(Expr::Lit(2.into()), true)).build(),
-                    else_branch: Some(Box::new(Expr::If(ExprIf {
-                        cond: Box::new(Expr::Lit(3.into())),
+            .block(
+                block()
+                    .statement(Stmt::Expr(Expr::If(ExprIf {
+                        cond: Box::new(Expr::Lit(1.into())),
                         then_branch: block()
-                            .statement(Stmt::Expr(Expr::Lit(4.into()), true))
+                            .statement(Stmt::Expr(Expr::Lit(2.into())))
+                            .has_trailing_semicolon(true)
                             .build(),
-                        else_branch: Some(Box::new(Expr::Block(ExprBlock {
-                            block: block()
-                                .statement(Stmt::Expr(Expr::Lit(5.into()), true))
+                        else_branch: Some(Box::new(Expr::If(ExprIf {
+                            cond: Box::new(Expr::Lit(3.into())),
+                            then_branch: block()
+                                .statement(Stmt::Expr(Expr::Lit(4.into())))
+                                .has_trailing_semicolon(true)
                                 .build(),
+                            else_branch: Some(Box::new(Expr::Block(ExprBlock {
+                                block: block()
+                                    .statement(Stmt::Expr(Expr::Lit(5.into())))
+                                    .has_trailing_semicolon(true)
+                                    .build(),
+                            }))),
                         }))),
-                    }))),
-                }),
-                true,
-            )))
+                    })))
+                    .has_trailing_semicolon(true),
+            )
             .build(),
     );
 
@@ -590,14 +625,15 @@ fn test_if_expression() {
 fn test_binary_expression() {
     let ast = Item::Fn(
         fn_def("foo")
-            .block(block().statement(Stmt::Expr(
-                Expr::Binary(ExprBinary {
-                    left: Box::new(Expr::Lit(1.into())),
-                    op: BinOp::Add,
-                    right: Box::new(Expr::Lit(2.into())),
-                }),
-                true,
-            )))
+            .block(
+                block()
+                    .statement(Stmt::Expr(Expr::Binary(ExprBinary {
+                        left: Box::new(Expr::Lit(1.into())),
+                        op: BinOp::Add,
+                        right: Box::new(Expr::Lit(2.into())),
+                    })))
+                    .has_trailing_semicolon(true),
+            )
             .build(),
     );
 
@@ -608,7 +644,11 @@ fn test_binary_expression() {
 fn test_expr_statement_without_semicolon() {
     let ast = Item::Fn(
         fn_def("foo")
-            .block(block().statement(Stmt::Expr(Expr::Lit(42.into()), false)))
+            .block(
+                block()
+                    .statement(Stmt::Expr(Expr::Lit(42.into())))
+                    .has_trailing_semicolon(false),
+            )
             .build(),
     );
 

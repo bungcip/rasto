@@ -19,6 +19,8 @@ pub struct Block {
     pub leading_comments: ThinVec<Comment>,
     /// The statements within the block.
     pub stmts: ThinVec<Stmt>,
+    /// Whether the last statement in the block has a trailing semicolon.
+    pub has_trailing_semicolon: bool,
     /// Comments that appear at the end of the block, after all statements.
     pub trailing_comments: ThinVec<Comment>,
 }
@@ -30,8 +32,8 @@ pub enum Stmt {
     Local(Local),
     /// An item definition.
     Item(Item),
-    /// An expression statement, with an optional trailing semicolon.
-    Expr(Expr, bool),
+    /// An expression statement.
+    Expr(Expr),
     /// A macro call.
     MacCall(ExprMacroCall),
 }
