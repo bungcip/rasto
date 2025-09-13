@@ -1593,6 +1593,83 @@ impl ItemUseBuilder {
     }
 }
 
+/// Creates a new `AttributeBuilder` to construct an attribute.
+pub fn attr() -> AttributeBuilder {
+    AttributeBuilder::new()
+}
+
+/// A builder for constructing an `Attribute` AST node.
+#[derive(Default)]
+pub struct AttributeBuilder {
+    is_inner: bool,
+    meta: Option<Meta>,
+}
+
+impl AttributeBuilder {
+    /// Creates a new `AttributeBuilder`.
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Sets the attribute as an inner attribute.
+    pub fn inner(mut self) -> Self {
+        self.is_inner = true;
+        self
+    }
+
+    /// Sets the meta item for the attribute.
+    pub fn meta(mut self, meta: impl Into<Meta>) -> Self {
+        self.meta = Some(meta.into());
+        self
+    }
+
+    /// Builds the `Attribute` AST node.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the meta item has not been set.
+    pub fn build(self) -> Attribute {
+        let meta = self.meta.expect("meta is required");
+        if self.is_inner {
+            Attribute::Inner(meta)
+        } else {
+            Attribute::Outer(meta)
+        }
+    }
+}
+
+/// Creates a new `MetaBuilder` to construct a meta item.
+pub fn meta() -> MetaBuilder {
+    MetaBuilder
+}
+
+/// A builder for constructing `Meta` AST nodes.
+#[derive(Clone, Copy)]
+pub struct MetaBuilder;
+
+impl MetaBuilder {
+    /// Creates a meta list.
+    pub fn list(self, path: impl Into<String>, metas: impl IntoIterator<Item = Meta>) -> Meta {
+        Meta::List(MetaList {
+            path: path.into(),
+            metas: metas.into_iter().collect(),
+        })
+    }
+
+    /// Creates a meta path.
+    pub fn path(self, path: impl Into<String>) -> Meta {
+        Meta::Path(path.into())
+    }
+
+    /// Creates a meta name-value pair.
+    pub fn name_value(self, path: impl Into<String>, value: impl Into<Lit>) -> Meta {
+        Meta::NameValue(MetaNameValue {
+            path: path.into(),
+            value: value.into(),
+        })
+    }
+}
+
 impl Into<Pat> for &str {
     fn into(self) -> Pat {
         Pat::Ident(PatIdent {

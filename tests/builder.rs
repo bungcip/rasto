@@ -1,4 +1,4 @@
-use rasto::ast::{Block, Expr, Lit, LitInt, LitStr, Meta, Stmt, builder::*};
+use rasto::ast::{Block, Expr, Lit, LitInt, LitStr, Stmt, builder::*};
 use thin_vec::thin_vec;
 
 #[test]
@@ -22,12 +22,12 @@ fn test_fn_builder() {
     insta::assert_snapshot!(actual);
 }
 
-use rasto::ast::{Attribute, Comment, PatIdent};
+use rasto::ast::{Comment, PatIdent};
 
 #[test]
 fn test_fn_builder_with_metadata() {
     let item_fn = fn_def("foo")
-        .attr(Attribute::Outer(Meta::Path("test".to_string())))
+        .attr(attr().meta(meta().path("test")).build())
         .leading_comment(Comment::Line(" a leading comment".to_string()))
         .trailing_comment(Comment::Line(" a trailing comment".to_string()))
         .input(pat().ident("a", false))
