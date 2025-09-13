@@ -12,7 +12,7 @@
 //! Here's an example of how to build a simple function AST and pretty-print it:
 //!
 //! ```rust
-//! use rasto::ast::*;
+//! use rasto::ast::{*, Lit, LitInt};
 //! use rasto::pretty_printer::*;
 //!
 //! let ast = Item::from(

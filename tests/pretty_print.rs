@@ -43,7 +43,7 @@ fn test_file() {
                 .output("i32")
                 .block(Block {
                     leading_comments: vec![],
-                    stmts: vec![Stmt::Expr(Expr::Lit(Lit::Int(42)), true)],
+                    stmts: vec![Stmt::Expr(Expr::Lit(42.into()), true)],
                     trailing_comments: vec![],
                 })
                 .build(),
@@ -61,7 +61,7 @@ fn test_fn() {
             .output("i32")
             .block(Block {
                 leading_comments: vec![Comment::Block(" An inner comment ".to_string())],
-                stmts: vec![Stmt::Expr(Expr::Lit(Lit::Int(42)), true)],
+                stmts: vec![Stmt::Expr(Expr::Lit(42.into()), true)],
                 trailing_comments: vec![],
             })
             .build(),
@@ -72,7 +72,7 @@ fn test_fn() {
 
 #[test]
 fn unary_expression() {
-    let expr = expr().unary(UnOp::Neg, expr().lit(Lit::Int(42)));
+    let expr = expr().unary(UnOp::Neg, expr().lit(42));
 
     let mut output = String::new();
     let mut printer = Printer::new(&mut output);
@@ -84,7 +84,7 @@ fn unary_expression() {
 
 #[test]
 fn unary_expression_not() {
-    let expr = expr().unary(UnOp::Not, expr().lit(Lit::Bool(true)));
+    let expr = expr().unary(UnOp::Not, expr().lit(true));
 
     let mut output = String::new();
     let mut printer = Printer::new(&mut output);
@@ -105,7 +105,7 @@ fn pretty_print_expr(expr: Expr) -> String {
 #[test]
 fn test_expr_array() {
     let ast = Expr::Array(ExprArray {
-        elems: vec![Expr::Lit(Lit::Int(1)), Expr::Lit(Lit::Int(2))],
+        elems: vec![Expr::Lit(1.into()), Expr::Lit(2.into())],
     });
     insta::assert_snapshot!(pretty_print_expr(ast));
 }
@@ -115,7 +115,7 @@ fn test_expr_async() {
     let ast = Expr::Async(ExprAsync {
         block: Block {
             leading_comments: vec![],
-            stmts: vec![Stmt::Expr(Expr::Lit(Lit::Int(1)), true)],
+            stmts: vec![Stmt::Expr(Expr::Lit(1.into()), true)],
             trailing_comments: vec![],
         },
     });
@@ -125,7 +125,7 @@ fn test_expr_async() {
 #[test]
 fn test_expr_await() {
     let ast = Expr::Await(ExprAwait {
-        expr: Box::new(Expr::Lit(Lit::Str("future".to_string()))),
+        expr: Box::new(Expr::Lit("future".into())),
     });
     insta::assert_snapshot!(pretty_print_expr(ast));
 }
@@ -139,8 +139,8 @@ fn test_expr_break() {
 #[test]
 fn test_expr_call() {
     let ast = Expr::Call(ExprCall {
-        func: Box::new(Expr::Lit(Lit::Str("foo".to_string()))),
-        args: vec![Expr::Lit(Lit::Int(1)), Expr::Lit(Lit::Int(2))],
+        func: Box::new(Expr::Lit("foo".into())),
+        args: vec![Expr::Lit(1.into()), Expr::Lit(2.into())],
     });
     insta::assert_snapshot!(pretty_print_expr(ast));
 }
@@ -148,7 +148,7 @@ fn test_expr_call() {
 #[test]
 fn test_expr_cast() {
     let ast = Expr::Cast(ExprCast {
-        expr: Box::new(Expr::Lit(Lit::Str("x".to_string()))),
+        expr: Box::new(Expr::Lit("x".into())),
         ty: "u32".into(),
     });
     insta::assert_snapshot!(pretty_print_expr(ast));
@@ -158,7 +158,7 @@ fn test_expr_cast() {
 fn test_expr_closure() {
     let ast = Expr::Closure(ExprClosure {
         inputs: vec![pat().ident("a", false), pat().ident("b", false)],
-        body: Box::new(Expr::Lit(Lit::Int(1))),
+        body: Box::new(Expr::Lit(1.into())),
     });
     insta::assert_snapshot!(pretty_print_expr(ast));
 }
@@ -168,7 +168,7 @@ fn test_expr_const() {
     let ast = Expr::Const(ExprConst {
         block: Block {
             leading_comments: vec![],
-            stmts: vec![Stmt::Expr(Expr::Lit(Lit::Int(1)), true)],
+            stmts: vec![Stmt::Expr(Expr::Lit(1.into()), true)],
             trailing_comments: vec![],
         },
     });
@@ -184,7 +184,7 @@ fn test_expr_continue() {
 #[test]
 fn test_expr_field() {
     let ast = Expr::Field(ExprField {
-        expr: Box::new(Expr::Lit(Lit::Str("stru".to_string()))),
+        expr: Box::new(Expr::Lit("stru".into())),
         member: "field".to_string(),
     });
     insta::assert_snapshot!(pretty_print_expr(ast));
@@ -193,8 +193,8 @@ fn test_expr_field() {
 #[test]
 fn test_expr_index() {
     let ast = Expr::Index(ExprIndex {
-        expr: Box::new(Expr::Lit(Lit::Str("arr".to_string()))),
-        index: Box::new(Expr::Lit(Lit::Int(0))),
+        expr: Box::new(Expr::Lit("arr".into())),
+        index: Box::new(Expr::Lit(0.into())),
     });
     insta::assert_snapshot!(pretty_print_expr(ast));
 }
@@ -202,7 +202,7 @@ fn test_expr_index() {
 #[test]
 fn test_expr_match() {
     let ast = Expr::Match(ExprMatch {
-        expr: Box::new(Expr::Lit(Lit::Str("x".to_string()))),
+        expr: Box::new(Expr::Lit("x".into())),
         arms: vec![
             Arm {
                 pat: pat().tuple(vec![
@@ -210,12 +210,12 @@ fn test_expr_match() {
                     pat().ident("y", false),
                 ]),
                 guard: None,
-                body: Box::new(Expr::Lit(Lit::Int(1))),
+                body: Box::new(Expr::Lit(1.into())),
             },
             Arm {
                 pat: pat().ident("None", false),
-                guard: Some(Box::new(Expr::Lit(Lit::Bool(true)))),
-                body: Box::new(Expr::Lit(Lit::Int(2))),
+                guard: Some(Box::new(Expr::Lit(true.into()))),
+                body: Box::new(Expr::Lit(2.into())),
             },
         ],
     });
@@ -225,9 +225,9 @@ fn test_expr_match() {
 #[test]
 fn test_expr_method_call() {
     let ast = Expr::MethodCall(ExprMethodCall {
-        receiver: Box::new(Expr::Lit(Lit::Str("obj".to_string()))),
+        receiver: Box::new(Expr::Lit("obj".into())),
         method: "method".to_string(),
-        args: vec![Expr::Lit(Lit::Int(1)), Expr::Lit(Lit::Int(2))],
+        args: vec![Expr::Lit(1.into()), Expr::Lit(2.into())],
     });
     insta::assert_snapshot!(pretty_print_expr(ast));
 }
@@ -235,7 +235,7 @@ fn test_expr_method_call() {
 #[test]
 fn test_expr_paren() {
     let ast = Expr::Paren(ExprParen {
-        expr: Box::new(Expr::Lit(Lit::Int(1))),
+        expr: Box::new(Expr::Lit(1.into())),
     });
     insta::assert_snapshot!(pretty_print_expr(ast));
 }
@@ -243,9 +243,9 @@ fn test_expr_paren() {
 #[test]
 fn test_expr_range() {
     let ast = Expr::Range(ExprRange {
-        start: Some(Box::new(Expr::Lit(Lit::Int(1)))),
+        start: Some(Box::new(Expr::Lit(1.into()))),
         limits: RangeLimits::HalfOpen,
-        end: Some(Box::new(Expr::Lit(Lit::Int(5)))),
+        end: Some(Box::new(Expr::Lit(5.into()))),
     });
     insta::assert_snapshot!(pretty_print_expr(ast));
 }
@@ -254,7 +254,7 @@ fn test_expr_range() {
 fn test_expr_reference() {
     let ast = Expr::Reference(ExprRef {
         is_mut: true,
-        expr: Box::new(Expr::Lit(Lit::Str("x".to_string()))),
+        expr: Box::new(Expr::Lit("x".into())),
     });
     insta::assert_snapshot!(pretty_print_expr(ast));
 }
@@ -262,7 +262,7 @@ fn test_expr_reference() {
 #[test]
 fn test_expr_return() {
     let ast = Expr::Return(ExprReturn {
-        expr: Some(Box::new(Expr::Lit(Lit::Int(1)))),
+        expr: Some(Box::new(Expr::Lit(1.into()))),
     });
     insta::assert_snapshot!(pretty_print_expr(ast));
 }
@@ -274,11 +274,11 @@ fn test_expr_struct() {
         fields: vec![
             FieldValue {
                 member: "a".to_string(),
-                value: Expr::Lit(Lit::Int(1)),
+                value: Expr::Lit(1.into()),
             },
             FieldValue {
                 member: "b".to_string(),
-                value: Expr::Lit(Lit::Int(2)),
+                value: Expr::Lit(2.into()),
             },
         ],
     });
@@ -288,7 +288,7 @@ fn test_expr_struct() {
 #[test]
 fn test_expr_tuple() {
     let ast = Expr::Tuple(ExprTuple {
-        elems: vec![Expr::Lit(Lit::Int(1)), Expr::Lit(Lit::Int(2))],
+        elems: vec![Expr::Lit(1.into()), Expr::Lit(2.into())],
     });
     insta::assert_snapshot!(pretty_print_expr(ast));
 }
@@ -370,13 +370,13 @@ fn test_long_binary_expression() {
             leading_comments: vec![],
             stmts: vec![Stmt::Expr(
                 Expr::Binary(ExprBinary {
-                    left: Box::new(Expr::Lit(Lit::Str(
-                        "a_very_long_string_that_should_cause_a_line_break".to_string(),
-                    ))),
+                    left: Box::new(Expr::Lit(
+                        "a_very_long_string_that_should_cause_a_line_break".into(),
+                    )),
                     op: BinOp::Add,
-                    right: Box::new(Expr::Lit(Lit::Str(
-                        "another_very_long_string_that_should_also_cause_a_line_break".to_string(),
-                    ))),
+                    right: Box::new(Expr::Lit(
+                        "another_very_long_string_that_should_also_cause_a_line_break".into(),
+                    )),
                 }),
                 true,
             )],
@@ -421,7 +421,7 @@ fn test_loop_expression() {
                     Expr::Loop(ExprLoop {
                         body: Block {
                             leading_comments: vec![],
-                            stmts: vec![Stmt::Expr(Expr::Lit(Lit::Int(1)), true)],
+                            stmts: vec![Stmt::Expr(Expr::Lit(1.into()), true)],
                             trailing_comments: vec![],
                         },
                     }),
@@ -443,10 +443,10 @@ fn test_while_expression() {
                 leading_comments: vec![],
                 stmts: vec![Stmt::Expr(
                     Expr::While(ExprWhile {
-                        cond: Box::new(Expr::Lit(Lit::Int(1))),
+                        cond: Box::new(Expr::Lit(1.into())),
                         body: Block {
                             leading_comments: vec![],
-                            stmts: vec![Stmt::Expr(Expr::Lit(Lit::Int(2)), true)],
+                            stmts: vec![Stmt::Expr(Expr::Lit(2.into()), true)],
                             trailing_comments: vec![],
                         },
                     }),
@@ -469,10 +469,10 @@ fn test_for_expression() {
                 stmts: vec![Stmt::Expr(
                     Expr::For(ExprFor {
                         pat: pat().ident("x", false),
-                        expr: Box::new(Expr::Lit(Lit::Int(1))),
+                        expr: Box::new(Expr::Lit(1.into())),
                         body: Block {
                             leading_comments: vec![],
-                            stmts: vec![Stmt::Expr(Expr::Lit(Lit::Int(2)), true)],
+                            stmts: vec![Stmt::Expr(Expr::Lit(2.into()), true)],
                             trailing_comments: vec![],
                         },
                     }),
@@ -494,8 +494,8 @@ fn test_assign_expression() {
                 leading_comments: vec![],
                 stmts: vec![Stmt::Expr(
                     Expr::Assign(ExprAssign {
-                        left: Box::new(Expr::Lit(Lit::Str("x".to_string()))),
-                        right: Box::new(Expr::Lit(Lit::Int(1))),
+                        left: Box::new(Expr::Lit("x".into())),
+                        right: Box::new(Expr::Lit(1.into())),
                     }),
                     true,
                 )],
@@ -520,7 +520,7 @@ fn test_macro_call_expression() {
                             tokens: vec![TokenTree::Group(Group {
                                 delimiter: Delimiter::Parenthesis,
                                 stream: TokenStream {
-                                    tokens: vec![TokenTree::Literal(Lit::Str("hello".to_string()))],
+                                    tokens: vec![TokenTree::Literal("hello".into())],
                                 },
                             })],
                         },
@@ -588,7 +588,7 @@ fn test_let_statement() {
                     stmt()
                         .local(pat().ident("x", false))
                         .ty("i32")
-                        .expr(Expr::Lit(Lit::Int(42)))
+                        .expr(Expr::Lit(42.into()))
                         .build(),
                 ],
                 trailing_comments: vec![],
@@ -607,23 +607,23 @@ fn test_if_expression() {
                 leading_comments: vec![],
                 stmts: vec![Stmt::Expr(
                     Expr::If(ExprIf {
-                        cond: Box::new(Expr::Lit(Lit::Int(1))),
+                        cond: Box::new(Expr::Lit(1.into())),
                         then_branch: Block {
                             leading_comments: vec![],
-                            stmts: vec![Stmt::Expr(Expr::Lit(Lit::Int(2)), true)],
+                            stmts: vec![Stmt::Expr(Expr::Lit(2.into()), true)],
                             trailing_comments: vec![],
                         },
                         else_branch: Some(Box::new(Expr::If(ExprIf {
-                            cond: Box::new(Expr::Lit(Lit::Int(3))),
+                            cond: Box::new(Expr::Lit(3.into())),
                             then_branch: Block {
                                 leading_comments: vec![],
-                                stmts: vec![Stmt::Expr(Expr::Lit(Lit::Int(4)), true)],
+                                stmts: vec![Stmt::Expr(Expr::Lit(4.into()), true)],
                                 trailing_comments: vec![],
                             },
                             else_branch: Some(Box::new(Expr::Block(ExprBlock {
                                 block: Block {
                                     leading_comments: vec![],
-                                    stmts: vec![Stmt::Expr(Expr::Lit(Lit::Int(5)), true)],
+                                    stmts: vec![Stmt::Expr(Expr::Lit(5.into()), true)],
                                     trailing_comments: vec![],
                                 },
                             }))),
@@ -647,9 +647,9 @@ fn test_binary_expression() {
                 leading_comments: vec![],
                 stmts: vec![Stmt::Expr(
                     Expr::Binary(ExprBinary {
-                        left: Box::new(Expr::Lit(Lit::Int(1))),
+                        left: Box::new(Expr::Lit(1.into())),
                         op: BinOp::Add,
-                        right: Box::new(Expr::Lit(Lit::Int(2))),
+                        right: Box::new(Expr::Lit(2.into())),
                     }),
                     true,
                 )],
@@ -667,7 +667,7 @@ fn test_expr_statement_without_semicolon() {
         fn_def("foo")
             .block(Block {
                 leading_comments: vec![],
-                stmts: vec![Stmt::Expr(Expr::Lit(Lit::Int(42)), false)],
+                stmts: vec![Stmt::Expr(Expr::Lit(42.into()), false)],
                 trailing_comments: vec![],
             })
             .build(),
@@ -709,11 +709,37 @@ fn test_macro_call_statement() {
                         tokens: vec![TokenTree::Group(Group {
                             delimiter: Delimiter::Parenthesis,
                             stream: TokenStream {
-                                tokens: vec![TokenTree::Literal(Lit::Str("hello".to_string()))],
+                                tokens: vec![TokenTree::Literal("hello".into())],
                             },
                         })],
                     },
                 })],
+                trailing_comments: vec![],
+            })
+            .build(),
+    );
+
+    insta::assert_snapshot!(pretty_print_item(ast));
+}
+
+#[test]
+fn test_all_literals() {
+    let ast = Item::Fn(
+        fn_def("literals")
+            .block(Block {
+                leading_comments: vec![],
+                stmts: vec![
+                    stmt().local("s").expr(Expr::Lit("hello".into())).build(),
+                    stmt().local("bs").expr(Expr::Lit(Lit::ByteStr(LitByteStr::new(b"hello")))).build(),
+                    stmt().local("cs").expr(Expr::Lit(Lit::CStr(LitCStr::new("hello")))).build(),
+                    stmt().local("b").expr(Expr::Lit(Lit::Byte(LitByte::new(b'h')))).build(),
+                    stmt().local("c").expr(Expr::Lit(Lit::Char(LitChar::new('h')))).build(),
+                    stmt().local("i").expr(Expr::Lit(42.into())).build(),
+                    stmt().local("i_suffix").expr(Expr::Lit(Lit::Int(LitInt::new(42).with_suffix("u32")))).build(),
+                    stmt().local("f").expr(Expr::Lit(Lit::Float(LitFloat::new("1.23")))).build(),
+                    stmt().local("f_suffix").expr(Expr::Lit(Lit::Float(LitFloat::new("1.23").with_suffix("f32")))).build(),
+                    stmt().local("t").expr(Expr::Lit(true.into())).build(),
+                ],
                 trailing_comments: vec![],
             })
             .build(),

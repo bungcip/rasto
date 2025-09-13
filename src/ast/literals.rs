@@ -7,44 +7,202 @@
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Lit {
     /// A string literal, e.g., `"hello"`.
-    Str(String),
+    Str(LitStr),
+    /// A byte string literal, e.g., `b"hello"`.
+    ByteStr(LitByteStr),
+    /// A C-string literal, e.g., `c"hello"`.
+    CStr(LitCStr),
+    /// A byte literal, e.g., `b'h'`.
+    Byte(LitByte),
+    /// A character literal, e.g., `'h'`.
+    Char(LitChar),
     /// An integer literal, e.g., `42`.
-    Int(u64),
+    Int(LitInt),
+    /// A float literal, e.g., `1.23`.
+    Float(LitFloat),
     /// A boolean literal, e.g., `true` or `false`.
-    Bool(bool),
+    Bool(LitBool),
+}
+
+/// A string literal, e.g., `"hello"`.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct LitStr {
+    /// The value of the string literal.
+    pub value: String,
+}
+
+impl LitStr {
+    /// Creates a new `LitStr`.
+    pub fn new(value: &str) -> Self {
+        Self {
+            value: value.to_string(),
+        }
+    }
+}
+
+/// A byte string literal, e.g., `b"hello"`.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct LitByteStr {
+    /// The value of the byte string literal.
+    pub value: Vec<u8>,
+}
+
+impl LitByteStr {
+    /// Creates a new `LitByteStr`.
+    pub fn new(value: &[u8]) -> Self {
+        Self {
+            value: value.to_vec(),
+        }
+    }
+}
+
+/// A C-string literal, e.g., `c"hello"`.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct LitCStr {
+    /// The value of the C-string literal.
+    pub value: Vec<u8>,
+}
+
+impl LitCStr {
+    /// Creates a new `LitCStr`.
+    pub fn new(value: &str) -> Self {
+        Self {
+            value: value.as_bytes().to_vec(),
+        }
+    }
+}
+
+/// A byte literal, e.g., `b'h'`.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct LitByte {
+    /// The value of the byte literal.
+    pub value: u8,
+}
+
+impl LitByte {
+    /// Creates a new `LitByte`.
+    pub fn new(value: u8) -> Self {
+        Self { value }
+    }
+}
+
+/// A character literal, e.g., `'h'`.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct LitChar {
+    /// The value of the character literal.
+    pub value: char,
+}
+
+impl LitChar {
+    /// Creates a new `LitChar`.
+    pub fn new(value: char) -> Self {
+        Self { value }
+    }
+}
+
+/// An integer literal, e.g., `42`.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct LitInt {
+    /// The value of the integer literal.
+    pub value: u128,
+    /// The suffix of the integer literal, e.g., `u32`.
+    pub suffix: Option<String>,
+}
+
+impl LitInt {
+    /// Creates a new `LitInt`.
+    pub fn new(value: u128) -> Self {
+        Self {
+            value,
+            suffix: None,
+        }
+    }
+
+    /// Adds a suffix to the `LitInt`.
+    pub fn with_suffix(mut self, suffix: &str) -> Self {
+        self.suffix = Some(suffix.to_string());
+        self
+    }
+}
+
+/// A float literal, e.g., `1.23`.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct LitFloat {
+    /// The value of the float literal.
+    pub value: String,
+    /// The suffix of the float literal, e.g., `f64`.
+    pub suffix: Option<String>,
+}
+
+impl LitFloat {
+    /// Creates a new `LitFloat`.
+    pub fn new(value: &str) -> Self {
+        Self {
+            value: value.to_string(),
+            suffix: None,
+        }
+    }
+
+    /// Adds a suffix to the `LitFloat`.
+    pub fn with_suffix(mut self, suffix: &str) -> Self {
+        self.suffix = Some(suffix.to_string());
+        self
+    }
+}
+
+/// A boolean literal, e.g., `true` or `false`.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct LitBool {
+    /// The value of the boolean literal.
+    pub value: bool,
+}
+
+impl LitBool {
+    /// Creates a new `LitBool`.
+    pub fn new(value: bool) -> Self {
+        Self { value }
+    }
 }
 
 impl From<String> for Lit {
     /// Converts a `String` into a `Lit::Str`.
     fn from(s: String) -> Self {
-        Lit::Str(s)
+        Lit::Str(LitStr { value: s })
     }
 }
 
 impl From<&str> for Lit {
     /// Converts a `&str` into a `Lit::Str`.
     fn from(s: &str) -> Self {
-        Lit::Str(s.to_string())
+        Lit::Str(LitStr {
+            value: s.to_string(),
+        })
     }
 }
 
 impl From<u64> for Lit {
     /// Converts a `u64` into a `Lit::Int`.
     fn from(i: u64) -> Self {
-        Lit::Int(i)
+        Lit::Int(LitInt {
+            value: i as u128,
+            suffix: None,
+        })
     }
 }
 
 impl From<i32> for Lit {
     /// Converts an `i32` into a `Lit::Int`.
     fn from(i: i32) -> Self {
-        Lit::Int(i as u64)
+        Lit::Int(LitInt {
+            value: i as u128,
+            suffix: None,
+        })
     }
 }
 
 impl From<bool> for Lit {
     /// Converts a `bool` into a `Lit::Bool`.
     fn from(b: bool) -> Self {
-        Lit::Bool(b)
+        Lit::Bool(LitBool { value: b })
     }
 }
