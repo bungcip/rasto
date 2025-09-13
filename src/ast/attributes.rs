@@ -6,6 +6,7 @@
 use crate::ast::literals::Lit;
 use crate::pretty_printer::{PrettyPrinter, Printer};
 use std::fmt;
+use thin_vec::ThinVec;
 
 /// An attribute, such as `#[repr(C)]` or `#![allow(dead_code)]`.
 #[derive(Debug, Clone, PartialEq)]
@@ -35,7 +36,7 @@ pub struct MetaList {
     /// The path of the meta list, e.g., `repr`.
     pub path: String,
     /// The meta items within the list, e.g., `C`.
-    pub metas: Vec<Meta>,
+    pub metas: ThinVec<Meta>,
 }
 
 /// A meta name-value pair, such as `key = "value"`.

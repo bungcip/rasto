@@ -1,6 +1,7 @@
 use rasto::ast::builder::{file, fn_def, pat, stmt};
 use rasto::ast::*;
 use rasto::pretty_printer::{PrettyPrinter, Printer};
+use thin_vec::thin_vec;
 
 mod patterns;
 
@@ -20,32 +21,34 @@ fn pretty_print_file(file: File) -> String {
 fn test_file() {
     let ast = file()
         .item(Item::Struct(ItemStruct {
-            attrs: vec![],
-            leading_comments: vec![Comment::Line(" A simple struct.".to_string())],
+            md: Some(Box::new(Md {
+                attrs: thin_vec![],
+                leading_comments: thin_vec![Comment::Line(" A simple struct.".to_string())],
+                trailing_comments: thin_vec![],
+            })),
             ident: "Foo".to_string(),
             generics: Default::default(),
-            fields: vec![
+            fields: thin_vec![
                 Field {
-                    attrs: vec![],
+                    md: None,
                     ident: "field1".to_string(),
                     ty: "i32".into(),
                 },
                 Field {
-                    attrs: vec![],
+                    md: None,
                     ident: "field2".to_string(),
                     ty: "String".into(),
                 },
             ],
-            trailing_comments: vec![],
         }))
         .item(
             fn_def("foo")
                 .input(pat().ident("a", false))
                 .output("i32")
                 .block(Block {
-                    leading_comments: vec![],
-                    stmts: vec![Stmt::Expr(Expr::Lit(42.into()), true)],
-                    trailing_comments: vec![],
+                    leading_comments: thin_vec![],
+                    stmts: thin_vec![Stmt::Expr(Expr::Lit(42.into()), true)],
+                    trailing_comments: thin_vec![],
                 })
                 .build(),
         )
@@ -61,9 +64,9 @@ fn test_fn() {
             .input(pat().ident("a", false))
             .output("i32")
             .block(Block {
-                leading_comments: vec![Comment::Block(" An inner comment ".to_string())],
-                stmts: vec![Stmt::Expr(Expr::Lit(42.into()), true)],
-                trailing_comments: vec![],
+                leading_comments: thin_vec![Comment::Block(" An inner comment ".to_string())],
+                stmts: thin_vec![Stmt::Expr(Expr::Lit(42.into()), true)],
+                trailing_comments: thin_vec![],
             })
             .build(),
     );
@@ -106,7 +109,7 @@ fn pretty_print_expr(expr: Expr) -> String {
 #[test]
 fn test_expr_array() {
     let ast = Expr::Array(ExprArray {
-        elems: vec![Expr::Lit(1.into()), Expr::Lit(2.into())],
+        elems: thin_vec![Expr::Lit(1.into()), Expr::Lit(2.into())],
     });
     insta::assert_snapshot!(pretty_print_expr(ast));
 }
@@ -115,9 +118,9 @@ fn test_expr_array() {
 fn test_expr_async() {
     let ast = Expr::Async(ExprAsync {
         block: Block {
-            leading_comments: vec![],
-            stmts: vec![Stmt::Expr(Expr::Lit(1.into()), true)],
-            trailing_comments: vec![],
+            leading_comments: thin_vec![],
+            stmts: thin_vec![Stmt::Expr(Expr::Lit(1.into()), true)],
+            trailing_comments: thin_vec![],
         },
     });
     insta::assert_snapshot!(pretty_print_expr(ast));
@@ -141,7 +144,7 @@ fn test_expr_break() {
 fn test_expr_call() {
     let ast = Expr::Call(ExprCall {
         func: Box::new(Expr::Lit("foo".into())),
-        args: vec![Expr::Lit(1.into()), Expr::Lit(2.into())],
+        args: thin_vec![Expr::Lit(1.into()), Expr::Lit(2.into())],
     });
     insta::assert_snapshot!(pretty_print_expr(ast));
 }
@@ -158,7 +161,7 @@ fn test_expr_cast() {
 #[test]
 fn test_expr_closure() {
     let ast = Expr::Closure(ExprClosure {
-        inputs: vec![pat().ident("a", false), pat().ident("b", false)],
+        inputs: thin_vec![pat().ident("a", false), pat().ident("b", false)],
         body: Box::new(Expr::Lit(1.into())),
     });
     insta::assert_snapshot!(pretty_print_expr(ast));
@@ -168,9 +171,9 @@ fn test_expr_closure() {
 fn test_expr_const() {
     let ast = Expr::Const(ExprConst {
         block: Block {
-            leading_comments: vec![],
-            stmts: vec![Stmt::Expr(Expr::Lit(1.into()), true)],
-            trailing_comments: vec![],
+            leading_comments: thin_vec![],
+            stmts: thin_vec![Stmt::Expr(Expr::Lit(1.into()), true)],
+            trailing_comments: thin_vec![],
         },
     });
     insta::assert_snapshot!(pretty_print_expr(ast));
@@ -204,9 +207,12 @@ fn test_expr_index() {
 fn test_expr_match() {
     let ast = Expr::Match(ExprMatch {
         expr: Box::new(Expr::Lit("x".into())),
-        arms: vec![
+        arms: thin_vec![
             Arm {
-                pat: pat().tuple(vec![pat().ident("Some", false), pat().ident("y", false)]),
+                pat: pat().tuple(thin_vec![
+                    pat().ident("Some", false),
+                    pat().ident("y", false)
+                ]),
                 guard: None,
                 body: Box::new(Expr::Lit(1.into())),
             },
@@ -225,7 +231,7 @@ fn test_expr_method_call() {
     let ast = Expr::MethodCall(ExprMethodCall {
         receiver: Box::new(Expr::Lit("obj".into())),
         method: "method".to_string(),
-        args: vec![Expr::Lit(1.into()), Expr::Lit(2.into())],
+        args: thin_vec![Expr::Lit(1.into()), Expr::Lit(2.into())],
     });
     insta::assert_snapshot!(pretty_print_expr(ast));
 }
@@ -269,7 +275,7 @@ fn test_expr_return() {
 fn test_expr_struct() {
     let ast = Expr::Struct(ExprStruct {
         path: "Foo".to_string(),
-        fields: vec![
+        fields: thin_vec![
             FieldValue {
                 member: "a".to_string(),
                 value: Expr::Lit(1.into()),
@@ -286,7 +292,7 @@ fn test_expr_struct() {
 #[test]
 fn test_expr_tuple() {
     let ast = Expr::Tuple(ExprTuple {
-        elems: vec![Expr::Lit(1.into()), Expr::Lit(2.into())],
+        elems: thin_vec![Expr::Lit(1.into()), Expr::Lit(2.into())],
     });
     insta::assert_snapshot!(pretty_print_expr(ast));
 }
@@ -294,21 +300,19 @@ fn test_expr_tuple() {
 #[test]
 fn test_long_enum() {
     let ast = Item::Enum(ItemEnum {
-        attrs: vec![],
-        leading_comments: vec![],
+        md: None,
         ident: "MyLongLongLongLongLongEnum".to_string(),
         generics: Default::default(),
-        variants: vec![
+        variants: thin_vec![
             Variant {
-                attrs: vec![],
+                md: None,
                 ident: "AVeryLongVariantNameThatShouldCauseALineBreak".to_string(),
             },
             Variant {
-                attrs: vec![],
+                md: None,
                 ident: "AnotherVeryLongVariantNameThatShouldAlsoCauseALineBreak".to_string(),
             },
         ],
-        trailing_comments: vec![],
     });
 
     insta::assert_snapshot!(pretty_print_item(ast));
@@ -317,16 +321,14 @@ fn test_long_enum() {
 #[test]
 fn test_single_field_struct() {
     let ast = Item::Struct(ItemStruct {
-        attrs: vec![],
-        leading_comments: vec![],
+        md: None,
         ident: "MyStruct".to_string(),
         generics: Default::default(),
-        fields: vec![Field {
-            attrs: vec![],
+        fields: thin_vec![Field {
+            md: None,
             ident: "field".to_string(),
             ty: "i32".into(),
         }],
-        trailing_comments: vec![],
     });
 
     insta::assert_snapshot!(pretty_print_item(ast));
@@ -335,23 +337,21 @@ fn test_single_field_struct() {
 #[test]
 fn test_nested_struct() {
     let ast = Item::Struct(ItemStruct {
-        attrs: vec![],
-        leading_comments: vec![],
+        md: None,
         ident: "Outer".to_string(),
         generics: Default::default(),
-        fields: vec![
+        fields: thin_vec![
             Field {
-                attrs: vec![],
+                md: None,
                 ident: "inner".to_string(),
                 ty: "Inner".into(),
             },
             Field {
-                attrs: vec![],
+                md: None,
                 ident: "another_field".to_string(),
                 ty: "i32".into(),
             },
         ],
-        trailing_comments: vec![],
     });
 
     insta::assert_snapshot!(pretty_print_item(ast));
@@ -360,17 +360,16 @@ fn test_nested_struct() {
 #[test]
 fn test_long_binary_expression() {
     let ast = Item::Fn(ItemFn {
-        attrs: vec![],
-        leading_comments: vec![],
+        md: None,
         sig: Signature {
             ident: "foo".to_string(),
             generics: Default::default(),
-            inputs: vec![],
+            inputs: thin_vec![],
             output: None,
         },
         block: Block {
-            leading_comments: vec![],
-            stmts: vec![Stmt::Expr(
+            leading_comments: thin_vec![],
+            stmts: thin_vec![Stmt::Expr(
                 Expr::Binary(ExprBinary {
                     left: Box::new(Expr::Lit(
                         "a_very_long_string_that_should_cause_a_line_break".into(),
@@ -382,9 +381,8 @@ fn test_long_binary_expression() {
                 }),
                 true,
             )],
-            trailing_comments: vec![],
+            trailing_comments: thin_vec![],
         },
-        trailing_comments: vec![],
     });
 
     insta::assert_snapshot!(pretty_print_item(ast));
@@ -393,23 +391,23 @@ fn test_long_binary_expression() {
 #[test]
 fn test_trait() {
     let ast = Item::Trait(ItemTrait {
-        attrs: vec![],
-        leading_comments: vec![Comment::Line(" A simple trait.".to_string())],
+        md: Some(Box::new(Md {
+            attrs: thin_vec![],
+            leading_comments: thin_vec![Comment::Line(" A simple trait.".to_string())],
+            trailing_comments: thin_vec![],
+        })),
         ident: "MyTrait".to_string(),
         generics: Default::default(),
-        items: vec![TraitItem::Fn(TraitItemFn {
-            attrs: vec![],
-            leading_comments: vec![],
+        items: thin_vec![TraitItem::Fn(TraitItemFn {
+            md: None,
             sig: Signature {
                 ident: "my_func".to_string(),
                 generics: Default::default(),
-                inputs: vec![],
+                inputs: thin_vec![],
                 output: None,
             },
             block: None,
-            trailing_comments: vec![],
         })],
-        trailing_comments: vec![],
     });
 
     insta::assert_snapshot!(pretty_print_item(ast));
@@ -420,18 +418,18 @@ fn test_loop_expression() {
     let ast = Item::Fn(
         fn_def("foo")
             .block(Block {
-                leading_comments: vec![],
-                stmts: vec![Stmt::Expr(
+                leading_comments: thin_vec![],
+                stmts: thin_vec![Stmt::Expr(
                     Expr::Loop(ExprLoop {
                         body: Block {
-                            leading_comments: vec![],
-                            stmts: vec![Stmt::Expr(Expr::Lit(1.into()), true)],
-                            trailing_comments: vec![],
+                            leading_comments: thin_vec![],
+                            stmts: thin_vec![Stmt::Expr(Expr::Lit(1.into()), true)],
+                            trailing_comments: thin_vec![],
                         },
                     }),
                     true,
                 )],
-                trailing_comments: vec![],
+                trailing_comments: thin_vec![],
             })
             .build(),
     );
@@ -444,19 +442,19 @@ fn test_while_expression() {
     let ast = Item::Fn(
         fn_def("foo")
             .block(Block {
-                leading_comments: vec![],
-                stmts: vec![Stmt::Expr(
+                leading_comments: thin_vec![],
+                stmts: thin_vec![Stmt::Expr(
                     Expr::While(ExprWhile {
                         cond: Box::new(Expr::Lit(1.into())),
                         body: Block {
-                            leading_comments: vec![],
-                            stmts: vec![Stmt::Expr(Expr::Lit(2.into()), true)],
-                            trailing_comments: vec![],
+                            leading_comments: thin_vec![],
+                            stmts: thin_vec![Stmt::Expr(Expr::Lit(2.into()), true)],
+                            trailing_comments: thin_vec![],
                         },
                     }),
                     true,
                 )],
-                trailing_comments: vec![],
+                trailing_comments: thin_vec![],
             })
             .build(),
     );
@@ -469,20 +467,20 @@ fn test_for_expression() {
     let ast = Item::Fn(
         fn_def("foo")
             .block(Block {
-                leading_comments: vec![],
-                stmts: vec![Stmt::Expr(
+                leading_comments: thin_vec![],
+                stmts: thin_vec![Stmt::Expr(
                     Expr::For(ExprFor {
                         pat: pat().ident("x", false),
                         expr: Box::new(Expr::Lit(1.into())),
                         body: Block {
-                            leading_comments: vec![],
-                            stmts: vec![Stmt::Expr(Expr::Lit(2.into()), true)],
-                            trailing_comments: vec![],
+                            leading_comments: thin_vec![],
+                            stmts: thin_vec![Stmt::Expr(Expr::Lit(2.into()), true)],
+                            trailing_comments: thin_vec![],
                         },
                     }),
                     true,
                 )],
-                trailing_comments: vec![],
+                trailing_comments: thin_vec![],
             })
             .build(),
     );
@@ -495,15 +493,15 @@ fn test_assign_expression() {
     let ast = Item::Fn(
         fn_def("foo")
             .block(Block {
-                leading_comments: vec![],
-                stmts: vec![Stmt::Expr(
+                leading_comments: thin_vec![],
+                stmts: thin_vec![Stmt::Expr(
                     Expr::Assign(ExprAssign {
                         left: Box::new(Expr::Lit("x".into())),
                         right: Box::new(Expr::Lit(1.into())),
                     }),
                     true,
                 )],
-                trailing_comments: vec![],
+                trailing_comments: thin_vec![],
             })
             .build(),
     );
@@ -516,22 +514,22 @@ fn test_macro_call_expression() {
     let ast = Item::Fn(
         fn_def("foo")
             .block(Block {
-                leading_comments: vec![],
-                stmts: vec![Stmt::Expr(
+                leading_comments: thin_vec![],
+                stmts: thin_vec![Stmt::Expr(
                     Expr::MacroCall(ExprMacroCall {
                         ident: "println".to_string(),
                         tokens: TokenStream {
-                            tokens: vec![TokenTree::Group(Group {
+                            tokens: thin_vec![TokenTree::Group(Group {
                                 delimiter: Delimiter::Parenthesis,
                                 stream: TokenStream {
-                                    tokens: vec![TokenTree::Literal("hello".into())],
+                                    tokens: thin_vec![TokenTree::Literal("hello".into())],
                                 },
                             })],
                         },
                     }),
                     true,
                 )],
-                trailing_comments: vec![],
+                trailing_comments: thin_vec![],
             })
             .build(),
     );
@@ -542,21 +540,23 @@ fn test_macro_call_expression() {
 #[test]
 fn test_enum() {
     let ast = Item::Enum(ItemEnum {
-        attrs: vec![],
-        leading_comments: vec![Comment::Line(" A simple enum.".to_string())],
+        md: Some(Box::new(Md {
+            attrs: thin_vec![],
+            leading_comments: thin_vec![Comment::Line(" A simple enum.".to_string())],
+            trailing_comments: thin_vec![],
+        })),
         ident: "MyEnum".to_string(),
         generics: Default::default(),
-        variants: vec![
+        variants: thin_vec![
             Variant {
-                attrs: vec![],
+                md: None,
                 ident: "Variant1".to_string(),
             },
             Variant {
-                attrs: vec![],
+                md: None,
                 ident: "Variant2".to_string(),
             },
         ],
-        trailing_comments: vec![],
     });
 
     insta::assert_snapshot!(pretty_print_item(ast));
@@ -565,20 +565,22 @@ fn test_enum() {
 #[test]
 fn test_impl() {
     let ast = Item::Impl(ItemImpl {
-        attrs: vec![],
-        leading_comments: vec![Comment::Line(" A simple impl.".to_string())],
+        md: Some(Box::new(Md {
+            attrs: thin_vec![],
+            leading_comments: thin_vec![Comment::Line(" A simple impl.".to_string())],
+            trailing_comments: thin_vec![],
+        })),
         generics: Default::default(),
         ty: "MyStruct".into(),
-        fns: vec![
+        fns: thin_vec![
             fn_def("new")
                 .block(Block {
-                    leading_comments: vec![],
-                    stmts: vec![],
-                    trailing_comments: vec![],
+                    leading_comments: thin_vec![],
+                    stmts: thin_vec![],
+                    trailing_comments: thin_vec![],
                 })
                 .build(),
         ],
-        trailing_comments: vec![],
     });
 
     insta::assert_snapshot!(pretty_print_item(ast));
@@ -589,15 +591,15 @@ fn test_let_statement() {
     let ast = Item::Fn(
         fn_def("foo")
             .block(Block {
-                leading_comments: vec![],
-                stmts: vec![
+                leading_comments: thin_vec![],
+                stmts: thin_vec![
                     stmt()
                         .local(pat().ident("x", false))
                         .ty("i32")
                         .expr(Expr::Lit(42.into()))
                         .build(),
                 ],
-                trailing_comments: vec![],
+                trailing_comments: thin_vec![],
             })
             .build(),
     );
@@ -610,34 +612,34 @@ fn test_if_expression() {
     let ast = Item::Fn(
         fn_def("foo")
             .block(Block {
-                leading_comments: vec![],
-                stmts: vec![Stmt::Expr(
+                leading_comments: thin_vec![],
+                stmts: thin_vec![Stmt::Expr(
                     Expr::If(ExprIf {
                         cond: Box::new(Expr::Lit(1.into())),
                         then_branch: Block {
-                            leading_comments: vec![],
-                            stmts: vec![Stmt::Expr(Expr::Lit(2.into()), true)],
-                            trailing_comments: vec![],
+                            leading_comments: thin_vec![],
+                            stmts: thin_vec![Stmt::Expr(Expr::Lit(2.into()), true)],
+                            trailing_comments: thin_vec![],
                         },
                         else_branch: Some(Box::new(Expr::If(ExprIf {
                             cond: Box::new(Expr::Lit(3.into())),
                             then_branch: Block {
-                                leading_comments: vec![],
-                                stmts: vec![Stmt::Expr(Expr::Lit(4.into()), true)],
-                                trailing_comments: vec![],
+                                leading_comments: thin_vec![],
+                                stmts: thin_vec![Stmt::Expr(Expr::Lit(4.into()), true)],
+                                trailing_comments: thin_vec![],
                             },
                             else_branch: Some(Box::new(Expr::Block(ExprBlock {
                                 block: Block {
-                                    leading_comments: vec![],
-                                    stmts: vec![Stmt::Expr(Expr::Lit(5.into()), true)],
-                                    trailing_comments: vec![],
+                                    leading_comments: thin_vec![],
+                                    stmts: thin_vec![Stmt::Expr(Expr::Lit(5.into()), true)],
+                                    trailing_comments: thin_vec![],
                                 },
                             }))),
                         }))),
                     }),
                     true,
                 )],
-                trailing_comments: vec![],
+                trailing_comments: thin_vec![],
             })
             .build(),
     );
@@ -650,8 +652,8 @@ fn test_binary_expression() {
     let ast = Item::Fn(
         fn_def("foo")
             .block(Block {
-                leading_comments: vec![],
-                stmts: vec![Stmt::Expr(
+                leading_comments: thin_vec![],
+                stmts: thin_vec![Stmt::Expr(
                     Expr::Binary(ExprBinary {
                         left: Box::new(Expr::Lit(1.into())),
                         op: BinOp::Add,
@@ -659,7 +661,7 @@ fn test_binary_expression() {
                     }),
                     true,
                 )],
-                trailing_comments: vec![],
+                trailing_comments: thin_vec![],
             })
             .build(),
     );
@@ -672,9 +674,9 @@ fn test_expr_statement_without_semicolon() {
     let ast = Item::Fn(
         fn_def("foo")
             .block(Block {
-                leading_comments: vec![],
-                stmts: vec![Stmt::Expr(Expr::Lit(42.into()), false)],
-                trailing_comments: vec![],
+                leading_comments: thin_vec![],
+                stmts: thin_vec![Stmt::Expr(Expr::Lit(42.into()), false)],
+                trailing_comments: thin_vec![],
             })
             .build(),
     );
@@ -687,16 +689,14 @@ fn test_item_statement() {
     let ast = Item::Fn(
         fn_def("foo")
             .block(Block {
-                leading_comments: vec![],
-                stmts: vec![Stmt::Item(Item::Struct(ItemStruct {
-                    attrs: vec![],
-                    leading_comments: vec![],
+                leading_comments: thin_vec![],
+                stmts: thin_vec![Stmt::Item(Item::Struct(ItemStruct {
+                    md: None,
                     ident: "MyStruct".to_string(),
                     generics: Default::default(),
-                    fields: vec![],
-                    trailing_comments: vec![],
+                    fields: thin_vec![],
                 }))],
-                trailing_comments: vec![],
+                trailing_comments: thin_vec![],
             })
             .build(),
     );
@@ -709,19 +709,19 @@ fn test_macro_call_statement() {
     let ast = Item::Fn(
         fn_def("foo")
             .block(Block {
-                leading_comments: vec![],
-                stmts: vec![Stmt::MacCall(ExprMacroCall {
+                leading_comments: thin_vec![],
+                stmts: thin_vec![Stmt::MacCall(ExprMacroCall {
                     ident: "println".to_string(),
                     tokens: TokenStream {
-                        tokens: vec![TokenTree::Group(Group {
+                        tokens: thin_vec![TokenTree::Group(Group {
                             delimiter: Delimiter::Parenthesis,
                             stream: TokenStream {
-                                tokens: vec![TokenTree::Literal("hello".into())],
+                                tokens: thin_vec![TokenTree::Literal("hello".into())],
                             },
                         })],
                     },
                 })],
-                trailing_comments: vec![],
+                trailing_comments: thin_vec![],
             })
             .build(),
     );
@@ -734,8 +734,8 @@ fn test_all_literals() {
     let ast = Item::Fn(
         fn_def("literals")
             .block(Block {
-                leading_comments: vec![],
-                stmts: vec![
+                leading_comments: thin_vec![],
+                stmts: thin_vec![
                     stmt().local("s").expr(Expr::Lit("hello".into())).build(),
                     stmt()
                         .local("bs")
@@ -756,7 +756,9 @@ fn test_all_literals() {
                     stmt().local("i").expr(Expr::Lit(42.into())).build(),
                     stmt()
                         .local("i_suffix")
-                        .expr(Expr::Lit(Lit::Int(LitInt::new(42).with_suffix("u32"))))
+                        .expr(Expr::Lit(Lit::Int(
+                            LitInt::new(42).with_suffix(IntSuffix::U32)
+                        )))
                         .build(),
                     stmt()
                         .local("f")
@@ -765,12 +767,12 @@ fn test_all_literals() {
                     stmt()
                         .local("f_suffix")
                         .expr(Expr::Lit(Lit::Float(
-                            LitFloat::new("1.23").with_suffix("f32"),
+                            LitFloat::new("1.23").with_suffix(FloatSuffix::F32),
                         )))
                         .build(),
                     stmt().local("t").expr(Expr::Lit(true.into())).build(),
                 ],
-                trailing_comments: vec![],
+                trailing_comments: thin_vec![],
             })
             .build(),
     );
@@ -781,23 +783,25 @@ fn test_all_literals() {
 #[test]
 fn test_struct() {
     let ast = Item::Struct(ItemStruct {
-        attrs: vec![],
-        leading_comments: vec![Comment::Line(" A simple struct.".to_string())],
+        md: Some(Box::new(Md {
+            attrs: thin_vec![],
+            leading_comments: thin_vec![Comment::Line(" A simple struct.".to_string())],
+            trailing_comments: thin_vec![],
+        })),
         ident: "Foo".to_string(),
         generics: Default::default(),
-        fields: vec![
+        fields: thin_vec![
             Field {
-                attrs: vec![],
+                md: None,
                 ident: "field1".to_string(),
                 ty: "i32".into(),
             },
             Field {
-                attrs: vec![],
+                md: None,
                 ident: "field2".to_string(),
                 ty: "String".into(),
             },
         ],
-        trailing_comments: vec![],
     });
 
     insta::assert_snapshot!(pretty_print_item(ast));

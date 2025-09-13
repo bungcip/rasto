@@ -8,14 +8,15 @@
 //! ```
 //! use rasto::ast::builder::*;
 //! use rasto::ast::{*, Lit, LitInt};
+//! use thin_vec::thin_vec;
 //!
 //! let file_ast = file()
 //!     .item(
 //!         fn_def("my_function")
 //!             .block(Block {
-//!                 leading_comments: vec![],
-//!                 stmts: vec![Stmt::Expr(expr().lit(Lit::Int(LitInt::new(42))), true)],
-//!                 trailing_comments: vec![],
+//!                 leading_comments: thin_vec![],
+//!                 stmts: thin_vec![Stmt::Expr(expr().lit(Lit::Int(LitInt::new(42))), true)],
+//!                 trailing_comments: thin_vec![],
 //!             })
 //!             .build(),
 //!     )
@@ -23,6 +24,7 @@
 //! ```
 
 use crate::ast::*;
+use thin_vec::{ThinVec, thin_vec};
 
 /// Creates a new `FileBuilder` to construct a `File` AST node.
 ///
@@ -36,7 +38,7 @@ pub fn file() -> FileBuilder {
 /// A builder for constructing a `File` AST node.
 #[derive(Default)]
 pub struct FileBuilder {
-    items: Vec<Item>,
+    items: ThinVec<Item>,
 }
 
 impl FileBuilder {
@@ -82,7 +84,7 @@ pub fn trait_def(name: impl Into<String>) -> TraitBuilder {
 pub struct TraitBuilder {
     ident: String,
     generics: GenericParams,
-    items: Vec<TraitItem>,
+    items: ThinVec<TraitItem>,
 }
 
 impl TraitBuilder {
@@ -95,7 +97,7 @@ impl TraitBuilder {
         Self {
             ident: name.into(),
             generics: GenericParams::new(),
-            items: vec![],
+            items: thin_vec![],
         }
     }
 
@@ -126,12 +128,10 @@ impl TraitBuilder {
     /// An `ItemTrait` instance.
     pub fn build(self) -> ItemTrait {
         ItemTrait {
-            attrs: vec![],
-            leading_comments: vec![],
             ident: self.ident,
             generics: self.generics,
             items: self.items,
-            trailing_comments: vec![],
+            md: None,
         }
     }
 }
@@ -153,7 +153,7 @@ pub fn impl_block(ty: impl Into<Type>) -> ImplBuilder {
 pub struct ImplBuilder {
     generics: GenericParams,
     ty: Type,
-    fns: Vec<ItemFn>,
+    fns: ThinVec<ItemFn>,
 }
 
 impl ImplBuilder {
@@ -166,7 +166,7 @@ impl ImplBuilder {
         Self {
             generics: GenericParams::new(),
             ty: ty.into(),
-            fns: vec![],
+            fns: thin_vec![],
         }
     }
 
@@ -197,12 +197,10 @@ impl ImplBuilder {
     /// An `ItemImpl` instance.
     pub fn build(self) -> ItemImpl {
         ItemImpl {
-            attrs: vec![],
-            leading_comments: vec![],
             generics: self.generics,
             ty: self.ty,
             fns: self.fns,
-            trailing_comments: vec![],
+            md: None,
         }
     }
 }
@@ -224,7 +222,8 @@ pub fn enum_def(name: impl Into<String>) -> EnumBuilder {
 pub struct EnumBuilder {
     ident: String,
     generics: GenericParams,
-    variants: Vec<Variant>,
+    variants: ThinVec<Variant>,
+    md: Option<Box<Md>>,
 }
 
 impl EnumBuilder {
@@ -237,7 +236,8 @@ impl EnumBuilder {
         Self {
             ident: name.into(),
             generics: GenericParams::new(),
-            variants: vec![],
+            variants: thin_vec![],
+            md: None,
         }
     }
 
@@ -258,8 +258,8 @@ impl EnumBuilder {
     /// - `name`: The name of the variant.
     pub fn variant(mut self, name: impl Into<String>) -> Self {
         self.variants.push(Variant {
-            attrs: vec![],
             ident: name.into(),
+            md: None,
         });
         self
     }
@@ -271,12 +271,10 @@ impl EnumBuilder {
     /// An `ItemEnum` instance.
     pub fn build(self) -> ItemEnum {
         ItemEnum {
-            attrs: vec![],
-            leading_comments: vec![],
             ident: self.ident,
             generics: self.generics,
             variants: self.variants,
-            trailing_comments: vec![],
+            md: self.md,
         }
     }
 }
@@ -298,7 +296,7 @@ pub fn struct_def(name: impl Into<String>) -> StructBuilder {
 pub struct StructBuilder {
     ident: String,
     generics: GenericParams,
-    fields: Vec<Field>,
+    fields: ThinVec<Field>,
 }
 
 impl StructBuilder {
@@ -311,7 +309,7 @@ impl StructBuilder {
         Self {
             ident: name.into(),
             generics: GenericParams::new(),
-            fields: vec![],
+            fields: thin_vec![],
         }
     }
 
@@ -333,9 +331,9 @@ impl StructBuilder {
     /// - `ty`: The type of the field.
     pub fn field(mut self, name: impl Into<String>, ty: impl Into<Type>) -> Self {
         self.fields.push(Field {
-            attrs: vec![],
             ident: name.into(),
             ty: ty.into(),
+            md: None,
         });
         self
     }
@@ -347,12 +345,10 @@ impl StructBuilder {
     /// An `ItemStruct` instance.
     pub fn build(self) -> ItemStruct {
         ItemStruct {
-            attrs: vec![],
-            leading_comments: vec![],
             ident: self.ident,
             generics: self.generics,
             fields: self.fields,
-            trailing_comments: vec![],
+            md: None,
         }
     }
 }
@@ -374,9 +370,10 @@ pub fn fn_def(name: impl Into<String>) -> FnBuilder {
 pub struct FnBuilder {
     ident: String,
     generics: GenericParams,
-    inputs: Vec<Pat>,
+    inputs: ThinVec<Pat>,
     output: Option<Type>,
     block: Option<Block>,
+    md: Option<Box<Md>>,
 }
 
 impl FnBuilder {
@@ -388,10 +385,11 @@ impl FnBuilder {
     pub fn new(name: impl Into<String>) -> Self {
         Self {
             ident: name.into(),
-            generics: GenericParams::new(),
-            inputs: vec![],
+            inputs: thin_vec![],
             output: None,
             block: None,
+            md: None,
+            generics: GenericParams::new(),
         }
     }
 
@@ -435,6 +433,33 @@ impl FnBuilder {
         self
     }
 
+    /// Adds an attribute to the function.
+    pub fn attr(mut self, attr: impl Into<Attribute>) -> Self {
+        self.md
+            .get_or_insert_with(Default::default)
+            .attrs
+            .push(attr.into());
+        self
+    }
+
+    /// Adds a leading comment to the function.
+    pub fn leading_comment(mut self, comment: impl Into<Comment>) -> Self {
+        self.md
+            .get_or_insert_with(Default::default)
+            .leading_comments
+            .push(comment.into());
+        self
+    }
+
+    /// Adds a trailing comment to the function.
+    pub fn trailing_comment(mut self, comment: impl Into<Comment>) -> Self {
+        self.md
+            .get_or_insert_with(Default::default)
+            .trailing_comments
+            .push(comment.into());
+        self
+    }
+
     /// Builds the `ItemFn` AST node.
     ///
     /// # Panics
@@ -448,8 +473,6 @@ impl FnBuilder {
         let block = self.block.expect("block is required");
 
         ItemFn {
-            attrs: vec![],
-            leading_comments: vec![],
             sig: Signature {
                 ident: self.ident,
                 generics: self.generics,
@@ -457,7 +480,7 @@ impl FnBuilder {
                 output: self.output,
             },
             block,
-            trailing_comments: vec![],
+            md: self.md,
         }
     }
 }
@@ -941,8 +964,7 @@ pub struct ItemConstBuilder {
     ident: String,
     ty: Type,
     expr: Box<Expr>,
-    leading_comments: Vec<Comment>,
-    trailing_comments: Vec<Comment>,
+    md: Option<Box<Md>>,
 }
 
 impl ItemConstBuilder {
@@ -952,32 +974,44 @@ impl ItemConstBuilder {
             ident: name.into(),
             ty: ty.into(),
             expr: Box::new(expr.into()),
-            leading_comments: vec![],
-            trailing_comments: vec![],
+            md: None,
         }
     }
 
     /// Adds a leading comment to the `const` item.
     pub fn leading_comment(mut self, comment: impl Into<Comment>) -> Self {
-        self.leading_comments.push(comment.into());
+        self.md
+            .get_or_insert_with(Default::default)
+            .leading_comments
+            .push(comment.into());
         self
     }
 
     /// Adds a trailing comment to the `const` item.
     pub fn trailing_comment(mut self, comment: impl Into<Comment>) -> Self {
-        self.trailing_comments.push(comment.into());
+        self.md
+            .get_or_insert_with(Default::default)
+            .trailing_comments
+            .push(comment.into());
+        self
+    }
+
+    /// Adds an attribute to the `const` item.
+    pub fn attr(mut self, attr: impl Into<Attribute>) -> Self {
+        self.md
+            .get_or_insert_with(Default::default)
+            .attrs
+            .push(attr.into());
         self
     }
 
     /// Builds the `ItemConst` AST node.
     pub fn build(self) -> ItemConst {
         ItemConst {
-            attrs: vec![],
             ident: self.ident,
             ty: self.ty,
             expr: self.expr,
-            leading_comments: self.leading_comments,
-            trailing_comments: self.trailing_comments,
+            md: self.md,
         }
     }
 }
@@ -990,8 +1024,7 @@ pub fn extern_crate_item(name: impl Into<String>) -> ItemExternCrateBuilder {
 /// A builder for constructing an `ItemExternCrate` AST node.
 pub struct ItemExternCrateBuilder {
     ident: String,
-    leading_comments: Vec<Comment>,
-    trailing_comments: Vec<Comment>,
+    md: Option<Box<Md>>,
 }
 
 impl ItemExternCrateBuilder {
@@ -999,30 +1032,42 @@ impl ItemExternCrateBuilder {
     pub fn new(name: impl Into<String>) -> Self {
         Self {
             ident: name.into(),
-            leading_comments: vec![],
-            trailing_comments: vec![],
+            md: None,
         }
     }
 
     /// Adds a leading comment to the `extern crate` item.
     pub fn leading_comment(mut self, comment: impl Into<Comment>) -> Self {
-        self.leading_comments.push(comment.into());
+        self.md
+            .get_or_insert_with(Default::default)
+            .leading_comments
+            .push(comment.into());
         self
     }
 
     /// Adds a trailing comment to the `extern crate` item.
     pub fn trailing_comment(mut self, comment: impl Into<Comment>) -> Self {
-        self.trailing_comments.push(comment.into());
+        self.md
+            .get_or_insert_with(Default::default)
+            .trailing_comments
+            .push(comment.into());
+        self
+    }
+
+    /// Adds an attribute to the `extern crate` item.
+    pub fn attr(mut self, attr: impl Into<Attribute>) -> Self {
+        self.md
+            .get_or_insert_with(Default::default)
+            .attrs
+            .push(attr.into());
         self
     }
 
     /// Builds the `ItemExternCrate` AST node.
     pub fn build(self) -> ItemExternCrate {
         ItemExternCrate {
-            attrs: vec![],
             ident: self.ident,
-            leading_comments: self.leading_comments,
-            trailing_comments: self.trailing_comments,
+            md: self.md,
         }
     }
 }
@@ -1035,9 +1080,8 @@ pub fn foreign_mod_item(abi: impl Into<String>) -> ItemForeignModBuilder {
 /// A builder for constructing an `ItemForeignMod` AST node.
 pub struct ItemForeignModBuilder {
     abi: String,
-    items: Vec<Item>,
-    leading_comments: Vec<Comment>,
-    trailing_comments: Vec<Comment>,
+    items: ThinVec<Item>,
+    md: Option<Box<Md>>,
 }
 
 impl ItemForeignModBuilder {
@@ -1045,9 +1089,8 @@ impl ItemForeignModBuilder {
     pub fn new(abi: impl Into<String>) -> Self {
         Self {
             abi: abi.into(),
-            items: vec![],
-            leading_comments: vec![],
-            trailing_comments: vec![],
+            items: thin_vec![],
+            md: None,
         }
     }
 
@@ -1059,24 +1102,37 @@ impl ItemForeignModBuilder {
 
     /// Adds a leading comment to the foreign module.
     pub fn leading_comment(mut self, comment: impl Into<Comment>) -> Self {
-        self.leading_comments.push(comment.into());
+        self.md
+            .get_or_insert_with(Default::default)
+            .leading_comments
+            .push(comment.into());
         self
     }
 
     /// Adds a trailing comment to the foreign module.
     pub fn trailing_comment(mut self, comment: impl Into<Comment>) -> Self {
-        self.trailing_comments.push(comment.into());
+        self.md
+            .get_or_insert_with(Default::default)
+            .trailing_comments
+            .push(comment.into());
+        self
+    }
+
+    /// Adds an attribute to the foreign module.
+    pub fn attr(mut self, attr: impl Into<Attribute>) -> Self {
+        self.md
+            .get_or_insert_with(Default::default)
+            .attrs
+            .push(attr.into());
         self
     }
 
     /// Builds the `ItemForeignMod` AST node.
     pub fn build(self) -> ItemForeignMod {
         ItemForeignMod {
-            attrs: vec![],
             abi: self.abi,
             items: self.items,
-            leading_comments: self.leading_comments,
-            trailing_comments: self.trailing_comments,
+            md: self.md,
         }
     }
 }
@@ -1089,8 +1145,7 @@ pub fn macro_item(expr: impl Into<Expr>) -> ItemMacroBuilder {
 /// A builder for constructing an `ItemMacro` AST node.
 pub struct ItemMacroBuilder {
     expr: Expr,
-    leading_comments: Vec<Comment>,
-    trailing_comments: Vec<Comment>,
+    md: Option<Box<Md>>,
 }
 
 impl ItemMacroBuilder {
@@ -1098,30 +1153,42 @@ impl ItemMacroBuilder {
     pub fn new(expr: impl Into<Expr>) -> Self {
         Self {
             expr: expr.into(),
-            leading_comments: vec![],
-            trailing_comments: vec![],
+            md: None,
         }
     }
 
     /// Adds a leading comment to the macro item.
     pub fn leading_comment(mut self, comment: impl Into<Comment>) -> Self {
-        self.leading_comments.push(comment.into());
+        self.md
+            .get_or_insert_with(Default::default)
+            .leading_comments
+            .push(comment.into());
         self
     }
 
     /// Adds a trailing comment to the macro item.
     pub fn trailing_comment(mut self, comment: impl Into<Comment>) -> Self {
-        self.trailing_comments.push(comment.into());
+        self.md
+            .get_or_insert_with(Default::default)
+            .trailing_comments
+            .push(comment.into());
+        self
+    }
+
+    /// Adds an attribute to the macro item.
+    pub fn attr(mut self, attr: impl Into<Attribute>) -> Self {
+        self.md
+            .get_or_insert_with(Default::default)
+            .attrs
+            .push(attr.into());
         self
     }
 
     /// Builds the `ItemMacro` AST node.
     pub fn build(self) -> ItemMacro {
         ItemMacro {
-            attrs: vec![],
             expr: Box::new(self.expr),
-            leading_comments: self.leading_comments,
-            trailing_comments: self.trailing_comments,
+            md: self.md,
         }
     }
 }
@@ -1134,9 +1201,8 @@ pub fn mod_item(name: impl Into<String>) -> ItemModBuilder {
 /// A builder for constructing an `ItemMod` AST node.
 pub struct ItemModBuilder {
     ident: String,
-    content: Option<Vec<Item>>,
-    leading_comments: Vec<Comment>,
-    trailing_comments: Vec<Comment>,
+    content: Option<ThinVec<Item>>,
+    md: Option<Box<Md>>,
 }
 
 impl ItemModBuilder {
@@ -1145,37 +1211,49 @@ impl ItemModBuilder {
         Self {
             ident: name.into(),
             content: None,
-            leading_comments: vec![],
-            trailing_comments: vec![],
+            md: None,
         }
     }
 
     /// Sets the content of the module.
-    pub fn content(mut self, content: Vec<Item>) -> Self {
+    pub fn content(mut self, content: ThinVec<Item>) -> Self {
         self.content = Some(content);
         self
     }
 
     /// Adds a leading comment to the module item.
     pub fn leading_comment(mut self, comment: impl Into<Comment>) -> Self {
-        self.leading_comments.push(comment.into());
+        self.md
+            .get_or_insert_with(Default::default)
+            .leading_comments
+            .push(comment.into());
         self
     }
 
     /// Adds a trailing comment to the module item.
     pub fn trailing_comment(mut self, comment: impl Into<Comment>) -> Self {
-        self.trailing_comments.push(comment.into());
+        self.md
+            .get_or_insert_with(Default::default)
+            .trailing_comments
+            .push(comment.into());
+        self
+    }
+
+    /// Adds an attribute to the module item.
+    pub fn attr(mut self, attr: impl Into<Attribute>) -> Self {
+        self.md
+            .get_or_insert_with(Default::default)
+            .attrs
+            .push(attr.into());
         self
     }
 
     /// Builds the `ItemMod` AST node.
     pub fn build(self) -> ItemMod {
         ItemMod {
-            attrs: vec![],
             ident: self.ident,
             content: self.content,
-            leading_comments: self.leading_comments,
-            trailing_comments: self.trailing_comments,
+            md: self.md,
         }
     }
 }
@@ -1194,8 +1272,7 @@ pub struct ItemStaticBuilder {
     ident: String,
     ty: Type,
     expr: Box<Expr>,
-    leading_comments: Vec<Comment>,
-    trailing_comments: Vec<Comment>,
+    md: Option<Box<Md>>,
 }
 
 impl ItemStaticBuilder {
@@ -1205,80 +1282,103 @@ impl ItemStaticBuilder {
             ident: name.into(),
             ty: ty.into(),
             expr: Box::new(expr.into()),
-            leading_comments: vec![],
-            trailing_comments: vec![],
+            md: None,
         }
     }
 
     /// Adds a leading comment to the `static` item.
     pub fn leading_comment(mut self, comment: impl Into<Comment>) -> Self {
-        self.leading_comments.push(comment.into());
+        self.md
+            .get_or_insert_with(Default::default)
+            .leading_comments
+            .push(comment.into());
         self
     }
 
     /// Adds a trailing comment to the `static` item.
     pub fn trailing_comment(mut self, comment: impl Into<Comment>) -> Self {
-        self.trailing_comments.push(comment.into());
+        self.md
+            .get_or_insert_with(Default::default)
+            .trailing_comments
+            .push(comment.into());
+        self
+    }
+
+    /// Adds an attribute to the `static` item.
+    pub fn attr(mut self, attr: impl Into<Attribute>) -> Self {
+        self.md
+            .get_or_insert_with(Default::default)
+            .attrs
+            .push(attr.into());
         self
     }
 
     /// Builds the `ItemStatic` AST node.
     pub fn build(self) -> ItemStatic {
         ItemStatic {
-            attrs: vec![],
             ident: self.ident,
             ty: self.ty,
             expr: self.expr,
-            leading_comments: self.leading_comments,
-            trailing_comments: self.trailing_comments,
+            md: self.md,
         }
     }
 }
 
 /// Creates a new `ItemTraitAliasBuilder` to construct a trait alias.
-pub fn trait_alias_item(name: impl Into<String>, bounds: Vec<String>) -> ItemTraitAliasBuilder {
+pub fn trait_alias_item(name: impl Into<String>, bounds: ThinVec<String>) -> ItemTraitAliasBuilder {
     ItemTraitAliasBuilder::new(name, bounds)
 }
 
 /// A builder for constructing an `ItemTraitAlias` AST node.
 pub struct ItemTraitAliasBuilder {
     ident: String,
-    bounds: Vec<String>,
-    leading_comments: Vec<Comment>,
-    trailing_comments: Vec<Comment>,
+    bounds: ThinVec<String>,
+    md: Option<Box<Md>>,
 }
 
 impl ItemTraitAliasBuilder {
     /// Creates a new `ItemTraitAliasBuilder`.
-    pub fn new(name: impl Into<String>, bounds: Vec<String>) -> Self {
+    pub fn new(name: impl Into<String>, bounds: ThinVec<String>) -> Self {
         Self {
             ident: name.into(),
             bounds,
-            leading_comments: vec![],
-            trailing_comments: vec![],
+            md: None,
         }
     }
 
     /// Adds a leading comment to the trait alias.
     pub fn leading_comment(mut self, comment: impl Into<Comment>) -> Self {
-        self.leading_comments.push(comment.into());
+        self.md
+            .get_or_insert_with(Default::default)
+            .leading_comments
+            .push(comment.into());
         self
     }
 
     /// Adds a trailing comment to the trait alias.
     pub fn trailing_comment(mut self, comment: impl Into<Comment>) -> Self {
-        self.trailing_comments.push(comment.into());
+        self.md
+            .get_or_insert_with(Default::default)
+            .trailing_comments
+            .push(comment.into());
+        self
+    }
+
+    /// Adds an attribute to the trait alias.
+    pub fn attr(mut self, attr: impl Into<Attribute>) -> Self {
+        self.md
+            .get_or_insert_with(Default::default)
+            .attrs
+            .push(attr.into());
         self
     }
 
     /// Builds the `ItemTraitAlias` AST node.
     pub fn build(self) -> ItemTraitAlias {
         ItemTraitAlias {
-            attrs: vec![],
             ident: self.ident,
             bounds: self.bounds,
-            leading_comments: self.leading_comments,
-            trailing_comments: self.trailing_comments,
+            md: self.md,
         }
     }
 }
@@ -1293,8 +1393,7 @@ pub struct ItemTypeBuilder {
     ident: String,
     generics: GenericParams,
     ty: Type,
-    leading_comments: Vec<Comment>,
-    trailing_comments: Vec<Comment>,
+    md: Option<Box<Md>>,
 }
 
 impl ItemTypeBuilder {
@@ -1304,8 +1403,7 @@ impl ItemTypeBuilder {
             ident: name.into(),
             generics: GenericParams::new(),
             ty: ty.into(),
-            leading_comments: vec![],
-            trailing_comments: vec![],
+            md: None,
         }
     }
 
@@ -1321,25 +1419,38 @@ impl ItemTypeBuilder {
 
     /// Adds a leading comment to the type alias.
     pub fn leading_comment(mut self, comment: impl Into<Comment>) -> Self {
-        self.leading_comments.push(comment.into());
+        self.md
+            .get_or_insert_with(Default::default)
+            .leading_comments
+            .push(comment.into());
         self
     }
 
     /// Adds a trailing comment to the type alias.
     pub fn trailing_comment(mut self, comment: impl Into<Comment>) -> Self {
-        self.trailing_comments.push(comment.into());
+        self.md
+            .get_or_insert_with(Default::default)
+            .trailing_comments
+            .push(comment.into());
+        self
+    }
+
+    /// Adds an attribute to the type alias.
+    pub fn attr(mut self, attr: impl Into<Attribute>) -> Self {
+        self.md
+            .get_or_insert_with(Default::default)
+            .attrs
+            .push(attr.into());
         self
     }
 
     /// Builds the `ItemType` AST node.
     pub fn build(self) -> ItemType {
         ItemType {
-            attrs: vec![],
             ident: self.ident,
             generics: self.generics,
             ty: self.ty,
-            leading_comments: self.leading_comments,
-            trailing_comments: self.trailing_comments,
+            md: self.md,
         }
     }
 }
@@ -1352,10 +1463,9 @@ pub fn union_item(name: impl Into<String>) -> ItemUnionBuilder {
 /// A builder for constructing an `ItemUnion` AST node.
 pub struct ItemUnionBuilder {
     ident: String,
+    fields: ThinVec<Field>,
     generics: GenericParams,
-    fields: Vec<Field>,
-    leading_comments: Vec<Comment>,
-    trailing_comments: Vec<Comment>,
+    md: Option<Box<Md>>,
 }
 
 impl ItemUnionBuilder {
@@ -1364,9 +1474,8 @@ impl ItemUnionBuilder {
         Self {
             ident: name.into(),
             generics: GenericParams::new(),
-            fields: vec![],
-            leading_comments: vec![],
-            trailing_comments: vec![],
+            fields: thin_vec![],
+            md: None,
         }
     }
 
@@ -1383,34 +1492,47 @@ impl ItemUnionBuilder {
     /// Adds a field to the `union`.
     pub fn field(mut self, name: impl Into<String>, ty: impl Into<Type>) -> Self {
         self.fields.push(Field {
-            attrs: vec![],
             ident: name.into(),
             ty: ty.into(),
+            md: None,
         });
         self
     }
 
     /// Adds a leading comment to the `union` item.
     pub fn leading_comment(mut self, comment: impl Into<Comment>) -> Self {
-        self.leading_comments.push(comment.into());
+        self.md
+            .get_or_insert_with(Default::default)
+            .leading_comments
+            .push(comment.into());
         self
     }
 
     /// Adds a trailing comment to the `union` item.
     pub fn trailing_comment(mut self, comment: impl Into<Comment>) -> Self {
-        self.trailing_comments.push(comment.into());
+        self.md
+            .get_or_insert_with(Default::default)
+            .trailing_comments
+            .push(comment.into());
+        self
+    }
+
+    /// Adds an attribute to the `union` item.
+    pub fn attr(mut self, attr: impl Into<Attribute>) -> Self {
+        self.md
+            .get_or_insert_with(Default::default)
+            .attrs
+            .push(attr.into());
         self
     }
 
     /// Builds the `ItemUnion` AST node.
     pub fn build(self) -> ItemUnion {
         ItemUnion {
-            attrs: vec![],
             ident: self.ident,
             generics: self.generics,
             fields: self.fields,
-            leading_comments: self.leading_comments,
-            trailing_comments: self.trailing_comments,
+            md: self.md,
         }
     }
 }
@@ -1423,8 +1545,7 @@ pub fn use_item(path: impl Into<String>) -> ItemUseBuilder {
 /// A builder for constructing an `ItemUse` AST node.
 pub struct ItemUseBuilder {
     path: String,
-    leading_comments: Vec<Comment>,
-    trailing_comments: Vec<Comment>,
+    md: Option<Box<Md>>,
 }
 
 impl ItemUseBuilder {
@@ -1432,38 +1553,50 @@ impl ItemUseBuilder {
     pub fn new(path: impl Into<String>) -> Self {
         Self {
             path: path.into(),
-            leading_comments: vec![],
-            trailing_comments: vec![],
+            md: None,
         }
     }
 
     /// Adds a leading comment to the `use` item.
     pub fn leading_comment(mut self, comment: impl Into<Comment>) -> Self {
-        self.leading_comments.push(comment.into());
+        self.md
+            .get_or_insert_with(Default::default)
+            .leading_comments
+            .push(comment.into());
         self
     }
 
     /// Adds a trailing comment to the `use` item.
     pub fn trailing_comment(mut self, comment: impl Into<Comment>) -> Self {
-        self.trailing_comments.push(comment.into());
+        self.md
+            .get_or_insert_with(Default::default)
+            .trailing_comments
+            .push(comment.into());
+        self
+    }
+
+    /// Adds an attribute to the `use` item.
+    pub fn attr(mut self, attr: impl Into<Attribute>) -> Self {
+        self.md
+            .get_or_insert_with(Default::default)
+            .attrs
+            .push(attr.into());
         self
     }
 
     /// Builds the `ItemUse` AST node.
     pub fn build(self) -> ItemUse {
         ItemUse {
-            attrs: vec![],
             path: self.path,
-            leading_comments: self.leading_comments,
-            trailing_comments: self.trailing_comments,
+            md: self.md,
         }
     }
 }
 
-impl From<&str> for Pat {
-    fn from(s: &str) -> Self {
+impl Into<Pat> for &str {
+    fn into(self) -> Pat {
         Pat::Ident(PatIdent {
-            ident: s.to_string(),
+            ident: self.into(),
             is_mut: false,
         })
     }

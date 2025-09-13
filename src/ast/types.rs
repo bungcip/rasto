@@ -6,6 +6,7 @@ use crate::ast::expressions::{Path, PathSegment};
 use crate::ast::item_macro::ItemMacro;
 use crate::pretty_printer::{PrettyPrinter, Printer};
 use std::fmt;
+use thin_vec::{ThinVec, thin_vec};
 
 /// A Rust type.
 #[derive(Debug, Clone, PartialEq)]
@@ -53,7 +54,7 @@ pub enum Type {
     TraitObject,
 
     /// A tuple type: `(A, B, C, String)`.
-    Tuple(Vec<Type>),
+    Tuple(ThinVec<Type>),
 }
 
 /// A fixed size array type: `[T; n]`.
@@ -69,7 +70,7 @@ pub struct TypeArray {
 #[derive(Debug, Clone, PartialEq)]
 pub struct TypeBareFn {
     /// The input types.
-    pub inputs: Vec<Type>,
+    pub inputs: ThinVec<Type>,
     /// The output type.
     pub output: Option<Box<Type>>,
 }
@@ -107,7 +108,7 @@ impl From<&str> for Type {
     fn from(s: &str) -> Self {
         Type::Path(TypePath {
             path: Path {
-                segments: vec![PathSegment {
+                segments: thin_vec![PathSegment {
                     ident: s.to_string(),
                     args: None,
                 }],

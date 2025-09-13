@@ -14,23 +14,26 @@
 //! ```rust
 //! use rasto::ast::{*, Lit, LitInt};
 //! use rasto::pretty_printer::*;
+//! use thin_vec::thin_vec;
 //!
 //! let ast = Item::from(
 //!     ItemFn {
-//!         attrs: vec![],
-//!         leading_comments: vec![Comment::Line(" A simple function.".to_string())],
+//!         md: Some(Box::new(Md {
+//!             attrs: thin_vec![],
+//!             leading_comments: thin_vec![Comment::Line(" A simple function.".to_string())],
+//!             trailing_comments: thin_vec![Comment::Line(" Trailing comment.".to_string())],
+//!         })),
 //!         sig: Signature {
 //!             ident: "foo".to_string(),
 //!             generics: Default::default(),
-//!             inputs: vec![],
+//!             inputs: thin_vec![],
 //!             output: None,
 //!         },
 //!         block: Block {
-//!             leading_comments: vec![Comment::Block(" An inner comment ".to_string())],
-//!             stmts: vec![Stmt::Expr(Expr::Lit(Lit::Int(LitInt::new(42))), true)],
-//!             trailing_comments: vec![],
+//!             leading_comments: thin_vec![Comment::Block(" An inner comment ".to_string())],
+//!             stmts: thin_vec![Stmt::Expr(Expr::Lit(Lit::Int(LitInt::new(42))), true)],
+//!             trailing_comments: thin_vec![],
 //!         },
-//!         trailing_comments: vec![Comment::Line(" Trailing comment.".to_string())],
 //!     }
 //! );
 //!

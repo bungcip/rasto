@@ -5,6 +5,7 @@
 //! function calls, and control flow expressions like `if` and `match`.
 
 use crate::ast::{Pat, TokenStream, generics::GenericArgs, literals::Lit, statements::Block};
+use thin_vec::ThinVec;
 
 /// Represents a Rust expression.
 #[derive(Debug, Clone, PartialEq)]
@@ -92,7 +93,7 @@ pub struct ExprUnary {
 #[derive(Debug, Clone, PartialEq)]
 pub struct ExprArray {
     /// The elements of the array.
-    pub elems: Vec<Expr>,
+    pub elems: ThinVec<Expr>,
 }
 
 /// An `async` block: `async { ... }`.
@@ -130,7 +131,7 @@ pub struct ExprCall {
     /// The function to call.
     pub func: Box<Expr>,
     /// The arguments to the function.
-    pub args: Vec<Expr>,
+    pub args: ThinVec<Expr>,
 }
 
 use crate::ast::types::Type;
@@ -147,7 +148,7 @@ pub struct ExprCast {
 #[derive(Debug, Clone, PartialEq)]
 pub struct ExprClosure {
     /// The input parameters of the closure.
-    pub inputs: Vec<Pat>,
+    pub inputs: ThinVec<Pat>,
     /// The body of the closure.
     pub body: Box<Expr>,
 }
@@ -187,7 +188,7 @@ pub struct ExprMatch {
     /// The expression to match on.
     pub expr: Box<Expr>,
     /// The arms of the `match` expression.
-    pub arms: Vec<Arm>,
+    pub arms: ThinVec<Arm>,
 }
 
 /// An arm of a `match` expression, e.g., `pat if guard => body`.
@@ -209,7 +210,7 @@ pub struct ExprMethodCall {
     /// The name of the method.
     pub method: String,
     /// The arguments to the method.
-    pub args: Vec<Expr>,
+    pub args: ThinVec<Expr>,
 }
 
 /// A parenthesized expression: `(a + b)`.
@@ -261,7 +262,7 @@ pub struct ExprStruct {
     /// The path to the struct type.
     pub path: String,
     /// The fields to initialize.
-    pub fields: Vec<FieldValue>,
+    pub fields: ThinVec<FieldValue>,
 }
 
 /// A field-value pair in a struct expression.
@@ -277,7 +278,7 @@ pub struct FieldValue {
 #[derive(Debug, Clone, PartialEq)]
 pub struct ExprTuple {
     /// The elements of the tuple.
-    pub elems: Vec<Expr>,
+    pub elems: ThinVec<Expr>,
 }
 
 /// A binary operator.
@@ -360,7 +361,7 @@ pub struct ExprMacroCall {
 #[derive(Debug, Clone, PartialEq)]
 pub struct Path {
     /// The segments of the path.
-    pub segments: Vec<PathSegment>,
+    pub segments: ThinVec<PathSegment>,
 }
 
 /// A segment of a path.

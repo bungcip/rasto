@@ -1,22 +1,18 @@
-use crate::ast::attributes::Attribute;
-use crate::ast::comments::Comment;
 use crate::ast::items::Item;
+use crate::ast::metadata::Md;
 use crate::pretty_printer::{PrettyPrinter, Printer};
 use std::fmt;
+use thin_vec::ThinVec;
 
 /// A `mod` item: `mod my_module;` or `mod my_module { ... }`
 #[derive(Debug, Clone, PartialEq)]
 pub struct ItemMod {
-    /// Attributes that appear before the mod item.
-    pub attrs: Vec<Attribute>,
-    /// Comments that appear before the mod item.
-    pub leading_comments: Vec<Comment>,
     /// The name of the module.
     pub ident: String,
     /// The content of the module, if any.
-    pub content: Option<Vec<Item>>,
-    /// Comments that appear after the mod item.
-    pub trailing_comments: Vec<Comment>,
+    pub content: Option<ThinVec<Item>>,
+    /// Metadata about the mod item.
+    pub md: Option<Box<Md>>,
 }
 
 impl fmt::Display for ItemMod {
@@ -29,12 +25,14 @@ impl fmt::Display for ItemMod {
 
 impl PrettyPrinter for ItemMod {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
-        for attr in &self.attrs {
-            attr.pretty_print(printer)?;
-            printer.hard_break();
-        }
-        for comment in &self.leading_comments {
-            comment.pretty_print(printer)?;
+        if let Some(md) = &self.md {
+            for attr in &md.attrs {
+                attr.pretty_print(printer)?;
+                printer.hard_break();
+            }
+            for comment in &md.leading_comments {
+                comment.pretty_print(printer)?;
+            }
         }
         printer.string("mod ");
         printer.string(&self.ident);
@@ -49,8 +47,10 @@ impl PrettyPrinter for ItemMod {
         } else {
             printer.string(";");
         }
-        for comment in &self.trailing_comments {
-            comment.pretty_print(printer)?;
+        if let Some(md) = &self.md {
+            for comment in &md.trailing_comments {
+                comment.pretty_print(printer)?;
+            }
         }
         Ok(())
     }

@@ -1,22 +1,18 @@
-use crate::ast::attributes::Attribute;
-use crate::ast::comments::Comment;
 use crate::ast::items::Item;
+use crate::ast::metadata::Md;
 use crate::pretty_printer::{PrettyPrinter, Printer};
 use std::fmt;
+use thin_vec::ThinVec;
 
 /// A foreign mod item: `extern "C" { ... }`
 #[derive(Debug, Clone, PartialEq)]
 pub struct ItemForeignMod {
-    /// Attributes that appear before the foreign mod item.
-    pub attrs: Vec<Attribute>,
-    /// Comments that appear before the foreign mod item.
-    pub leading_comments: Vec<Comment>,
     /// The ABI of the foreign mod.
     pub abi: String,
     /// The items within the foreign mod.
-    pub items: Vec<Item>,
-    /// Comments that appear after the foreign mod item.
-    pub trailing_comments: Vec<Comment>,
+    pub items: ThinVec<Item>,
+    /// Metadata about the foreign mod item.
+    pub md: Option<Box<Md>>,
 }
 
 impl fmt::Display for ItemForeignMod {
@@ -29,12 +25,14 @@ impl fmt::Display for ItemForeignMod {
 
 impl PrettyPrinter for ItemForeignMod {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
-        for attr in &self.attrs {
-            attr.pretty_print(printer)?;
-            printer.hard_break();
-        }
-        for comment in &self.leading_comments {
-            comment.pretty_print(printer)?;
+        if let Some(md) = &self.md {
+            for attr in &md.attrs {
+                attr.pretty_print(printer)?;
+                printer.hard_break();
+            }
+            for comment in &md.leading_comments {
+                comment.pretty_print(printer)?;
+            }
         }
         printer.string("extern ");
         printer.string(format!("\"{}\"", self.abi));
@@ -45,8 +43,10 @@ impl PrettyPrinter for ItemForeignMod {
             printer.hard_break();
         }
         printer.string("}");
-        for comment in &self.trailing_comments {
-            comment.pretty_print(printer)?;
+        if let Some(md) = &self.md {
+            for comment in &md.trailing_comments {
+                comment.pretty_print(printer)?;
+            }
         }
         Ok(())
     }

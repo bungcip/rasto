@@ -2,6 +2,7 @@ use rasto::ast::PathSegment;
 use rasto::ast::builder::*;
 use rasto::ast::generics::*;
 use rasto::ast::types::{Type, TypePath};
+use thin_vec::thin_vec;
 
 #[test]
 fn test_fn_with_generics() {
@@ -14,9 +15,9 @@ fn test_fn_with_generics() {
             ident: "a".to_string(),
         })
         .block(rasto::ast::Block {
-            leading_comments: vec![],
-            stmts: vec![],
-            trailing_comments: vec![],
+            stmts: thin_vec![],
+            leading_comments: thin_vec![],
+            trailing_comments: thin_vec![],
         })
         .build();
 
@@ -93,7 +94,7 @@ fn test_type_with_generics() {
         "MyType",
         Type::Path(TypePath {
             path: rasto::ast::expressions::Path {
-                segments: vec![PathSegment {
+                segments: thin_vec![PathSegment {
                     ident: "Vec".to_string(),
                     args: Some(GenericArgs {
                         args: vec![GenericArg::Type(Type::from("T"))],
