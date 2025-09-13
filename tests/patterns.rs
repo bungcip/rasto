@@ -35,15 +35,7 @@ fn test_let_statement_with_mut_ident_pattern() {
 
 #[test]
 fn test_for_expression_with_ident_pattern() {
-    let for_expr = expr().for_loop(
-        pat().ident("x", false),
-        expr().lit(10),
-        Block {
-            leading_comments: thin_vec![],
-            stmts: thin_vec![],
-            trailing_comments: thin_vec![],
-        },
-    );
+    let for_expr = expr().for_loop(pat().ident("x", false), expr().lit(10), block().build());
 
     insta::assert_snapshot!(pretty_print(&for_expr), @"for x in 10 {}");
 }
@@ -87,11 +79,7 @@ fn test_let_statement_with_tuple_pattern() {
 fn test_function_with_tuple_pattern_in_arg() {
     let fn_def = fn_def("foo")
         .input(pat().tuple(thin_vec![pat().ident("x", false), pat().ident("y", false)]))
-        .block(Block {
-            leading_comments: thin_vec![],
-            stmts: thin_vec![],
-            trailing_comments: thin_vec![],
-        })
+        .block(block())
         .build();
 
     insta::assert_snapshot!(pretty_print(&fn_def), @"fn foo((x, y)) {}");

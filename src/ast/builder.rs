@@ -13,18 +13,16 @@
 //! let file_ast = file()
 //!     .item(
 //!         fn_def("my_function")
-//!             .block(Block {
-//!                 leading_comments: thin_vec![],
-//!                 stmts: thin_vec![Stmt::Expr(expr().lit(Lit::Int(LitInt::new(42))), true)],
-//!                 trailing_comments: thin_vec![],
-//!             })
+//!             .block(
+//!                 block().statement(stmt().expr(expr().lit(Lit::Int(LitInt::new(42))), true)),
+//!             )
 //!             .build(),
 //!     )
 //!     .build();
 //! ```
 
 use crate::ast::*;
-use thin_vec::{ThinVec, thin_vec};
+use thin_vec::{thin_vec, ThinVec};
 
 /// Creates a new `FileBuilder` to construct a `File` AST node.
 ///
@@ -132,6 +130,73 @@ impl TraitBuilder {
             generics: self.generics,
             items: self.items,
             md: None,
+        }
+    }
+}
+
+/// Creates a new `BlockBuilder` to construct a block of statements.
+///
+/// # Returns
+///
+/// A `BlockBuilder` instance.
+pub fn block() -> BlockBuilder {
+    BlockBuilder::new()
+}
+
+/// A builder for constructing a `Block` AST node.
+#[derive(Default)]
+pub struct BlockBuilder {
+    leading_comments: ThinVec<Comment>,
+    stmts: ThinVec<Stmt>,
+    trailing_comments: ThinVec<Comment>,
+}
+
+impl BlockBuilder {
+    /// Creates a new, empty `BlockBuilder`.
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Adds a leading comment to the block.
+    ///
+    /// # Parameters
+    ///
+    /// - `comment`: The comment to add.
+    pub fn leading_comment(mut self, comment: impl Into<Comment>) -> Self {
+        self.leading_comments.push(comment.into());
+        self
+    }
+
+    /// Adds a statement to the block.
+    ///
+    /// # Parameters
+    ///
+    /// - `stmt`: The statement to add.
+    pub fn statement(mut self, stmt: impl Into<Stmt>) -> Self {
+        self.stmts.push(stmt.into());
+        self
+    }
+
+    /// Adds a trailing comment to the block.
+    ///
+    /// # Parameters
+    ///
+    /// - `comment`: The comment to add.
+    pub fn trailing_comment(mut self, comment: impl Into<Comment>) -> Self {
+        self.trailing_comments.push(comment.into());
+        self
+    }
+
+    /// Builds the `Block` AST node.
+    ///
+    /// # Returns
+    ///
+    /// A `Block` instance.
+    pub fn build(self) -> Block {
+        Block {
+            leading_comments: self.leading_comments,
+            stmts: self.stmts,
+            trailing_comments: self.trailing_comments,
         }
     }
 }
@@ -428,8 +493,8 @@ impl FnBuilder {
     /// # Parameters
     ///
     /// - `block`: The `Block` containing the function's body.
-    pub fn block(mut self, block: Block) -> Self {
-        self.block = Some(block);
+    pub fn block(mut self, block: BlockBuilder) -> Self {
+        self.block = Some(block.build());
         self
     }
 

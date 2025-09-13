@@ -17,6 +17,8 @@ fn pretty_print_file(file: File) -> String {
     file.to_string()
 }
 
+use rasto::ast::builder::block;
+
 #[test]
 fn test_file() {
     let ast = file()
@@ -45,11 +47,7 @@ fn test_file() {
             fn_def("foo")
                 .input(pat().ident("a", false))
                 .output("i32")
-                .block(Block {
-                    leading_comments: thin_vec![],
-                    stmts: thin_vec![Stmt::Expr(Expr::Lit(42.into()), true)],
-                    trailing_comments: thin_vec![],
-                })
+                .block(block().statement(Stmt::Expr(Expr::Lit(42.into()), true)))
                 .build(),
         )
         .build();
@@ -63,15 +61,31 @@ fn test_fn() {
         fn_def("foo")
             .input(pat().ident("a", false))
             .output("i32")
-            .block(Block {
-                leading_comments: thin_vec![Comment::Block(" An inner comment ".to_string())],
-                stmts: thin_vec![Stmt::Expr(Expr::Lit(42.into()), true)],
-                trailing_comments: thin_vec![],
-            })
+            .block(
+                block()
+                    .leading_comment(Comment::Block(" An inner comment ".to_string()))
+                    .statement(Stmt::Expr(Expr::Lit(42.into()), true)),
+            )
             .build(),
     );
 
     insta::assert_snapshot!(pretty_print_item(ast));
+}
+
+#[test]
+fn test_block_with_comments() {
+    let ast = block()
+        .leading_comment(Comment::Line(" leading comment".to_string()))
+        .statement(Stmt::Expr(Expr::Lit(42.into()), true))
+        .trailing_comment(Comment::Line(" trailing comment".to_string()))
+        .build();
+
+    let mut buf = String::new();
+    let mut printer = Printer::new(&mut buf);
+    ast.pretty_print(&mut printer).unwrap();
+    printer.finish().unwrap();
+
+    insta::assert_snapshot!(buf);
 }
 
 #[test]
@@ -116,13 +130,8 @@ fn test_expr_array() {
 
 #[test]
 fn test_expr_async() {
-    let ast = Expr::Async(ExprAsync {
-        block: Block {
-            leading_comments: thin_vec![],
-            stmts: thin_vec![Stmt::Expr(Expr::Lit(1.into()), true)],
-            trailing_comments: thin_vec![],
-        },
-    });
+    let ast =
+        Expr::Async(ExprAsync { block: block().statement(Stmt::Expr(Expr::Lit(1.into()), true)).build() });
     insta::assert_snapshot!(pretty_print_expr(ast));
 }
 
@@ -169,13 +178,8 @@ fn test_expr_closure() {
 
 #[test]
 fn test_expr_const() {
-    let ast = Expr::Const(ExprConst {
-        block: Block {
-            leading_comments: thin_vec![],
-            stmts: thin_vec![Stmt::Expr(Expr::Lit(1.into()), true)],
-            trailing_comments: thin_vec![],
-        },
-    });
+    let ast =
+        Expr::Const(ExprConst { block: block().statement(Stmt::Expr(Expr::Lit(1.into()), true)).build() });
     insta::assert_snapshot!(pretty_print_expr(ast));
 }
 
@@ -359,17 +363,9 @@ fn test_nested_struct() {
 
 #[test]
 fn test_long_binary_expression() {
-    let ast = Item::Fn(ItemFn {
-        md: None,
-        sig: Signature {
-            ident: "foo".to_string(),
-            generics: Default::default(),
-            inputs: thin_vec![],
-            output: None,
-        },
-        block: Block {
-            leading_comments: thin_vec![],
-            stmts: thin_vec![Stmt::Expr(
+    let ast = Item::Fn(
+        fn_def("foo")
+            .block(block().statement(Stmt::Expr(
                 Expr::Binary(ExprBinary {
                     left: Box::new(Expr::Lit(
                         "a_very_long_string_that_should_cause_a_line_break".into(),
@@ -380,10 +376,9 @@ fn test_long_binary_expression() {
                     )),
                 }),
                 true,
-            )],
-            trailing_comments: thin_vec![],
-        },
-    });
+            )))
+            .build(),
+    );
 
     insta::assert_snapshot!(pretty_print_item(ast));
 }
@@ -417,20 +412,12 @@ fn test_trait() {
 fn test_loop_expression() {
     let ast = Item::Fn(
         fn_def("foo")
-            .block(Block {
-                leading_comments: thin_vec![],
-                stmts: thin_vec![Stmt::Expr(
-                    Expr::Loop(ExprLoop {
-                        body: Block {
-                            leading_comments: thin_vec![],
-                            stmts: thin_vec![Stmt::Expr(Expr::Lit(1.into()), true)],
-                            trailing_comments: thin_vec![],
-                        },
-                    }),
-                    true,
-                )],
-                trailing_comments: thin_vec![],
-            })
+            .block(block().statement(Stmt::Expr(
+                Expr::Loop(ExprLoop {
+                    body: block().statement(Stmt::Expr(Expr::Lit(1.into()), true)).build(),
+                }),
+                true,
+            )))
             .build(),
     );
 
@@ -441,21 +428,13 @@ fn test_loop_expression() {
 fn test_while_expression() {
     let ast = Item::Fn(
         fn_def("foo")
-            .block(Block {
-                leading_comments: thin_vec![],
-                stmts: thin_vec![Stmt::Expr(
-                    Expr::While(ExprWhile {
-                        cond: Box::new(Expr::Lit(1.into())),
-                        body: Block {
-                            leading_comments: thin_vec![],
-                            stmts: thin_vec![Stmt::Expr(Expr::Lit(2.into()), true)],
-                            trailing_comments: thin_vec![],
-                        },
-                    }),
-                    true,
-                )],
-                trailing_comments: thin_vec![],
-            })
+            .block(block().statement(Stmt::Expr(
+                Expr::While(ExprWhile {
+                    cond: Box::new(Expr::Lit(1.into())),
+                    body: block().statement(Stmt::Expr(Expr::Lit(2.into()), true)).build(),
+                }),
+                true,
+            )))
             .build(),
     );
 
@@ -466,22 +445,14 @@ fn test_while_expression() {
 fn test_for_expression() {
     let ast = Item::Fn(
         fn_def("foo")
-            .block(Block {
-                leading_comments: thin_vec![],
-                stmts: thin_vec![Stmt::Expr(
-                    Expr::For(ExprFor {
-                        pat: pat().ident("x", false),
-                        expr: Box::new(Expr::Lit(1.into())),
-                        body: Block {
-                            leading_comments: thin_vec![],
-                            stmts: thin_vec![Stmt::Expr(Expr::Lit(2.into()), true)],
-                            trailing_comments: thin_vec![],
-                        },
-                    }),
-                    true,
-                )],
-                trailing_comments: thin_vec![],
-            })
+            .block(block().statement(Stmt::Expr(
+                Expr::For(ExprFor {
+                    pat: pat().ident("x", false),
+                    expr: Box::new(Expr::Lit(1.into())),
+                    body: block().statement(Stmt::Expr(Expr::Lit(2.into()), true)).build(),
+                }),
+                true,
+            )))
             .build(),
     );
 
@@ -492,17 +463,13 @@ fn test_for_expression() {
 fn test_assign_expression() {
     let ast = Item::Fn(
         fn_def("foo")
-            .block(Block {
-                leading_comments: thin_vec![],
-                stmts: thin_vec![Stmt::Expr(
-                    Expr::Assign(ExprAssign {
-                        left: Box::new(Expr::Lit("x".into())),
-                        right: Box::new(Expr::Lit(1.into())),
-                    }),
-                    true,
-                )],
-                trailing_comments: thin_vec![],
-            })
+            .block(block().statement(Stmt::Expr(
+                Expr::Assign(ExprAssign {
+                    left: Box::new(Expr::Lit("x".into())),
+                    right: Box::new(Expr::Lit(1.into())),
+                }),
+                true,
+            )))
             .build(),
     );
 
@@ -513,24 +480,20 @@ fn test_assign_expression() {
 fn test_macro_call_expression() {
     let ast = Item::Fn(
         fn_def("foo")
-            .block(Block {
-                leading_comments: thin_vec![],
-                stmts: thin_vec![Stmt::Expr(
-                    Expr::MacroCall(ExprMacroCall {
-                        ident: "println".to_string(),
-                        tokens: TokenStream {
-                            tokens: thin_vec![TokenTree::Group(Group {
-                                delimiter: Delimiter::Parenthesis,
-                                stream: TokenStream {
-                                    tokens: thin_vec![TokenTree::Literal("hello".into())],
-                                },
-                            })],
-                        },
-                    }),
-                    true,
-                )],
-                trailing_comments: thin_vec![],
-            })
+            .block(block().statement(Stmt::Expr(
+                Expr::MacroCall(ExprMacroCall {
+                    ident: "println".to_string(),
+                    tokens: TokenStream {
+                        tokens: thin_vec![TokenTree::Group(Group {
+                            delimiter: Delimiter::Parenthesis,
+                            stream: TokenStream {
+                                tokens: thin_vec![TokenTree::Literal("hello".into())],
+                            },
+                        })],
+                    },
+                }),
+                true,
+            )))
             .build(),
     );
 
@@ -572,15 +535,7 @@ fn test_impl() {
         })),
         generics: Default::default(),
         ty: "MyStruct".into(),
-        fns: thin_vec![
-            fn_def("new")
-                .block(Block {
-                    leading_comments: thin_vec![],
-                    stmts: thin_vec![],
-                    trailing_comments: thin_vec![],
-                })
-                .build(),
-        ],
+        fns: thin_vec![fn_def("new").block(block()).build()],
     });
 
     insta::assert_snapshot!(pretty_print_item(ast));
@@ -590,17 +545,13 @@ fn test_impl() {
 fn test_let_statement() {
     let ast = Item::Fn(
         fn_def("foo")
-            .block(Block {
-                leading_comments: thin_vec![],
-                stmts: thin_vec![
-                    stmt()
-                        .local(pat().ident("x", false))
-                        .ty("i32")
-                        .expr(Expr::Lit(42.into()))
-                        .build(),
-                ],
-                trailing_comments: thin_vec![],
-            })
+            .block(block().statement(
+                stmt()
+                    .local(pat().ident("x", false))
+                    .ty("i32")
+                    .expr(Expr::Lit(42.into()))
+                    .build(),
+            ))
             .build(),
     );
 
@@ -611,36 +562,24 @@ fn test_let_statement() {
 fn test_if_expression() {
     let ast = Item::Fn(
         fn_def("foo")
-            .block(Block {
-                leading_comments: thin_vec![],
-                stmts: thin_vec![Stmt::Expr(
-                    Expr::If(ExprIf {
-                        cond: Box::new(Expr::Lit(1.into())),
-                        then_branch: Block {
-                            leading_comments: thin_vec![],
-                            stmts: thin_vec![Stmt::Expr(Expr::Lit(2.into()), true)],
-                            trailing_comments: thin_vec![],
-                        },
-                        else_branch: Some(Box::new(Expr::If(ExprIf {
-                            cond: Box::new(Expr::Lit(3.into())),
-                            then_branch: Block {
-                                leading_comments: thin_vec![],
-                                stmts: thin_vec![Stmt::Expr(Expr::Lit(4.into()), true)],
-                                trailing_comments: thin_vec![],
-                            },
-                            else_branch: Some(Box::new(Expr::Block(ExprBlock {
-                                block: Block {
-                                    leading_comments: thin_vec![],
-                                    stmts: thin_vec![Stmt::Expr(Expr::Lit(5.into()), true)],
-                                    trailing_comments: thin_vec![],
-                                },
-                            }))),
+            .block(block().statement(Stmt::Expr(
+                Expr::If(ExprIf {
+                    cond: Box::new(Expr::Lit(1.into())),
+                    then_branch: block().statement(Stmt::Expr(Expr::Lit(2.into()), true)).build(),
+                    else_branch: Some(Box::new(Expr::If(ExprIf {
+                        cond: Box::new(Expr::Lit(3.into())),
+                        then_branch: block()
+                            .statement(Stmt::Expr(Expr::Lit(4.into()), true))
+                            .build(),
+                        else_branch: Some(Box::new(Expr::Block(ExprBlock {
+                            block: block()
+                                .statement(Stmt::Expr(Expr::Lit(5.into()), true))
+                                .build(),
                         }))),
-                    }),
-                    true,
-                )],
-                trailing_comments: thin_vec![],
-            })
+                    }))),
+                }),
+                true,
+            )))
             .build(),
     );
 
@@ -651,18 +590,14 @@ fn test_if_expression() {
 fn test_binary_expression() {
     let ast = Item::Fn(
         fn_def("foo")
-            .block(Block {
-                leading_comments: thin_vec![],
-                stmts: thin_vec![Stmt::Expr(
-                    Expr::Binary(ExprBinary {
-                        left: Box::new(Expr::Lit(1.into())),
-                        op: BinOp::Add,
-                        right: Box::new(Expr::Lit(2.into())),
-                    }),
-                    true,
-                )],
-                trailing_comments: thin_vec![],
-            })
+            .block(block().statement(Stmt::Expr(
+                Expr::Binary(ExprBinary {
+                    left: Box::new(Expr::Lit(1.into())),
+                    op: BinOp::Add,
+                    right: Box::new(Expr::Lit(2.into())),
+                }),
+                true,
+            )))
             .build(),
     );
 
@@ -673,11 +608,7 @@ fn test_binary_expression() {
 fn test_expr_statement_without_semicolon() {
     let ast = Item::Fn(
         fn_def("foo")
-            .block(Block {
-                leading_comments: thin_vec![],
-                stmts: thin_vec![Stmt::Expr(Expr::Lit(42.into()), false)],
-                trailing_comments: thin_vec![],
-            })
+            .block(block().statement(Stmt::Expr(Expr::Lit(42.into()), false)))
             .build(),
     );
 
@@ -688,16 +619,12 @@ fn test_expr_statement_without_semicolon() {
 fn test_item_statement() {
     let ast = Item::Fn(
         fn_def("foo")
-            .block(Block {
-                leading_comments: thin_vec![],
-                stmts: thin_vec![Stmt::Item(Item::Struct(ItemStruct {
-                    md: None,
-                    ident: "MyStruct".to_string(),
-                    generics: Default::default(),
-                    fields: thin_vec![],
-                }))],
-                trailing_comments: thin_vec![],
-            })
+            .block(block().statement(Stmt::Item(Item::Struct(ItemStruct {
+                md: None,
+                ident: "MyStruct".to_string(),
+                generics: Default::default(),
+                fields: thin_vec![],
+            }))))
             .build(),
     );
 
@@ -708,21 +635,17 @@ fn test_item_statement() {
 fn test_macro_call_statement() {
     let ast = Item::Fn(
         fn_def("foo")
-            .block(Block {
-                leading_comments: thin_vec![],
-                stmts: thin_vec![Stmt::MacCall(ExprMacroCall {
-                    ident: "println".to_string(),
-                    tokens: TokenStream {
-                        tokens: thin_vec![TokenTree::Group(Group {
-                            delimiter: Delimiter::Parenthesis,
-                            stream: TokenStream {
-                                tokens: thin_vec![TokenTree::Literal("hello".into())],
-                            },
-                        })],
-                    },
-                })],
-                trailing_comments: thin_vec![],
-            })
+            .block(block().statement(Stmt::MacCall(ExprMacroCall {
+                ident: "println".to_string(),
+                tokens: TokenStream {
+                    tokens: thin_vec![TokenTree::Group(Group {
+                        delimiter: Delimiter::Parenthesis,
+                        stream: TokenStream {
+                            tokens: thin_vec![TokenTree::Literal("hello".into())],
+                        },
+                    })],
+                },
+            })))
             .build(),
     );
 
@@ -733,47 +656,58 @@ fn test_macro_call_statement() {
 fn test_all_literals() {
     let ast = Item::Fn(
         fn_def("literals")
-            .block(Block {
-                leading_comments: thin_vec![],
-                stmts: thin_vec![
-                    stmt().local("s").expr(Expr::Lit("hello".into())).build(),
-                    stmt()
-                        .local("bs")
-                        .expr(Expr::Lit(Lit::ByteStr(LitByteStr::new(b"hello"))))
-                        .build(),
-                    stmt()
-                        .local("cs")
-                        .expr(Expr::Lit(Lit::CStr(LitCStr::new("hello"))))
-                        .build(),
-                    stmt()
-                        .local("b")
-                        .expr(Expr::Lit(Lit::Byte(LitByte::new(b'h'))))
-                        .build(),
-                    stmt()
-                        .local("c")
-                        .expr(Expr::Lit(Lit::Char(LitChar::new('h'))))
-                        .build(),
-                    stmt().local("i").expr(Expr::Lit(42.into())).build(),
-                    stmt()
-                        .local("i_suffix")
-                        .expr(Expr::Lit(Lit::Int(
-                            LitInt::new(42).with_suffix(IntSuffix::U32)
-                        )))
-                        .build(),
-                    stmt()
-                        .local("f")
-                        .expr(Expr::Lit(Lit::Float(LitFloat::new("1.23"))))
-                        .build(),
-                    stmt()
-                        .local("f_suffix")
-                        .expr(Expr::Lit(Lit::Float(
-                            LitFloat::new("1.23").with_suffix(FloatSuffix::F32),
-                        )))
-                        .build(),
-                    stmt().local("t").expr(Expr::Lit(true.into())).build(),
-                ],
-                trailing_comments: thin_vec![],
-            })
+            .block(
+                block()
+                    .statement(stmt().local("s").expr(Expr::Lit("hello".into())).build())
+                    .statement(
+                        stmt()
+                            .local("bs")
+                            .expr(Expr::Lit(Lit::ByteStr(LitByteStr::new(b"hello"))))
+                            .build(),
+                    )
+                    .statement(
+                        stmt()
+                            .local("cs")
+                            .expr(Expr::Lit(Lit::CStr(LitCStr::new("hello"))))
+                            .build(),
+                    )
+                    .statement(
+                        stmt()
+                            .local("b")
+                            .expr(Expr::Lit(Lit::Byte(LitByte::new(b'h'))))
+                            .build(),
+                    )
+                    .statement(
+                        stmt()
+                            .local("c")
+                            .expr(Expr::Lit(Lit::Char(LitChar::new('h'))))
+                            .build(),
+                    )
+                    .statement(stmt().local("i").expr(Expr::Lit(42.into())).build())
+                    .statement(
+                        stmt()
+                            .local("i_suffix")
+                            .expr(Expr::Lit(Lit::Int(
+                                LitInt::new(42).with_suffix(IntSuffix::U32),
+                            )))
+                            .build(),
+                    )
+                    .statement(
+                        stmt()
+                            .local("f")
+                            .expr(Expr::Lit(Lit::Float(LitFloat::new("1.23"))))
+                            .build(),
+                    )
+                    .statement(
+                        stmt()
+                            .local("f_suffix")
+                            .expr(Expr::Lit(Lit::Float(
+                                LitFloat::new("1.23").with_suffix(FloatSuffix::F32),
+                            )))
+                            .build(),
+                    )
+                    .statement(stmt().local("t").expr(Expr::Lit(true.into())).build()),
+            )
             .build(),
     );
 

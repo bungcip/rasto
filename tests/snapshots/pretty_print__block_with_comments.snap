@@ -1,0 +1,11 @@
+---
+source: tests/pretty_print.rs
+expression: buf
+---
+{
+
+// leading comment
+42;
+// trailing comment
+
+}
