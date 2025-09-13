@@ -3,8 +3,12 @@ name: CI
 on:
   push:
     branches: [ main ]
+    paths-ignore:
+      - "**.md"
   pull_request:
     branches: [ main ]
+    paths-ignore:
+      - "**.md"
 
 env:
   CARGO_TERM_COLOR: always
@@ -14,13 +18,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
-
-    - name: Install Rust toolchain
-      uses: actions-rs/toolchain@v1
-      with:
-        toolchain: stable
-        override: true
+    - uses: actions/checkout@v5
 
     - name: Run tests
       run: cargo test
