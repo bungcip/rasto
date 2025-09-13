@@ -21,11 +21,7 @@ fn test_fn_with_attributes() {
                     ))
                     .build(),
             )
-            .block(Block {
-                stmts: thin_vec![],
-                leading_comments: thin_vec![],
-                trailing_comments: thin_vec![],
-            })
+            .block(block())
             .build(),
     );
 
