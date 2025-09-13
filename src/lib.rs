@@ -31,7 +31,8 @@
 //!         },
 //!         block: Block {
 //!             leading_comments: thin_vec![Comment::Block(" An inner comment ".to_string())],
-//!             stmts: thin_vec![Stmt::Expr(Expr::Lit(Lit::Int(LitInt::new(42))), true)],
+//!             stmts: thin_vec![Stmt::Expr(Expr::Lit(Lit::Int(LitInt::new(42))))],
+//!             has_trailing_semicolon: true,
 //!             trailing_comments: thin_vec![],
 //!         },
 //!     }

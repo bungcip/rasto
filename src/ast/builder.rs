@@ -14,7 +14,9 @@
 //!     .item(
 //!         fn_def("my_function")
 //!             .block(
-//!                 block().statement(stmt().expr(expr().lit(Lit::Int(LitInt::new(42))), true)),
+//!                 block()
+//!                     .statement(stmt().expr(expr().lit(Lit::Int(LitInt::new(42)))))
+//!                     .has_trailing_semicolon(true),
 //!             )
 //!             .build(),
 //!     )
@@ -149,6 +151,7 @@ pub struct BlockBuilder {
     leading_comments: ThinVec<Comment>,
     stmts: ThinVec<Stmt>,
     trailing_comments: ThinVec<Comment>,
+    has_trailing_semicolon: bool,
 }
 
 impl BlockBuilder {
@@ -177,6 +180,16 @@ impl BlockBuilder {
         self
     }
 
+    /// Sets whether the block has a trailing semicolon.
+    ///
+    /// # Parameters
+    ///
+    /// - `has_trailing_semicolon`: Whether the block has a trailing semicolon.
+    pub fn has_trailing_semicolon(mut self, has_trailing_semicolon: bool) -> Self {
+        self.has_trailing_semicolon = has_trailing_semicolon;
+        self
+    }
+
     /// Adds a trailing comment to the block.
     ///
     /// # Parameters
@@ -197,6 +210,7 @@ impl BlockBuilder {
             leading_comments: self.leading_comments,
             stmts: self.stmts,
             trailing_comments: self.trailing_comments,
+            has_trailing_semicolon: self.has_trailing_semicolon,
         }
     }
 }
@@ -571,8 +585,8 @@ impl StmtBuilder {
     }
 
     /// Creates an expression statement.
-    pub fn expr(self, expr: Expr, semi: bool) -> Stmt {
-        Stmt::Expr(expr, semi)
+    pub fn expr(self, expr: Expr) -> Stmt {
+        Stmt::Expr(expr)
     }
 
     /// Creates a macro call statement.
