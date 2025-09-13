@@ -1,6 +1,6 @@
 use crate::ast::items::Item;
 use crate::ast::metadata::Md;
-use crate::pretty_printer::{PrettyPrinter, Printer};
+use crate::pretty_printer::{BreakStyle, PrettyPrinter, Printer};
 use std::fmt;
 use thin_vec::ThinVec;
 
@@ -37,15 +37,16 @@ impl PrettyPrinter for ItemMod {
         printer.string("mod ");
         printer.string(&self.ident);
         if let Some(content) = &self.content {
-            printer.string(" {");
+            printer.begin(BreakStyle::Consistent, " {");
             printer.hard_break();
             for item in content {
                 item.pretty_print(printer)?;
                 printer.hard_break();
             }
-            printer.string("}");
+            printer.end("}");
         } else {
             printer.string(";");
+            printer.hard_break();
         }
         if let Some(md) = &self.md {
             for comment in &md.trailing_comments {

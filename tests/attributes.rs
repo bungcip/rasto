@@ -1,5 +1,4 @@
 use rasto::ast::*;
-use thin_vec::thin_vec;
 
 #[test]
 fn test_fn_with_attributes() {

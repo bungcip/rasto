@@ -4,6 +4,6 @@ expression: pretty_print_item(ast)
 ---
 fn foo(a) -> i32 {
 
-/* An inner comment */
+/* Block comment with single line */
 42;
 }

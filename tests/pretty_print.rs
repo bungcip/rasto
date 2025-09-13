@@ -13,6 +13,15 @@ fn pretty_print_item(item: Item) -> String {
     buf
 }
 
+fn pretty_print_comment(comment: Comment) -> String {
+    let mut buf = String::new();
+    let mut printer = Printer::new(&mut buf);
+    comment.pretty_print(&mut printer).unwrap();
+    printer.finish().unwrap();
+    buf
+}
+
+
 fn pretty_print_file(file: File) -> String {
     file.to_string()
 }
@@ -60,6 +69,19 @@ fn test_file() {
 }
 
 #[test]
+fn test_block_single_comment(){
+    let single = Comment::Block("Block comment with single line".into());
+    insta::assert_snapshot!(pretty_print_comment(single));
+}
+
+#[test]
+fn test_block_multiline_comment(){
+    let single = Comment::Block("Block comment with multi line 1\nBlock comment with multi line 2".into());
+    insta::assert_snapshot!(pretty_print_comment(single));
+}
+
+
+#[test]
 fn test_fn() {
     let ast = Item::Fn(
         fn_def("foo")
@@ -67,7 +89,7 @@ fn test_fn() {
             .output("i32")
             .block(
                 block()
-                    .leading_comment(Comment::Block(" An inner comment ".to_string()))
+                    .leading_comment(Comment::Block(" Block comment with single line ".to_string()))
                     .statement(Stmt::Expr(Expr::Lit(42.into())))
                     .has_trailing_semicolon(true),
             )

@@ -1749,10 +1749,10 @@ impl MetaBuilder {
     }
 }
 
-impl Into<Pat> for &str {
-    fn into(self) -> Pat {
+impl From<&str> for Pat {
+    fn from(val: &str) -> Self {
         Pat::Ident(PatIdent {
-            ident: self.into(),
+            ident: val.into(),
             is_mut: false,
         })
     }

@@ -69,8 +69,6 @@ pub enum Token<'a> {
         /// The closing string of the group (e.g., `)`, `]`, `}`).
         close: &'a str,
     },
-    /// A comment.
-    Comment(Cow<'a, str>),
 }
 
 /// A trait for types that can be pretty-printed.
@@ -167,15 +165,6 @@ impl<'a> Printer<'a> {
         self.tokens.push(Token::End { close });
     }
 
-    /// Adds a comment to the token stream.
-    ///
-    /// # Parameters
-    ///
-    /// - `s`: The comment string.
-    pub fn comment(&mut self, s: impl Into<Cow<'a, str>>) {
-        self.tokens.push(Token::Comment(s.into()));
-    }
-
     /// Scans the token stream to determine the best layout.
     ///
     /// This method implements the first pass of the pretty-printing algorithm.
@@ -228,9 +217,6 @@ impl<'a> Printer<'a> {
                     self.scan_push(i, -self.right_total);
                 }
                 Token::String(s) => {
-                    self.right_total += s.len() as isize;
-                }
-                Token::Comment(s) => {
                     self.right_total += s.len() as isize;
                 }
             }
@@ -319,9 +305,6 @@ impl<'a> Printer<'a> {
                     self.writer.write_str(s)?;
                     self.space -= s.len() as isize;
                 }
-                Token::Comment(s) => {
-                    self.writer.write_str(s)?;
-                }
             }
         }
         Ok(())
@@ -340,8 +323,20 @@ impl PrettyPrinter for Comment {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.hard_break();
         match self {
-            Comment::Line(s) => printer.comment(format!("//{s}")),
-            Comment::Block(s) => printer.comment(format!("/*{s}*/")),
+            Comment::Line(s) => printer.string(format!("//{s}")),
+            Comment::Block(s) => {
+                printer.string(format!("/*"));
+                let mut first = true;
+                for line in s.split('\n') {
+                    if first == true {
+                        first = false
+                    } else {
+                        printer.hard_break();
+                    }
+                    printer.string(line);
+                }
+                printer.string(format!("*/"));
+            }
         }
         printer.hard_break();
         Ok(())
@@ -692,14 +687,14 @@ impl PrettyPrinter for ExprMatch {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string("match ");
         self.expr.pretty_print(printer)?;
-        printer.string(" {");
+        printer.begin(BreakStyle::Consistent, " {");
         printer.hard_break();
         for arm in &self.arms {
             arm.pretty_print(printer)?;
             printer.string(",");
             printer.hard_break();
         }
-        printer.string("}");
+        printer.end("}");
         Ok(())
     }
 }
@@ -782,7 +777,7 @@ impl PrettyPrinter for ExprReturn {
 impl PrettyPrinter for ExprStruct {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string(&self.path);
-        printer.string(" {");
+        printer.begin(BreakStyle::Consistent, " {");
         printer.break_();
         for (i, field) in self.fields.iter().enumerate() {
             if i > 0 {
@@ -792,7 +787,7 @@ impl PrettyPrinter for ExprStruct {
             field.pretty_print(printer)?;
         }
         printer.break_();
-        printer.string("}");
+        printer.end("}");
         Ok(())
     }
 }

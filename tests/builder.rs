@@ -1,5 +1,5 @@
-use rasto::ast::{builder::*, Block, Expr, Lit, LitInt, LitStr, Meta, Stmt};
-use thin_vec::thin_vec;
+use rasto::ast::{builder::*, Expr, Lit, LitInt, LitStr, Stmt};
+
 
 #[test]
 fn test_fn_builder() {
