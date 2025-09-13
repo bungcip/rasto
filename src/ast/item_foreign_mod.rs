@@ -19,14 +19,15 @@ pub struct ItemForeignMod {
     pub trailing_comments: Vec<Comment>,
 }
 
-impl ItemForeignMod {
-    /// Pretty-prints the foreign mod item to a string.
-    pub fn to_string(&self) -> String {
+use std::fmt::{Display, Formatter};
+
+impl Display for ItemForeignMod {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         let mut buf = String::new();
         let mut printer = Printer::new(&mut buf);
         self.pretty_print(&mut printer).unwrap();
         printer.finish().unwrap();
-        buf
+        write!(f, "{buf}")
     }
 }
 

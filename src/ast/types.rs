@@ -1,9 +1,9 @@
 //! The `ast` module contains the definitions for the Abstract Syntax Tree (AST) nodes
 //! that represent Rust types.
 
+use crate::ast::Expr;
 use crate::ast::expressions::{Path, PathSegment};
 use crate::ast::item_macro::ItemMacro;
-use crate::ast::Expr;
 use crate::pretty_printer::{PrettyPrinter, Printer};
 use std::fmt;
 
@@ -107,7 +107,9 @@ impl From<&str> for Type {
     fn from(s: &str) -> Self {
         Type::Path(TypePath {
             path: Path {
-                segments: vec![PathSegment { ident: s.to_string() }],
+                segments: vec![PathSegment {
+                    ident: s.to_string(),
+                }],
             },
         })
     }

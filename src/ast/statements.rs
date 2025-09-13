@@ -6,6 +6,7 @@
 use crate::ast::comments::Comment;
 use crate::ast::expressions::{Expr, ExprMacroCall};
 use crate::ast::items::Item;
+use crate::ast::patterns::Pat;
 use crate::ast::types::Type;
 
 /// A block of code, enclosed in curly braces: `{ ... }`.
@@ -37,8 +38,8 @@ pub enum Stmt {
 /// A `let` statement: `let x = 1;`.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Local {
-    /// The name of the variable being bound.
-    pub ident: String,
+    /// The pattern to bind.
+    pub pat: Pat,
     /// The optional type annotation of the variable.
     pub ty: Option<Type>,
     /// The optional expression to initialize the variable.

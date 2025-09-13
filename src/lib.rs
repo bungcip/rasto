@@ -15,32 +15,30 @@
 //! use rasto::ast::*;
 //! use rasto::pretty_printer::*;
 //!
-//! fn main() {
-//!     let ast = Item::from(
-//!         ItemFn {
-//!             attrs: vec![],
-//!             leading_comments: vec![Comment::Line(" A simple function.".to_string())],
-//!             sig: Signature {
-//!                 ident: "foo".to_string(),
-//!                 inputs: vec![],
-//!                 output: None,
-//!             },
-//!             block: Block {
-//!                 leading_comments: vec![Comment::Block(" An inner comment ".to_string())],
-//!                 stmts: vec![Stmt::Expr(Expr::Lit(Lit::Int(42)), true)],
-//!                 trailing_comments: vec![],
-//!             },
-//!             trailing_comments: vec![Comment::Line(" Trailing comment.".to_string())],
-//!         }
-//!     );
+//! let ast = Item::from(
+//!     ItemFn {
+//!         attrs: vec![],
+//!         leading_comments: vec![Comment::Line(" A simple function.".to_string())],
+//!         sig: Signature {
+//!             ident: "foo".to_string(),
+//!             inputs: vec![],
+//!             output: None,
+//!         },
+//!         block: Block {
+//!             leading_comments: vec![Comment::Block(" An inner comment ".to_string())],
+//!             stmts: vec![Stmt::Expr(Expr::Lit(Lit::Int(42)), true)],
+//!             trailing_comments: vec![],
+//!         },
+//!         trailing_comments: vec![Comment::Line(" Trailing comment.".to_string())],
+//!     }
+//! );
 //!
-//!     let mut buf = String::new();
-//!     let mut printer = Printer::new(&mut buf);
-//!     ast.pretty_print(&mut printer).unwrap();
-//!     printer.finish().unwrap();
+//! let mut buf = String::new();
+//! let mut printer = Printer::new(&mut buf);
+//! ast.pretty_print(&mut printer).unwrap();
+//! printer.finish().unwrap();
 //!
-//!     println!("{}", buf);
-//! }
+//! println!("{}", buf);
 //! ```
 //!
 //! This will output:

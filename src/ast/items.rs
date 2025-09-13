@@ -17,7 +17,7 @@ use crate::ast::item_union::ItemUnion;
 use crate::ast::item_use::ItemUse;
 use crate::ast::statements::Block;
 use crate::ast::types::Type;
-use crate::pretty_printer::{Printer, PrettyPrinter};
+use crate::pretty_printer::{PrettyPrinter, Printer};
 
 /// A top-level item in a Rust file.
 #[derive(Debug, Clone, PartialEq)]
@@ -54,14 +54,15 @@ pub enum Item {
     Use(ItemUse),
 }
 
-impl Item {
-    /// Pretty-prints the item to a string.
-    pub fn to_string(&self) -> String {
+use std::fmt::{Display, Formatter};
+
+impl Display for Item {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         let mut buf = String::new();
         let mut printer = Printer::new(&mut buf);
         self.pretty_print(&mut printer).unwrap();
         printer.finish().unwrap();
-        buf
+        write!(f, "{buf}")
     }
 }
 
@@ -102,78 +103,53 @@ pub struct TraitItemFn {
     pub trailing_comments: Vec<Comment>,
 }
 
-impl ItemFn {
-    /// Pretty-prints the function to a string.
-    ///
-    /// # Returns
-    ///
-    /// A `String` containing the formatted function.
-    pub fn to_string(&self) -> String {
+impl Display for ItemFn {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         let mut buf = String::new();
         let mut printer = Printer::new(&mut buf);
         self.pretty_print(&mut printer).unwrap();
         printer.finish().unwrap();
-        buf
+        write!(f, "{buf}")
     }
 }
 
-impl ItemStruct {
-    /// Pretty-prints the struct to a string.
-    ///
-    /// # Returns
-    ///
-    /// A `String` containing the formatted struct.
-    pub fn to_string(&self) -> String {
+impl Display for ItemStruct {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         let mut buf = String::new();
         let mut printer = Printer::new(&mut buf);
         self.pretty_print(&mut printer).unwrap();
         printer.finish().unwrap();
-        buf
+        write!(f, "{buf}")
     }
 }
 
-impl ItemEnum {
-    /// Pretty-prints the enum to a string.
-    ///
-    /// # Returns
-    ///
-    /// A `String` containing the formatted enum.
-    pub fn to_string(&self) -> String {
+impl Display for ItemEnum {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         let mut buf = String::new();
         let mut printer = Printer::new(&mut buf);
         self.pretty_print(&mut printer).unwrap();
         printer.finish().unwrap();
-        buf
+        write!(f, "{buf}")
     }
 }
 
-impl ItemImpl {
-    /// Pretty-prints the `impl` block to a string.
-    ///
-    /// # Returns
-    ///
-    /// A `String` containing the formatted `impl` block.
-    pub fn to_string(&self) -> String {
+impl Display for ItemImpl {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         let mut buf = String::new();
         let mut printer = Printer::new(&mut buf);
         self.pretty_print(&mut printer).unwrap();
         printer.finish().unwrap();
-        buf
+        write!(f, "{buf}")
     }
 }
 
-impl ItemTrait {
-    /// Pretty-prints the trait to a string.
-    ///
-    /// # Returns
-    ///
-    /// A `String` containing the formatted trait.
-    pub fn to_string(&self) -> String {
+impl Display for ItemTrait {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         let mut buf = String::new();
         let mut printer = Printer::new(&mut buf);
         self.pretty_print(&mut printer).unwrap();
         printer.finish().unwrap();
-        buf
+        write!(f, "{buf}")
     }
 }
 

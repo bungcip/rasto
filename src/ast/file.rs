@@ -2,6 +2,7 @@
 
 use crate::ast::items::Item;
 use crate::pretty_printer::{PrettyPrinter, Printer};
+use std::fmt::{Display, Formatter};
 
 /// Represents a Rust source file.
 ///
@@ -14,17 +15,12 @@ pub struct File {
     pub items: Vec<Item>,
 }
 
-impl File {
-    /// Pretty-prints the file to a string.
-    ///
-    /// # Returns
-    ///
-    /// A `String` containing the formatted Rust code.
-    pub fn to_string(&self) -> String {
+impl Display for File {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         let mut buf = String::new();
         let mut printer = Printer::new(&mut buf);
         self.pretty_print(&mut printer).unwrap();
         printer.finish().unwrap();
-        buf
+        write!(f, "{buf}")
     }
 }

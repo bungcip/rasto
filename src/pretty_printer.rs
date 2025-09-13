@@ -283,8 +283,11 @@ impl<'a> Printer<'a> {
                     self.space -= close.len() as isize;
                 }
                 Token::Break { len } => {
-                    let (_, is_broken, style) =
-                        self.print_stack.last().copied().unwrap_or((0, false, BreakStyle::Consistent));
+                    let (_, is_broken, style) = self.print_stack.last().copied().unwrap_or((
+                        0,
+                        false,
+                        BreakStyle::Consistent,
+                    ));
 
                     let break_decision = if style == BreakStyle::Consistent {
                         is_broken
@@ -337,10 +340,32 @@ impl PrettyPrinter for Comment {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.hard_break();
         match self {
-            Comment::Line(s) => printer.comment(format!("//{}", s)),
-            Comment::Block(s) => printer.comment(format!("/*{}*/", s)),
+            Comment::Line(s) => printer.comment(format!("//{s}")),
+            Comment::Block(s) => printer.comment(format!("/*{s}*/")),
         }
         printer.hard_break();
+        Ok(())
+    }
+}
+
+impl PrettyPrinter for Pat {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        match self {
+            Pat::Ident(pat_ident) => pat_ident.pretty_print(printer),
+            Pat::Rest => {
+                printer.string("..");
+                Ok(())
+            }
+        }
+    }
+}
+
+impl PrettyPrinter for PatIdent {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        if self.is_mut {
+            printer.string("mut ");
+        }
+        printer.string(&self.ident);
         Ok(())
     }
 }
@@ -377,7 +402,7 @@ impl PrettyPrinter for PathSegment {
 impl PrettyPrinter for Lit {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         match self {
-            Lit::Str(s) => printer.string(format!("\"{}\"", s)),
+            Lit::Str(s) => printer.string(format!("\"{s}\"")),
             Lit::Int(i) => printer.string(i.to_string()),
             Lit::Bool(b) => printer.string(b.to_string()),
         }
@@ -579,7 +604,7 @@ impl PrettyPrinter for ExprMatch {
 
 impl PrettyPrinter for Arm {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
-        printer.string(&self.pat);
+        self.pat.pretty_print(printer)?;
         if let Some(guard) = &self.guard {
             printer.string(" if ");
             guard.pretty_print(printer)?;
@@ -784,7 +809,7 @@ impl PrettyPrinter for Stmt {
 impl PrettyPrinter for Local {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string("let ");
-        printer.string(&self.ident);
+        self.pat.pretty_print(printer)?;
         if let Some(ty) = &self.ty {
             printer.string(": ");
             ty.pretty_print(printer)?;
@@ -1034,7 +1059,7 @@ impl PrettyPrinter for ExprWhile {
 impl PrettyPrinter for ExprFor {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string("for ");
-        printer.string(&self.pat);
+        self.pat.pretty_print(printer)?;
         printer.string(" in ");
         self.expr.pretty_print(printer)?;
         printer.string(" ");

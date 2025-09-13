@@ -19,14 +19,15 @@ pub struct ItemUnion {
     pub trailing_comments: Vec<Comment>,
 }
 
-impl ItemUnion {
-    /// Pretty-prints the union item to a string.
-    pub fn to_string(&self) -> String {
+use std::fmt::{Display, Formatter};
+
+impl Display for ItemUnion {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         let mut buf = String::new();
         let mut printer = Printer::new(&mut buf);
         self.pretty_print(&mut printer).unwrap();
         printer.finish().unwrap();
-        buf
+        write!(f, "{buf}")
     }
 }
 

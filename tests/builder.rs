@@ -1,4 +1,4 @@
-use rasto::ast::{builder::*, Block, Expr, Lit, Stmt};
+use rasto::ast::{Block, Expr, Lit, Stmt, builder::*};
 
 #[test]
 fn test_fn_builder() {
@@ -24,7 +24,7 @@ fn test_fn_builder() {
 #[test]
 fn test_stmt_builder() {
     let local_stmt = stmt()
-        .local("x")
+        .local(pat().ident("x", false))
         .ty("i32")
         .expr(Expr::Lit(Lit::Int(42)))
         .build();
@@ -32,7 +32,7 @@ fn test_stmt_builder() {
     assert_eq!(
         local_stmt,
         Stmt::Local(rasto::ast::Local {
-            ident: "x".to_string(),
+            pat: pat().ident("x", false),
             ty: Some("i32".into()),
             expr: Some(Expr::Lit(Lit::Int(42))),
         })

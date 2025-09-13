@@ -2,6 +2,8 @@ use rasto::ast::builder::{file, fn_def, stmt};
 use rasto::ast::*;
 use rasto::pretty_printer::{PrettyPrinter, Printer};
 
+mod patterns;
+
 fn pretty_print_item(item: Item) -> String {
     let mut buf = String::new();
     let mut printer = Printer::new(&mut buf);
@@ -203,12 +205,12 @@ fn test_expr_match() {
         expr: Box::new(Expr::Lit(Lit::Str("x".to_string()))),
         arms: vec![
             Arm {
-                pat: "Some(y)".to_string(),
+                pat: pat().ident("Some(y)", false),
                 guard: None,
                 body: Box::new(Expr::Lit(Lit::Int(1))),
             },
             Arm {
-                pat: "None".to_string(),
+                pat: pat().ident("None", false),
                 guard: Some(Box::new(Expr::Lit(Lit::Bool(true)))),
                 body: Box::new(Expr::Lit(Lit::Int(2))),
             },
@@ -370,8 +372,7 @@ fn test_long_binary_expression() {
                     ))),
                     op: BinOp::Add,
                     right: Box::new(Expr::Lit(Lit::Str(
-                        "another_very_long_string_that_should_also_cause_a_line_break"
-                            .to_string(),
+                        "another_very_long_string_that_should_also_cause_a_line_break".to_string(),
                     ))),
                 }),
                 true,
@@ -456,6 +457,8 @@ fn test_while_expression() {
     insta::assert_snapshot!(pretty_print_item(ast));
 }
 
+use rasto::ast::builder::pat;
+
 #[test]
 fn test_for_expression() {
     let ast = Item::Fn(
@@ -464,7 +467,7 @@ fn test_for_expression() {
                 leading_comments: vec![],
                 stmts: vec![Stmt::Expr(
                     Expr::For(ExprFor {
-                        pat: "x".to_string(),
+                        pat: pat().ident("x", false),
                         expr: Box::new(Expr::Lit(Lit::Int(1))),
                         body: Block {
                             leading_comments: vec![],
@@ -559,13 +562,15 @@ fn test_impl() {
         attrs: vec![],
         leading_comments: vec![Comment::Line(" A simple impl.".to_string())],
         ty: "MyStruct".into(),
-        fns: vec![fn_def("new")
-            .block(Block {
-                leading_comments: vec![],
-                stmts: vec![],
-                trailing_comments: vec![],
-            })
-            .build()],
+        fns: vec![
+            fn_def("new")
+                .block(Block {
+                    leading_comments: vec![],
+                    stmts: vec![],
+                    trailing_comments: vec![],
+                })
+                .build(),
+        ],
         trailing_comments: vec![],
     });
 
@@ -578,11 +583,13 @@ fn test_let_statement() {
         fn_def("foo")
             .block(Block {
                 leading_comments: vec![],
-                stmts: vec![stmt()
-                    .local("x")
-                    .ty("i32")
-                    .expr(Expr::Lit(Lit::Int(42)))
-                    .build()],
+                stmts: vec![
+                    stmt()
+                        .local(pat().ident("x", false))
+                        .ty("i32")
+                        .expr(Expr::Lit(Lit::Int(42)))
+                        .build(),
+                ],
                 trailing_comments: vec![],
             })
             .build(),
