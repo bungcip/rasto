@@ -7,7 +7,6 @@ fn pretty_print_item(item: Item) -> String {
     let mut printer = Printer::new(&mut buf);
     item.pretty_print(&mut printer).unwrap();
     printer.finish().unwrap();
-    buf.push('\n');
     buf
 }
 
