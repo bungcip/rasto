@@ -24,7 +24,7 @@
 //! ```
 
 use crate::ast::*;
-use thin_vec::{thin_vec, ThinVec};
+use thin_vec::{ThinVec, thin_vec};
 
 /// Creates a new `FileBuilder` to construct a `File` AST node.
 ///
@@ -1595,7 +1595,7 @@ impl ItemUseBuilder {
 
 impl Into<Pat> for &str {
     fn into(self) -> Pat {
-        Pat::Ident(PatIdent { 
+        Pat::Ident(PatIdent {
             ident: self.into(),
             is_mut: false,
         })

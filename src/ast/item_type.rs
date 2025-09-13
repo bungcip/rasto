@@ -1,5 +1,5 @@
-use crate::ast::metadata::Md;
 use crate::ast::generics::GenericParams;
+use crate::ast::metadata::Md;
 use crate::ast::types::Type;
 use crate::pretty_printer::{PrettyPrinter, Printer};
 use std::fmt;

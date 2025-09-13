@@ -1,9 +1,10 @@
 use rasto::ast::{
+    Block, Item, TokenStream, Type,
     builder::{
-        const_item, extern_crate_item, fn_def, foreign_mod_item, macro_item, mod_item,
-        static_item, trait_alias_item, type_item, union_item, use_item,
+        const_item, extern_crate_item, fn_def, foreign_mod_item, macro_item, mod_item, static_item,
+        trait_alias_item, type_item, union_item, use_item,
     },
-    expr, Block, Field, Item, TokenStream, Type,
+    expr,
 };
 use thin_vec::thin_vec;
 
@@ -37,8 +38,13 @@ fn test_foreign_mod_item() {
 
 #[test]
 fn test_macro_item() {
-    let item =
-        macro_item(expr().macro_call("my_macro", TokenStream { tokens: thin_vec![] })).build();
+    let item = macro_item(expr().macro_call(
+        "my_macro",
+        TokenStream {
+            tokens: thin_vec![],
+        },
+    ))
+    .build();
     insta::assert_snapshot!(item.to_string());
 }
 
@@ -89,16 +95,8 @@ fn test_type_item() {
 #[test]
 fn test_union_item() {
     let item = union_item("MyUnion")
-        .field(Field {
-            ident: "f1".to_string(),
-            ty: Type::from("u32"),
-            md: None,
-        })
-        .field(Field {
-            ident: "f2".to_string(),
-            ty: Type::from("f32"),
-            md: None,
-        })
+        .field("f1", Type::from("u32"))
+        .field("f2", Type::from("f32"))
         .build();
     insta::assert_snapshot!(item.to_string());
 }

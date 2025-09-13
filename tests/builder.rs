@@ -1,4 +1,4 @@
-use rasto::ast::{builder::*, Block, Expr, Lit, LitInt, LitStr, Stmt, Meta};
+use rasto::ast::{Block, Expr, Lit, LitInt, LitStr, Meta, Stmt, builder::*};
 use thin_vec::thin_vec;
 
 #[test]

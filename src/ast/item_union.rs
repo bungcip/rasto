@@ -51,7 +51,7 @@ impl PrettyPrinter for ItemUnion {
             }
         }
         printer.end("}");
-        
+
         if let Some(md) = &self.md {
             for comment in &md.trailing_comments {
                 comment.pretty_print(printer)?;

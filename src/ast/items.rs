@@ -19,8 +19,8 @@ use crate::ast::patterns::Pat;
 use crate::ast::statements::Block;
 use crate::ast::types::Type;
 use crate::pretty_printer::{PrettyPrinter, Printer};
-use thin_vec::ThinVec;
 use std::fmt;
+use thin_vec::ThinVec;
 
 /// A top-level item in a Rust file.
 #[derive(Debug, Clone, PartialEq)]

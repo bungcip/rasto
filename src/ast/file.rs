@@ -2,8 +2,8 @@
 
 use crate::ast::items::Item;
 use crate::pretty_printer::{PrettyPrinter, Printer};
-use thin_vec::ThinVec;
 use std::fmt;
+use thin_vec::ThinVec;
 
 /// Represents a Rust source file.
 ///

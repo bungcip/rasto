@@ -209,7 +209,10 @@ fn test_expr_match() {
         expr: Box::new(Expr::Lit("x".into())),
         arms: thin_vec![
             Arm {
-                pat: pat().tuple(thin_vec![pat().ident("Some", false), pat().ident("y", false)]),
+                pat: pat().tuple(thin_vec![
+                    pat().ident("Some", false),
+                    pat().ident("y", false)
+                ]),
                 guard: None,
                 body: Box::new(Expr::Lit(1.into())),
             },
@@ -753,7 +756,9 @@ fn test_all_literals() {
                     stmt().local("i").expr(Expr::Lit(42.into())).build(),
                     stmt()
                         .local("i_suffix")
-                        .expr(Expr::Lit(Lit::Int(LitInt::new(42).with_suffix(IntSuffix::U32))))
+                        .expr(Expr::Lit(Lit::Int(
+                            LitInt::new(42).with_suffix(IntSuffix::U32)
+                        )))
                         .build(),
                     stmt()
                         .local("f")
