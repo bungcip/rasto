@@ -1,4 +1,4 @@
-use rasto::ast::builder::{file, fn_def, stmt};
+use rasto::ast::builder::{file, fn_def, pat, stmt};
 use rasto::ast::*;
 use rasto::pretty_printer::{PrettyPrinter, Printer};
 
@@ -39,7 +39,7 @@ fn test_file() {
         }))
         .item(
             fn_def("foo")
-                .input("i32")
+                .input(pat().ident("a", false))
                 .output("i32")
                 .block(Block {
                     leading_comments: vec![],
@@ -57,7 +57,7 @@ fn test_file() {
 fn test_fn() {
     let ast = Item::Fn(
         fn_def("foo")
-            .input("i32")
+            .input(pat().ident("a", false))
             .output("i32")
             .block(Block {
                 leading_comments: vec![Comment::Block(" An inner comment ".to_string())],
@@ -157,7 +157,7 @@ fn test_expr_cast() {
 #[test]
 fn test_expr_closure() {
     let ast = Expr::Closure(ExprClosure {
-        inputs: vec!["a".to_string(), "b".to_string()],
+        inputs: vec![pat().ident("a", false), pat().ident("b", false)],
         body: Box::new(Expr::Lit(Lit::Int(1))),
     });
     insta::assert_snapshot!(pretty_print_expr(ast));
@@ -205,7 +205,10 @@ fn test_expr_match() {
         expr: Box::new(Expr::Lit(Lit::Str("x".to_string()))),
         arms: vec![
             Arm {
-                pat: pat().ident("Some(y)", false),
+                pat: pat().tuple(vec![
+                    pat().ident("Some", false),
+                    pat().ident("y", false),
+                ]),
                 guard: None,
                 body: Box::new(Expr::Lit(Lit::Int(1))),
             },
@@ -456,8 +459,6 @@ fn test_while_expression() {
 
     insta::assert_snapshot!(pretty_print_item(ast));
 }
-
-use rasto::ast::builder::pat;
 
 #[test]
 fn test_for_expression() {

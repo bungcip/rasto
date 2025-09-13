@@ -147,7 +147,7 @@ pub struct ExprCast {
 #[derive(Debug, Clone, PartialEq)]
 pub struct ExprClosure {
     /// The input parameters of the closure.
-    pub inputs: Vec<String>,
+    pub inputs: Vec<Pat>,
     /// The body of the closure.
     pub body: Box<Expr>,
 }

@@ -64,3 +64,34 @@ fn test_match_expression_with_rest_pattern() {
     }
     ");
 }
+
+#[test]
+fn test_let_statement_with_wildcard_pattern() {
+    let let_stmt = stmt().local(pat().wild()).build();
+
+    insta::assert_snapshot!(pretty_print(&let_stmt), @"let _;");
+}
+
+#[test]
+fn test_let_statement_with_tuple_pattern() {
+    let let_stmt = stmt()
+        .local(pat().tuple(vec![pat().ident("x", false), pat().ident("y", false)]))
+        .expr(expr().tuple(vec![expr().lit(Lit::Int(1)), expr().lit(Lit::Int(2))]))
+        .build();
+
+    insta::assert_snapshot!(pretty_print(&let_stmt), @"let (x, y) = (1, 2);");
+}
+
+#[test]
+fn test_function_with_tuple_pattern_in_arg() {
+    let fn_def = fn_def("foo")
+        .input(pat().tuple(vec![pat().ident("x", false), pat().ident("y", false)]))
+        .block(Block {
+            leading_comments: vec![],
+            stmts: vec![],
+            trailing_comments: vec![],
+        })
+        .build();
+
+    insta::assert_snapshot!(pretty_print(&fn_def), @"fn foo((x, y)) {}");
+}

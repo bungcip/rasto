@@ -81,7 +81,7 @@ pub fn fn_def(name: impl Into<String>) -> FnBuilder {
 /// A builder for constructing an `ItemFn` (function definition) AST node.
 pub struct FnBuilder {
     ident: String,
-    inputs: Vec<Type>,
+    inputs: Vec<Pat>,
     output: Option<Type>,
     block: Option<Block>,
 }
@@ -105,9 +105,9 @@ impl FnBuilder {
     ///
     /// # Parameters
     ///
-    /// - `ty`: The type of the input parameter.
-    pub fn input(mut self, ty: impl Into<Type>) -> Self {
-        self.inputs.push(ty.into());
+    /// - `pat`: The pattern for the input parameter.
+    pub fn input(mut self, pat: impl Into<Pat>) -> Self {
+        self.inputs.push(pat.into());
         self
     }
 
@@ -237,12 +237,22 @@ pub fn pat() -> PatBuilder {
 pub struct PatBuilder;
 
 impl PatBuilder {
+    /// Creates a wildcard pattern (`_`).
+    pub fn wild(self) -> Pat {
+        Pat::Wild
+    }
+
     /// Creates an identifier pattern.
     pub fn ident(self, name: impl Into<String>, is_mut: bool) -> Pat {
         Pat::Ident(PatIdent {
             ident: name.into(),
             is_mut,
         })
+    }
+
+    /// Creates a tuple pattern.
+    pub fn tuple(self, pats: impl IntoIterator<Item = Pat>) -> Pat {
+        Pat::Tuple(pats.into_iter().collect())
     }
 
     /// Creates a rest pattern (`..`).
@@ -377,9 +387,9 @@ impl ExprBuilder {
     ///
     /// # Parameters
     ///
-    /// - `inputs`: An iterator of strings for the closure's input parameters.
+    /// - `inputs`: An iterator of patterns for the closure's input parameters.
     /// - `body`: The body of the closure.
-    pub fn closure(self, inputs: impl IntoIterator<Item = impl Into<String>>, body: Expr) -> Expr {
+    pub fn closure(self, inputs: impl IntoIterator<Item = impl Into<Pat>>, body: Expr) -> Expr {
         Expr::Closure(ExprClosure {
             inputs: inputs.into_iter().map(Into::into).collect(),
             body: Box::new(body),

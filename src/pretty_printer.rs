@@ -351,7 +351,22 @@ impl PrettyPrinter for Comment {
 impl PrettyPrinter for Pat {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         match self {
+            Pat::Wild => {
+                printer.string("_");
+                Ok(())
+            }
             Pat::Ident(pat_ident) => pat_ident.pretty_print(printer),
+            Pat::Tuple(pats) => {
+                printer.begin(BreakStyle::Consistent, "(");
+                for (i, pat) in pats.iter().enumerate() {
+                    if i > 0 {
+                        printer.string(", ");
+                    }
+                    pat.pretty_print(printer)?;
+                }
+                printer.end(")");
+                Ok(())
+            }
             Pat::Rest => {
                 printer.string("..");
                 Ok(())
@@ -546,7 +561,7 @@ impl PrettyPrinter for ExprClosure {
             if i > 0 {
                 printer.string(", ");
             }
-            printer.string(input);
+            input.pretty_print(printer)?;
         }
         printer.string("| ");
         self.body.pretty_print(printer)
