@@ -377,10 +377,76 @@ impl PrettyPrinter for PathSegment {
 impl PrettyPrinter for Lit {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         match self {
-            Lit::Str(s) => printer.string(format!("\"{}\"", s)),
-            Lit::Int(i) => printer.string(i.to_string()),
-            Lit::Bool(b) => printer.string(b.to_string()),
+            Lit::Str(lit) => lit.pretty_print(printer),
+            Lit::ByteStr(lit) => lit.pretty_print(printer),
+            Lit::CStr(lit) => lit.pretty_print(printer),
+            Lit::Byte(lit) => lit.pretty_print(printer),
+            Lit::Char(lit) => lit.pretty_print(printer),
+            Lit::Int(lit) => lit.pretty_print(printer),
+            Lit::Float(lit) => lit.pretty_print(printer),
+            Lit::Bool(lit) => lit.pretty_print(printer),
         }
+    }
+}
+
+impl PrettyPrinter for LitStr {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        printer.string(format!("\"{}\"", self.value));
+        Ok(())
+    }
+}
+
+impl PrettyPrinter for LitByteStr {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        printer.string(format!("b\"{}\"", String::from_utf8_lossy(&self.value)));
+        Ok(())
+    }
+}
+
+impl PrettyPrinter for LitCStr {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        printer.string(format!("c\"{}\"", String::from_utf8_lossy(&self.value)));
+        Ok(())
+    }
+}
+
+impl PrettyPrinter for LitByte {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        printer.string(format!("b'{}'", self.value as char));
+        Ok(())
+    }
+}
+
+impl PrettyPrinter for LitChar {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        printer.string(format!("'{}'", self.value));
+        Ok(())
+    }
+}
+
+impl PrettyPrinter for LitInt {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        printer.string(self.value.to_string());
+        if let Some(suffix) = &self.suffix {
+            printer.string(suffix);
+        }
+        Ok(())
+    }
+}
+
+impl PrettyPrinter for LitFloat {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        printer.string(&self.value);
+        if let Some(suffix) = &self.suffix {
+            printer.string(suffix);
+        }
+        Ok(())
+    }
+}
+
+impl PrettyPrinter for LitBool {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        printer.string(self.value.to_string());
         Ok(())
     }
 }
