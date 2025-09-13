@@ -12,7 +12,7 @@
 //! Here's an example of how to build a simple function AST and pretty-print it:
 //!
 //! ```rust
-//! use rasto::ast::*;
+//! use rasto::ast::{*, Lit, LitInt};
 //! use rasto::pretty_printer::*;
 //!
 //! fn main() {
@@ -27,7 +27,7 @@
 //!             },
 //!             block: Block {
 //!                 leading_comments: vec![Comment::Block(" An inner comment ".to_string())],
-//!                 stmts: vec![Stmt::Expr(Expr::Lit(42.into()), true)],
+//!                 stmts: vec![Stmt::Expr(Expr::Lit(Lit::Int(LitInt::new(42))), true)],
 //!                 trailing_comments: vec![],
 //!             },
 //!             trailing_comments: vec![Comment::Line(" Trailing comment.".to_string())],
