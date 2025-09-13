@@ -27,7 +27,7 @@
 //!             },
 //!             block: Block {
 //!                 leading_comments: vec![Comment::Block(" An inner comment ".to_string())],
-//!                 stmts: vec![Stmt::Expr(Expr::Lit(Lit::Int(42)), true)],
+//!                 stmts: vec![Stmt::Expr(Expr::Lit(42.into()), true)],
 //!                 trailing_comments: vec![],
 //!             },
 //!             trailing_comments: vec![Comment::Line(" Trailing comment.".to_string())],

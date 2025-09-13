@@ -14,7 +14,7 @@
 //!         fn_def("my_function")
 //!             .block(Block {
 //!                 leading_comments: vec![],
-//!                 stmts: vec![Stmt::Expr(expr().lit(Lit::Int(42)), true)],
+//!                 stmts: vec![Stmt::Expr(expr().lit(42), true)],
 //!                 trailing_comments: vec![],
 //!             })
 //!             .build(),
