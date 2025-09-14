@@ -8,13 +8,14 @@ use thin_vec::ThinVec;
 /// Represents a pattern in a `let` binding, function parameter, or `match` arm.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Pat {
-    /// A wildcard pattern, `_`.
+    /// A wildcard pattern, `_`, which matches any value and ignores it.
     Wild,
-    /// A rest pattern, i.e., `..`.
+    /// A rest pattern, `..`, which can be used in tuple and slice patterns to
+    /// match multiple elements.
     Rest,
-    /// An identifier pattern, e.g., `x` or `mut x`.
+    /// An identifier pattern, e.g., `x` or `mut x`, which binds a variable to a value.
     Ident(PatIdent),
-    /// A tuple pattern, e.g., `(a, b)`.
+    /// A tuple pattern, e.g., `(a, b)`, which destructures a tuple.
     Tuple(ThinVec<Pat>),
 }
 

@@ -17,6 +17,8 @@ pub struct File {
 }
 
 impl fmt::Display for File {
+    /// Formats the `File` using the pretty-printer, producing a string
+    /// representation of the Rust source file.
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut printer = Printer::new(f);
         self.pretty_print(&mut printer)?;

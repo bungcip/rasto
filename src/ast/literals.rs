@@ -33,6 +33,10 @@ pub struct LitStr {
 
 impl LitStr {
     /// Creates a new `LitStr`.
+    ///
+    /// # Arguments
+    ///
+    /// * `value` - The string value.
     pub fn new(value: &str) -> Self {
         Self {
             value: value.to_string(),
@@ -49,6 +53,10 @@ pub struct LitByteStr {
 
 impl LitByteStr {
     /// Creates a new `LitByteStr`.
+    ///
+    /// # Arguments
+    ///
+    /// * `value` - The byte string value.
     pub fn new(value: &[u8]) -> Self {
         Self {
             value: value.to_vec(),
@@ -65,6 +73,10 @@ pub struct LitCStr {
 
 impl LitCStr {
     /// Creates a new `LitCStr`.
+    ///
+    /// # Arguments
+    ///
+    /// * `value` - The string value.
     pub fn new(value: &str) -> Self {
         Self {
             value: value.as_bytes().to_vec(),
@@ -81,6 +93,10 @@ pub struct LitByte {
 
 impl LitByte {
     /// Creates a new `LitByte`.
+    ///
+    /// # Arguments
+    ///
+    /// * `value` - The byte value.
     pub fn new(value: u8) -> Self {
         Self { value }
     }
@@ -95,6 +111,10 @@ pub struct LitChar {
 
 impl LitChar {
     /// Creates a new `LitChar`.
+    ///
+    /// # Arguments
+    ///
+    /// * `value` - The character value.
     pub fn new(value: char) -> Self {
         Self { value }
     }
@@ -140,6 +160,10 @@ pub struct LitInt {
 
 impl LitInt {
     /// Creates a new `LitInt`.
+    ///
+    /// # Arguments
+    ///
+    /// * `value` - The integer value.
     pub fn new(value: u128) -> Self {
         Self {
             value,
@@ -148,6 +172,10 @@ impl LitInt {
     }
 
     /// Adds a suffix to the `LitInt`.
+    ///
+    /// # Arguments
+    ///
+    /// * `suffix` - The integer suffix.
     pub fn with_suffix(mut self, suffix: IntSuffix) -> Self {
         self.suffix = Some(suffix);
         self
@@ -174,6 +202,10 @@ pub struct LitFloat {
 
 impl LitFloat {
     /// Creates a new `LitFloat`.
+    ///
+    /// # Arguments
+    ///
+    /// * `value` - The float value as a string.
     pub fn new(value: &str) -> Self {
         Self {
             value: value.to_string(),
@@ -182,6 +214,10 @@ impl LitFloat {
     }
 
     /// Adds a suffix to the `LitFloat`.
+    ///
+    /// # Arguments
+    ///
+    /// * `suffix` - The float suffix.
     pub fn with_suffix(mut self, suffix: FloatSuffix) -> Self {
         self.suffix = Some(suffix);
         self
@@ -197,20 +233,24 @@ pub struct LitBool {
 
 impl LitBool {
     /// Creates a new `LitBool`.
+    ///
+    /// # Arguments
+    ///
+    /// * `value` - The boolean value.
     pub fn new(value: bool) -> Self {
         Self { value }
     }
 }
 
 impl From<String> for Lit {
-    /// Converts a `String` into a `Lit::Str`.
+    /// Converts a `String` into a `Lit::Str` variant.
     fn from(s: String) -> Self {
         Lit::Str(LitStr { value: s })
     }
 }
 
 impl From<&str> for Lit {
-    /// Converts a `&str` into a `Lit::Str`.
+    /// Converts a `&str` into a `Lit::Str` variant.
     fn from(s: &str) -> Self {
         Lit::Str(LitStr {
             value: s.to_string(),
@@ -219,7 +259,7 @@ impl From<&str> for Lit {
 }
 
 impl From<u64> for Lit {
-    /// Converts a `u64` into a `Lit::Int`.
+    /// Converts a `u64` into a `Lit::Int` variant.
     fn from(i: u64) -> Self {
         Lit::Int(LitInt {
             value: i as u128,
@@ -229,7 +269,7 @@ impl From<u64> for Lit {
 }
 
 impl From<i32> for Lit {
-    /// Converts an `i32` into a `Lit::Int`.
+    /// Converts an `i32` into a `Lit::Int` variant.
     fn from(i: i32) -> Self {
         Lit::Int(LitInt {
             value: i as u128,
@@ -239,7 +279,7 @@ impl From<i32> for Lit {
 }
 
 impl From<bool> for Lit {
-    /// Converts a `bool` into a `Lit::Bool`.
+    /// Converts a `bool` into a `Lit::Bool` variant.
     fn from(b: bool) -> Self {
         Lit::Bool(LitBool { value: b })
     }

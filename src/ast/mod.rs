@@ -6,10 +6,15 @@
 
 /// Defines the AST node for an associated type in a trait.
 pub mod associated_type;
+/// Defines the AST nodes for attributes.
 pub mod attributes;
+/// Defines the AST nodes for comments.
 pub mod comments;
+/// Defines the AST nodes for expressions.
 pub mod expressions;
+/// Defines the AST node for a file.
 pub mod file;
+/// Defines the AST nodes for generics.
 pub mod generics;
 /// Defines the AST node for a `const` item.
 pub mod item_const;
@@ -33,11 +38,22 @@ pub mod item_type;
 pub mod item_union;
 /// Defines the AST node for a `use` item.
 pub mod item_use;
+/// Defines the AST nodes for items.
 pub mod items;
+/// Defines the AST nodes for literals.
 pub mod literals;
+/// Defines the AST nodes for metadata.
 pub mod metadata;
+/// Defines the AST nodes for statements.
 pub mod statements;
+/// Defines the AST nodes for tokens.
 pub mod tokens;
+/// Defines the AST nodes for types.
+pub mod types;
+/// Defines the AST nodes for patterns.
+pub mod patterns;
+/// Defines the builder API for constructing AST nodes.
+pub mod builder;
 
 pub use associated_type::*;
 pub use attributes::*;
@@ -59,14 +75,8 @@ pub use items::*;
 pub use literals::*;
 pub use metadata::*;
 pub use statements::*;
-
-pub mod types;
 pub use types::*;
-
-pub mod patterns;
 pub use patterns::*;
-
-pub mod builder;
 pub use builder::*;
 pub use generics::*;
 pub use tokens::*;

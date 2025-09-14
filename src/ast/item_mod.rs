@@ -4,18 +4,20 @@ use crate::pretty_printer::{BreakStyle, PrettyPrinter, Printer};
 use std::fmt;
 use thin_vec::ThinVec;
 
-/// A `mod` item: `mod my_module;` or `mod my_module { ... }`
+/// A module, such as `mod my_module;` or `mod my_module { ... }`.
 #[derive(Debug, Clone, PartialEq)]
 pub struct ItemMod {
     /// The name of the module.
     pub ident: String,
-    /// The content of the module, if any.
+    /// The content of the module. If this is `None`, the module is declared
+    /// with a semicolon, and the content is in a separate file.
     pub content: Option<ThinVec<Item>>,
-    /// Metadata about the mod item.
+    /// Metadata about the module, including attributes and comments.
     pub md: Option<Box<Md>>,
 }
 
 impl fmt::Display for ItemMod {
+    /// Formats the `ItemMod` using the pretty-printer.
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut printer = Printer::new(f);
         self.pretty_print(&mut printer)?;
@@ -24,6 +26,7 @@ impl fmt::Display for ItemMod {
 }
 
 impl PrettyPrinter for ItemMod {
+    /// Pretty-prints the `ItemMod` to the given printer.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         metadata::pp_begin(&self.md, printer)?;
         printer.string("mod ");

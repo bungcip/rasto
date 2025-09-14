@@ -4,13 +4,19 @@ The project follows the standard Rust project layout.
 
 ## Project Structure
 
--   `src/lib.rs`: The main library file, which exports the `ast` and `pretty_printer_v2` modules.
+-   `src/lib.rs`: The main library file, which exports the `ast` and `pretty_printer` modules.
 -   `src/ast/`: This directory contains the definitions for the AST nodes. Each file in this directory corresponds to a specific part of the AST, such as expressions, statements, or items.
--   `src/pretty_printer_v2.rs`: This file contains the implementation of the pretty-printer. It uses a token-based approach inspired by Philip Wadler's "A Prettier Printer".
+    -   `src/ast/mod.rs`: The root of the `ast` module, which exports all the AST nodes.
+    -   `src/ast/builder.rs`: A fluent builder API for constructing AST nodes programmatically.
+-   `src/pretty_printer.rs`: This file contains the implementation of the pretty-printer. It uses a token-based approach inspired by Philip Wadler's "A Prettier Printer".
 -   `tests/`: Contains the integration tests, which use snapshot testing with `insta`.
 -   `Cargo.toml`: The package manifest for Rust's package manager, Cargo.
 
-## Running Tests
+## Contributing
+
+When contributing to this project, please ensure that any new public items are fully documented. The build will fail if any public items are missing documentation.
+
+### Running Tests
 
 The tests use snapshot testing with the `insta` crate. To run the tests, use the following command:
 
@@ -24,7 +30,7 @@ If the snapshot tests fail because of intentional changes, you can review and up
 cargo insta review
 ```
 
-## Documentation
+### Documentation
 
 All public items in the crate are documented with doc comments. The documentation can be generated and viewed locally using `cargo doc --open`.
 

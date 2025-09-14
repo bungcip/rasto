@@ -57,5 +57,8 @@
 //! // Trailing comment.
 //! ```
 
+/// The `ast` module contains the definitions for the Abstract Syntax Tree (AST) nodes.
 pub mod ast;
+/// The `pretty_printer` module provides a flexible and efficient way to format Rust code from an
+/// Abstract Syntax Tree (AST).
 pub mod pretty_printer;

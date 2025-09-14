@@ -4,7 +4,7 @@ use crate::ast::types::Type;
 use crate::pretty_printer::{PrettyPrinter, Printer};
 use std::fmt;
 
-/// A `const` item: `const MAX: u16 = 234342;`
+/// A `const` item, such as `const MAX: u16 = 234342;`.
 #[derive(Debug, Clone, PartialEq)]
 pub struct ItemConst {
     /// The name of the const item.
@@ -13,11 +13,12 @@ pub struct ItemConst {
     pub ty: Type,
     /// The value of the const item.
     pub expr: Box<Expr>,
-    /// Metadata about the const item.
+    /// Metadata about the const item, including attributes and comments.
     pub md: Option<Box<Md>>,
 }
 
 impl fmt::Display for ItemConst {
+    /// Formats the `ItemConst` using the pretty-printer.
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut printer = Printer::new(f);
         self.pretty_print(&mut printer)?;
@@ -26,6 +27,7 @@ impl fmt::Display for ItemConst {
 }
 
 impl PrettyPrinter for ItemConst {
+    /// Pretty-prints the `ItemConst` to the given printer.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         metadata::pp_begin(&self.md, printer)?;
         printer.string("const ");

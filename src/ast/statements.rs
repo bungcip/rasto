@@ -28,20 +28,20 @@ pub struct Block {
 /// A statement in a block.
 #[derive(Debug, Clone, PartialEq)]
 pub enum Stmt {
-    /// A local (let) binding.
+    /// A local (let) binding, such as `let x = 1;`.
     Local(Local),
-    /// An item definition.
+    /// An item definition, such as a function or struct.
     Item(Item),
-    /// An expression statement.
+    /// An expression statement, which is an expression followed by a semicolon.
     Expr(Expr),
-    /// A macro call.
+    /// A macro call that is treated as a statement.
     MacCall(ExprMacroCall),
 }
 
-/// A `let` statement: `let x = 1;`.
+/// A `let` statement, such as `let x: i32 = 1;`.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Local {
-    /// The pattern to bind.
+    /// The pattern to bind, e.g., `x` or `(a, b)`.
     pub pat: Pat,
     /// The optional type annotation of the variable.
     pub ty: Option<Type>,

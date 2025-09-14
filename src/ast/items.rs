@@ -59,6 +59,7 @@ pub enum Item {
 }
 
 impl fmt::Display for Item {
+    /// Formats the `Item` using the pretty-printer.
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut printer = Printer::new(f);
         self.pretty_print(&mut printer)?;
@@ -80,11 +81,12 @@ pub struct TraitItemFn {
     pub sig: Signature,
     /// An optional default implementation of the function.
     pub block: Option<Block>,
-    /// Metadata about the function.
+    /// Metadata about the function, including attributes and comments.
     pub md: Option<Box<Md>>,
 }
 
 impl fmt::Display for ItemFn {
+    /// Formats the `ItemFn` using the pretty-printer.
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut printer = Printer::new(f);
         self.pretty_print(&mut printer)?;
@@ -93,6 +95,7 @@ impl fmt::Display for ItemFn {
 }
 
 impl fmt::Display for ItemStruct {
+    /// Formats the `ItemStruct` using the pretty-printer.
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut printer = Printer::new(f);
         self.pretty_print(&mut printer)?;
@@ -101,6 +104,7 @@ impl fmt::Display for ItemStruct {
 }
 
 impl fmt::Display for ItemEnum {
+    /// Formats the `ItemEnum` using the pretty-printer.
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut printer = Printer::new(f);
         self.pretty_print(&mut printer)?;
@@ -109,6 +113,7 @@ impl fmt::Display for ItemEnum {
 }
 
 impl fmt::Display for ItemImpl {
+    /// Formats the `ItemImpl` using the pretty-printer.
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut printer = Printer::new(f);
         self.pretty_print(&mut printer)?;
@@ -117,6 +122,7 @@ impl fmt::Display for ItemImpl {
 }
 
 impl fmt::Display for ItemTrait {
+    /// Formats the `ItemTrait` using the pretty-printer.
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut printer = Printer::new(f);
         self.pretty_print(&mut printer)?;
@@ -124,7 +130,7 @@ impl fmt::Display for ItemTrait {
     }
 }
 
-/// A struct item: `struct Foo { ... }`.
+/// A struct definition.
 #[derive(Debug, Clone, PartialEq)]
 pub struct ItemStruct {
     /// The name of the struct.
@@ -133,7 +139,7 @@ pub struct ItemStruct {
     pub generics: GenericParams,
     /// The fields of the struct.
     pub fields: ThinVec<Field>,
-    /// Metadata about the struct.
+    /// Metadata about the struct, including attributes and comments.
     pub md: Option<Box<Md>>,
 }
 
@@ -144,11 +150,11 @@ pub struct Field {
     pub ident: String,
     /// The type of the field.
     pub ty: Type,
-    /// Metadata about the field.
+    /// Metadata about the field, including attributes and comments.
     pub md: Option<Box<Md>>,
 }
 
-/// An enum item: `enum Foo { ... }`.
+/// An enum definition.
 #[derive(Debug, Clone, PartialEq)]
 pub struct ItemEnum {
     /// The name of the enum.
@@ -157,7 +163,7 @@ pub struct ItemEnum {
     pub generics: GenericParams,
     /// The variants of the enum.
     pub variants: ThinVec<Variant>,
-    /// Metadata about the enum.
+    /// Metadata about the enum, including attributes and comments.
     pub md: Option<Box<Md>>,
 }
 
@@ -166,33 +172,31 @@ pub struct ItemEnum {
 pub struct Variant {
     /// The name of the variant.
     pub ident: String,
-    /// Metadata about the variant.
+    /// Metadata about the variant, including attributes and comments.
     pub md: Option<Box<Md>>,
 }
 
-/// An `impl` block: `impl Foo { ... }`.
+/// An `impl` block.
 #[derive(Debug, Clone, PartialEq)]
 pub struct ItemImpl {
     /// The type the `impl` block is for.
     pub ty: Type,
-
-    /// generic
+    /// The generic parameters of the `impl` block.
     pub generics: GenericParams,
-
     /// The functions within the `impl` block.
     pub fns: ThinVec<ItemFn>,
-    /// Metadata about the `impl` block.
+    /// Metadata about the `impl` block, including attributes and comments.
     pub md: Option<Box<Md>>,
 }
 
-/// A function item: `fn foo() { ... }`.
+/// A function definition.
 #[derive(Debug, Clone, PartialEq)]
 pub struct ItemFn {
     /// The function signature.
     pub sig: Signature,
     /// The function body.
     pub block: Block,
-    /// Metadata about the function.
+    /// Metadata about the function, including attributes and comments.
     pub md: Option<Box<Md>>,
 }
 
@@ -211,95 +215,105 @@ pub struct Signature {
 }
 
 impl From<ItemFn> for Item {
-    /// Converts an `ItemFn` into an `Item`.
+    /// Converts an `ItemFn` into an `Item::Fn` variant.
     fn from(item: ItemFn) -> Self {
         Item::Fn(item)
     }
 }
 
 impl From<ItemStruct> for Item {
-    /// Converts an `ItemStruct` into an `Item`.
+    /// Converts an `ItemStruct` into an `Item::Struct` variant.
     fn from(item: ItemStruct) -> Self {
         Item::Struct(item)
     }
 }
 
 impl From<ItemEnum> for Item {
-    /// Converts an `ItemEnum` into an `Item`.
+    /// Converts an `ItemEnum` into an `Item::Enum` variant.
     fn from(item: ItemEnum) -> Self {
         Item::Enum(item)
     }
 }
 
 impl From<ItemImpl> for Item {
-    /// Converts an `ItemImpl` into an `Item`.
+    /// Converts an `ItemImpl` into an `Item::Impl` variant.
     fn from(item: ItemImpl) -> Self {
         Item::Impl(item)
     }
 }
 
 impl From<ItemTrait> for Item {
-    /// Converts an `ItemTrait` into an `Item`.
+    /// Converts an `ItemTrait` into an `Item::Trait` variant.
     fn from(item: ItemTrait) -> Self {
         Item::Trait(item)
     }
 }
 
 impl From<ItemConst> for Item {
+    /// Converts an `ItemConst` into an `Item::Const` variant.
     fn from(item: ItemConst) -> Self {
         Item::Const(item)
     }
 }
 
 impl From<ItemExternCrate> for Item {
+    /// Converts an `ItemExternCrate` into an `Item::ExternCrate` variant.
     fn from(item: ItemExternCrate) -> Self {
         Item::ExternCrate(item)
     }
 }
 
 impl From<ItemForeignMod> for Item {
+    /// Converts an `ItemForeignMod` into an `Item::ForeignMod` variant.
     fn from(item: ItemForeignMod) -> Self {
         Item::ForeignMod(item)
     }
 }
 
 impl From<ItemMacro> for Item {
+    /// Converts an `ItemMacro` into an `Item::Macro` variant.
     fn from(item: ItemMacro) -> Self {
         Item::Macro(item)
     }
 }
 
 impl From<ItemMod> for Item {
+    /// Converts an `ItemMod` into an `Item::Mod` variant.
     fn from(item: ItemMod) -> Self {
         Item::Mod(item)
     }
 }
 
 impl From<ItemStatic> for Item {
+    /// Converts an `ItemStatic` into an `Item::Static` variant.
     fn from(item: ItemStatic) -> Self {
         Item::Static(item)
     }
 }
 
 impl From<ItemTraitAlias> for Item {
+    /// Converts an `ItemTraitAlias` into an `Item::TraitAlias` variant.
     fn from(item: ItemTraitAlias) -> Self {
         Item::TraitAlias(item)
     }
 }
 
 impl From<ItemType> for Item {
+    /// Converts an `ItemType` into an `Item::Type` variant.
     fn from(item: ItemType) -> Self {
         Item::Type(item)
     }
 }
 
 impl From<ItemUnion> for Item {
+    /// Converts an `ItemUnion` into an `Item::Union` variant.
     fn from(item: ItemUnion) -> Self {
         Item::Union(item)
     }
 }
 
 impl From<ItemUse> for Item {
+    /// Converts an `ItemUse` into an `Item::Use` variant.
     fn from(item: ItemUse) -> Self {
         Item::Use(item)
     }

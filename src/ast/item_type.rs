@@ -4,7 +4,7 @@ use crate::ast::types::Type;
 use crate::pretty_printer::{PrettyPrinter, Printer};
 use std::fmt;
 
-/// A `type` item: `type MyResult<T> = Result<T, MyError>;`
+/// A type alias, such as `type MyResult<T> = Result<T, MyError>;`.
 #[derive(Debug, Clone, PartialEq)]
 pub struct ItemType {
     /// The name of the type alias.
@@ -13,11 +13,12 @@ pub struct ItemType {
     pub generics: GenericParams,
     /// The type being aliased.
     pub ty: Type,
-    /// Metadata about the type item.
+    /// Metadata about the type item, including attributes and comments.
     pub md: Option<Box<Md>>,
 }
 
 impl fmt::Display for ItemType {
+    /// Formats the `ItemType` using the pretty-printer.
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut printer = Printer::new(f);
         self.pretty_print(&mut printer)?;
@@ -26,6 +27,7 @@ impl fmt::Display for ItemType {
 }
 
 impl PrettyPrinter for ItemType {
+    /// Pretty-prints the `ItemType` to the given printer.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         metadata::pp_begin(&self.md, printer)?;
         printer.string("type ");

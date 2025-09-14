@@ -12,8 +12,12 @@ use thin_vec::ThinVec;
 #[derive(Debug, Clone, PartialEq)]
 pub enum Attribute {
     /// An inner attribute, such as `#![allow(dead_code)]`.
+    ///
+    /// Inner attributes apply to the item that contains them.
     Inner(Meta),
     /// An outer attribute, such as `#[repr(C)]`.
+    ///
+    /// Outer attributes apply to the item that follows them.
     Outer(Meta),
 }
 
@@ -22,9 +26,10 @@ pub enum Attribute {
 /// For example, in `#[repr(C)]`, the meta item is `repr(C)`.
 #[derive(Debug, Clone, PartialEq)]
 pub enum Meta {
-    /// A meta list, such as `repr(C)`.
+    /// A meta list, such as `repr(C)`. This is a path followed by a list of
+    /// meta items in parentheses.
     List(MetaList),
-    /// A meta path, such as `test`.
+    /// A meta path, such as `test`. This is a single path.
     Path(String),
     /// A meta name-value pair, such as `key = "value"`.
     NameValue(MetaNameValue),
@@ -49,6 +54,7 @@ pub struct MetaNameValue {
 }
 
 impl PrettyPrinter for Attribute {
+    /// Pretty-prints the `Attribute` to the given printer.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         match self {
             Attribute::Inner(meta) => {
@@ -67,6 +73,7 @@ impl PrettyPrinter for Attribute {
 }
 
 impl PrettyPrinter for Meta {
+    /// Pretty-prints the `Meta` to the given printer.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         match self {
             Meta::List(list) => list.pretty_print(printer),
@@ -80,6 +87,7 @@ impl PrettyPrinter for Meta {
 }
 
 impl PrettyPrinter for MetaList {
+    /// Pretty-prints the `MetaList` to the given printer.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string(&self.path);
         printer.string("(");
@@ -95,6 +103,7 @@ impl PrettyPrinter for MetaList {
 }
 
 impl PrettyPrinter for MetaNameValue {
+    /// Pretty-prints the `MetaNameValue` to the given printer.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string(&self.path);
         printer.string(" = ");
@@ -103,6 +112,9 @@ impl PrettyPrinter for MetaNameValue {
 }
 
 impl From<&str> for Meta {
+    /// Converts a string slice into a `Meta::Path`.
+    ///
+    /// This is a convenience function for creating simple path-based meta items.
     fn from(value: &str) -> Meta {
         Meta::Path(value.into())
     }

@@ -80,37 +80,37 @@ pub enum UnOp {
     Neg,
 }
 
-/// A unary expression: `!x` or `-x`.
+/// A unary expression, such as `!x` or `-x`.
 #[derive(Debug, Clone, PartialEq)]
 pub struct ExprUnary {
-    /// The unary operator.
+    /// The unary operator, e.g., `!` or `-`.
     pub op: UnOp,
-    /// The expression.
+    /// The expression the operator is applied to.
     pub expr: Box<Expr>,
 }
 
-/// An array expression: `[a, b, c]`.
+/// An array expression, such as `[a, b, c]`.
 #[derive(Debug, Clone, PartialEq)]
 pub struct ExprArray {
     /// The elements of the array.
     pub elems: ThinVec<Expr>,
 }
 
-/// An `async` block: `async { ... }`.
+/// An `async` block, such as `async { ... }`.
 #[derive(Debug, Clone, PartialEq)]
 pub struct ExprAsync {
     /// The block of statements inside the `async` block.
     pub block: Block,
 }
 
-/// An `await` expression: `future.await`.
+/// An `await` expression, such as `future.await`.
 #[derive(Debug, Clone, PartialEq)]
 pub struct ExprAwait {
     /// The future to `await`.
     pub expr: Box<Expr>,
 }
 
-/// A binary operation: `a + b`.
+/// A binary operation, such as `a + b`.
 #[derive(Debug, Clone, PartialEq)]
 pub struct ExprBinary {
     /// The left-hand side of the operation.
@@ -125,17 +125,17 @@ pub struct ExprBinary {
 #[derive(Debug, Clone, PartialEq)]
 pub struct ExprBreak;
 
-/// A function call expression: `foo(a, b)`.
+/// A function call expression, such as `foo(a, b)`.
 #[derive(Debug, Clone, PartialEq)]
 pub struct ExprCall {
-    /// The function to call.
+    /// The function to call. This can be a path to a function or a closure.
     pub func: Box<Expr>,
     /// The arguments to the function.
     pub args: ThinVec<Expr>,
 }
 
 use crate::ast::types::Type;
-/// A type cast expression: `x as u32`.
+/// A type cast expression, such as `x as u32`.
 #[derive(Debug, Clone, PartialEq)]
 pub struct ExprCast {
     /// The expression to cast.
@@ -144,7 +144,7 @@ pub struct ExprCast {
     pub ty: Type,
 }
 
-/// A closure expression: `|a, b| a + b`.
+/// A closure expression, such as `|a, b| a + b`.
 #[derive(Debug, Clone, PartialEq)]
 pub struct ExprClosure {
     /// The input parameters of the closure.
@@ -153,7 +153,7 @@ pub struct ExprClosure {
     pub body: Box<Expr>,
 }
 
-/// A `const` block: `const { ... }`.
+/// A `const` block, such as `const { ... }`.
 #[derive(Debug, Clone, PartialEq)]
 pub struct ExprConst {
     /// The block of statements inside the `const` block.
@@ -164,7 +164,7 @@ pub struct ExprConst {
 #[derive(Debug, Clone, PartialEq)]
 pub struct ExprContinue;
 
-/// A field access expression: `stru.field`.
+/// A field access expression, such as `stru.field`.
 #[derive(Debug, Clone, PartialEq)]
 pub struct ExprField {
     /// The expression to access the field from.
@@ -173,7 +173,7 @@ pub struct ExprField {
     pub member: String,
 }
 
-/// An index expression: `arr[i]`.
+/// An index expression, such as `arr[i]`.
 #[derive(Debug, Clone, PartialEq)]
 pub struct ExprIndex {
     /// The expression to index into.
@@ -182,7 +182,7 @@ pub struct ExprIndex {
     pub index: Box<Expr>,
 }
 
-/// A `match` expression: `match x { ... }`.
+/// A `match` expression, such as `match x { ... }`.
 #[derive(Debug, Clone, PartialEq)]
 pub struct ExprMatch {
     /// The expression to match on.
@@ -202,7 +202,7 @@ pub struct Arm {
     pub body: Box<Expr>,
 }
 
-/// A method call expression: `obj.method(a, b)`.
+/// A method call expression, such as `obj.method(a, b)`.
 #[derive(Debug, Clone, PartialEq)]
 pub struct ExprMethodCall {
     /// The receiver of the method call.
@@ -213,14 +213,14 @@ pub struct ExprMethodCall {
     pub args: ThinVec<Expr>,
 }
 
-/// A parenthesized expression: `(a + b)`.
+/// A parenthesized expression, such as `(a + b)`.
 #[derive(Debug, Clone, PartialEq)]
 pub struct ExprParen {
     /// The expression inside the parentheses.
     pub expr: Box<Expr>,
 }
 
-/// A range expression: `a..b`, `a..=b`, `..b`, `a..`.
+/// A range expression, such as `a..b`, `a..=b`, `..b`, `a..`.
 #[derive(Debug, Clone, PartialEq)]
 pub struct ExprRange {
     /// The optional start of the range.
@@ -240,7 +240,7 @@ pub enum RangeLimits {
     Closed,
 }
 
-/// A reference expression: `&x` or `&mut x`.
+/// A reference expression, such as `&x` or `&mut x`.
 #[derive(Debug, Clone, PartialEq)]
 pub struct ExprRef {
     /// `true` if the reference is mutable (`&mut`).
@@ -249,14 +249,14 @@ pub struct ExprRef {
     pub expr: Box<Expr>,
 }
 
-/// A `return` expression: `return x`.
+/// A `return` expression, such as `return x`.
 #[derive(Debug, Clone, PartialEq)]
 pub struct ExprReturn {
     /// The optional expression to return.
     pub expr: Option<Box<Expr>>,
 }
 
-/// A struct instantiation expression: `Foo { a: 1, b: 2 }`.
+/// A struct instantiation expression, such as `Foo { a: 1, b: 2 }`.
 #[derive(Debug, Clone, PartialEq)]
 pub struct ExprStruct {
     /// The path to the struct type.
@@ -274,7 +274,7 @@ pub struct FieldValue {
     pub value: Expr,
 }
 
-/// A tuple expression: `(a, b, c)`.
+/// A tuple expression, such as `(a, b, c)`.
 #[derive(Debug, Clone, PartialEq)]
 pub struct ExprTuple {
     /// The elements of the tuple.
@@ -294,7 +294,7 @@ pub enum BinOp {
     Div,
 }
 
-/// An `if` expression: `if x { y } else { z }`.
+/// An `if` expression, such as `if x { y } else { z }`.
 #[derive(Debug, Clone, PartialEq)]
 pub struct ExprIf {
     /// The condition of the `if` expression.
@@ -305,21 +305,21 @@ pub struct ExprIf {
     pub else_branch: Option<Box<Expr>>,
 }
 
-/// A block expression: `{ ... }`.
+/// A block expression, such as `{ ... }`.
 #[derive(Debug, Clone, PartialEq)]
 pub struct ExprBlock {
     /// The block of statements.
     pub block: Block,
 }
 
-/// A `loop` expression: `loop { ... }`.
+/// A `loop` expression, such as `loop { ... }`.
 #[derive(Debug, Clone, PartialEq)]
 pub struct ExprLoop {
     /// The body of the loop.
     pub body: Block,
 }
 
-/// A `while` loop expression: `while x { ... }`.
+/// A `while` loop expression, such as `while x { ... }`.
 #[derive(Debug, Clone, PartialEq)]
 pub struct ExprWhile {
     /// The condition of the `while` loop.
@@ -328,7 +328,7 @@ pub struct ExprWhile {
     pub body: Block,
 }
 
-/// A `for` loop expression: `for pat in iter { ... }`.
+/// A `for` loop expression, such as `for pat in iter { ... }`.
 #[derive(Debug, Clone, PartialEq)]
 pub struct ExprFor {
     /// The pattern to bind the elements of the iterator.
@@ -339,7 +339,7 @@ pub struct ExprFor {
     pub body: Block,
 }
 
-/// An assignment expression: `x = y`.
+/// An assignment expression, such as `x = y`.
 #[derive(Debug, Clone, PartialEq)]
 pub struct ExprAssign {
     /// The left-hand side of the assignment.
@@ -348,7 +348,7 @@ pub struct ExprAssign {
     pub right: Box<Expr>,
 }
 
-/// A macro call expression: `foo!(...)`.
+/// A macro call expression, such as `foo!(...)`.
 #[derive(Debug, Clone, PartialEq)]
 pub struct ExprMacroCall {
     /// The name of the macro being called.
@@ -357,18 +357,18 @@ pub struct ExprMacroCall {
     pub tokens: TokenStream,
 }
 
-/// A path expression: `foo::bar::baz`.
+/// A path expression, such as `foo::bar::baz`.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Path {
     /// The segments of the path.
     pub segments: ThinVec<PathSegment>,
 }
 
-/// A segment of a path.
+/// A segment of a path, such as `foo` or `bar`.
 #[derive(Debug, Clone, PartialEq)]
 pub struct PathSegment {
     /// The identifier of the segment.
     pub ident: String,
-    /// The generic arguments of the segment.
+    /// The generic arguments of the segment, such as `<T>`.
     pub args: Option<GenericArgs>,
 }
