@@ -1,11 +1,5 @@
-use rasto::ast::{
-    Item, TokenStream, Type,
-    builder::{
-        const_kind, def_item, extern_crate_item, fn_def, foreign_mod_item, macro_item, mod_item,
-        static_kind, trait_alias_item, trait_def, type_alias_kind, union_item, use_item,
-    },
-    expr,
-};
+use rasto::ast::{Item, TokenStream, Type};
+use rasto::builder::*;
 use thin_vec::thin_vec;
 
 #[test]
@@ -29,9 +23,6 @@ fn test_extern_crate_item() {
     let item = extern_crate_item("serde").build();
     insta::assert_snapshot!(item.to_string());
 }
-
-use rasto::ast::builder::associated_type;
-use rasto::ast::builder::block;
 
 #[test]
 fn test_foreign_mod_item() {

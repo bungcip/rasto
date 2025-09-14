@@ -8,8 +8,6 @@
 pub mod associated_type;
 /// Defines the AST nodes for attributes.
 pub mod attributes;
-/// Defines the builder API for constructing AST nodes.
-pub mod builder;
 /// Defines the AST nodes for comments.
 pub mod comments;
 /// Defines the AST nodes for expressions.
@@ -53,7 +51,6 @@ pub mod types;
 
 pub use associated_type::*;
 pub use attributes::*;
-pub use builder::*;
 pub use comments::*;
 pub use expressions::*;
 pub use file::*;

@@ -1,30 +1,18 @@
-use rasto::ast::builder::{
-    block, comment, enum_def, file, fn_def, pat, stmt, struct_def, trait_def,
-};
 use rasto::ast::*;
+use rasto::builder::{
+    block, comment, enum_def, expr, file, fn_def, impl_block, pat, stmt, struct_def, trait_def,
+};
 use rasto::pretty_printer::{PrettyPrinter, Printer};
 use thin_vec::thin_vec;
 
 mod patterns;
 
-fn pretty_print_item(item: Item) -> String {
+fn pretty(ast: &dyn PrettyPrinter) -> String {
     let mut buf = String::new();
     let mut printer = Printer::new(&mut buf);
-    item.pretty_print(&mut printer).unwrap();
+    ast.pretty_print(&mut printer).unwrap();
     printer.finish().unwrap();
     buf
-}
-
-fn pretty_print_comment(comment: Comment) -> String {
-    let mut buf = String::new();
-    let mut printer = Printer::new(&mut buf);
-    comment.pretty_print(&mut printer).unwrap();
-    printer.finish().unwrap();
-    buf
-}
-
-fn pretty_print_file(file: File) -> String {
-    file.to_string()
 }
 
 #[test]
@@ -41,28 +29,25 @@ fn test_file() {
             fn_def("foo")
                 .input(pat().ident("a", false))
                 .output("i32")
-                .block(
-                    block()
-                        .statement(expr().lit(42))
-                )
-                .build()
+                .block(block().statement(expr().lit(42)))
+                .build(),
         )
         .build();
 
-    insta::assert_snapshot!(pretty_print_file(ast));
+    insta::assert_snapshot!(pretty(&ast));
 }
 
 #[test]
 fn test_block_single_comment() {
     let single = comment().block("Block comment with single line");
-    insta::assert_snapshot!(pretty_print_comment(single));
+    insta::assert_snapshot!(pretty(&single));
 }
 
 #[test]
 fn test_block_multiline_comment() {
     let single =
         comment().block("Block comment with multi line 1\nBlock comment with multi line 2");
-    insta::assert_snapshot!(pretty_print_comment(single));
+    insta::assert_snapshot!(pretty(&single));
 }
 
 #[test]
@@ -85,7 +70,7 @@ fn test_fn() {
             .build(),
     );
 
-    insta::assert_snapshot!(pretty_print_item(ast));
+    insta::assert_snapshot!(pretty(&ast));
 }
 
 #[test]
@@ -96,44 +81,19 @@ fn test_block_with_comments() {
         .trailing_comment(comment().line(" trailing comment"))
         .build();
 
-    let mut buf = String::new();
-    let mut printer = Printer::new(&mut buf);
-    ast.pretty_print(&mut printer).unwrap();
-    printer.finish().unwrap();
-
-    insta::assert_snapshot!(buf);
+    insta::assert_snapshot!(pretty(&ast));
 }
 
 #[test]
 fn unary_expression() {
-    let expr = expr().unary(UnOp::Neg, expr().lit(42));
-
-    let mut output = String::new();
-    let mut printer = Printer::new(&mut output);
-    expr.pretty_print(&mut printer).unwrap();
-    printer.finish().unwrap();
-
-    insta::assert_snapshot!(output, @"-42");
+    let ast = expr().unary(UnOp::Neg, expr().lit(42));
+    insta::assert_snapshot!(pretty(&ast), @"-42");
 }
 
 #[test]
 fn unary_expression_not() {
-    let expr = expr().unary(UnOp::Not, expr().lit(true));
-
-    let mut output = String::new();
-    let mut printer = Printer::new(&mut output);
-    expr.pretty_print(&mut printer).unwrap();
-    printer.finish().unwrap();
-
-    insta::assert_snapshot!(output, @"!true");
-}
-
-fn pretty_print_expr(expr: Expr) -> String {
-    let mut buf = String::new();
-    let mut printer = Printer::new(&mut buf);
-    expr.pretty_print(&mut printer).unwrap();
-    printer.finish().unwrap();
-    buf
+    let ast = expr().unary(UnOp::Not, expr().lit(true));
+    insta::assert_snapshot!(pretty(&ast), @"!true");
 }
 
 #[test]
@@ -141,17 +101,15 @@ fn test_expr_array() {
     let ast = Expr::Array(ExprArray {
         elems: thin_vec![Expr::Lit(1.into()), Expr::Lit(2.into())],
     });
-    insta::assert_snapshot!(pretty_print_expr(ast));
+    insta::assert_snapshot!(pretty(&ast));
 }
 
 #[test]
 fn test_expr_async() {
     let ast = Expr::Async(ExprAsync {
-        block: block()
-            .statement(expr().lit(1))
-            .build(),
+        block: block().statement(expr().lit(1)).build(),
     });
-    insta::assert_snapshot!(pretty_print_expr(ast));
+    insta::assert_snapshot!(pretty(&ast));
 }
 
 #[test]
@@ -159,13 +117,13 @@ fn test_expr_await() {
     let ast = Expr::Await(ExprAwait {
         expr: Box::new(Expr::Lit("future".into())),
     });
-    insta::assert_snapshot!(pretty_print_expr(ast));
+    insta::assert_snapshot!(pretty(&ast));
 }
 
 #[test]
 fn test_expr_break() {
     let ast = Expr::Break(ExprBreak);
-    insta::assert_snapshot!(pretty_print_expr(ast));
+    insta::assert_snapshot!(pretty(&ast));
 }
 
 #[test]
@@ -174,7 +132,7 @@ fn test_expr_call() {
         func: Box::new(Expr::Lit("foo".into())),
         args: thin_vec![Expr::Lit(1.into()), Expr::Lit(2.into())],
     });
-    insta::assert_snapshot!(pretty_print_expr(ast));
+    insta::assert_snapshot!(pretty(&ast));
 }
 
 #[test]
@@ -183,7 +141,7 @@ fn test_expr_cast() {
         expr: Box::new(Expr::Lit("x".into())),
         ty: "u32".into(),
     });
-    insta::assert_snapshot!(pretty_print_expr(ast));
+    insta::assert_snapshot!(pretty(&ast));
 }
 
 #[test]
@@ -192,23 +150,21 @@ fn test_expr_closure() {
         inputs: thin_vec![pat().ident("a", false), pat().ident("b", false)],
         body: Box::new(Expr::Lit(1.into())),
     });
-    insta::assert_snapshot!(pretty_print_expr(ast));
+    insta::assert_snapshot!(pretty(&ast));
 }
 
 #[test]
 fn test_expr_const() {
     let ast = Expr::Const(ExprConst {
-        block: block()
-            .statement(Stmt::Expr(Expr::Lit(1.into())))
-            .build(),
+        block: block().statement(Stmt::Expr(Expr::Lit(1.into()))).build(),
     });
-    insta::assert_snapshot!(pretty_print_expr(ast));
+    insta::assert_snapshot!(pretty(&ast));
 }
 
 #[test]
 fn test_expr_continue() {
     let ast = Expr::Continue(ExprContinue);
-    insta::assert_snapshot!(pretty_print_expr(ast));
+    insta::assert_snapshot!(pretty(&ast));
 }
 
 #[test]
@@ -217,7 +173,7 @@ fn test_expr_field() {
         expr: Box::new(Expr::Lit("stru".into())),
         member: "field".to_string(),
     });
-    insta::assert_snapshot!(pretty_print_expr(ast));
+    insta::assert_snapshot!(pretty(&ast));
 }
 
 #[test]
@@ -226,7 +182,7 @@ fn test_expr_index() {
         expr: Box::new(Expr::Lit("arr".into())),
         index: Box::new(Expr::Lit(0.into())),
     });
-    insta::assert_snapshot!(pretty_print_expr(ast));
+    insta::assert_snapshot!(pretty(&ast));
 }
 
 #[test]
@@ -249,7 +205,7 @@ fn test_expr_match() {
             },
         ],
     });
-    insta::assert_snapshot!(pretty_print_expr(ast));
+    insta::assert_snapshot!(pretty(&ast));
 }
 
 #[test]
@@ -259,7 +215,7 @@ fn test_expr_method_call() {
         method: "method".to_string(),
         args: thin_vec![Expr::Lit(1.into()), Expr::Lit(2.into())],
     });
-    insta::assert_snapshot!(pretty_print_expr(ast));
+    insta::assert_snapshot!(pretty(&ast));
 }
 
 #[test]
@@ -267,7 +223,7 @@ fn test_expr_paren() {
     let ast = Expr::Paren(ExprParen {
         expr: Box::new(Expr::Lit(1.into())),
     });
-    insta::assert_snapshot!(pretty_print_expr(ast));
+    insta::assert_snapshot!(pretty(&ast));
 }
 
 #[test]
@@ -277,7 +233,7 @@ fn test_expr_range() {
         limits: RangeLimits::HalfOpen,
         end: Some(Box::new(Expr::Lit(5.into()))),
     });
-    insta::assert_snapshot!(pretty_print_expr(ast));
+    insta::assert_snapshot!(pretty(&ast));
 }
 
 #[test]
@@ -286,7 +242,7 @@ fn test_expr_reference() {
         is_mut: true,
         expr: Box::new(Expr::Lit("x".into())),
     });
-    insta::assert_snapshot!(pretty_print_expr(ast));
+    insta::assert_snapshot!(pretty(&ast));
 }
 
 #[test]
@@ -294,7 +250,7 @@ fn test_expr_return() {
     let ast = Expr::Return(ExprReturn {
         expr: Some(Box::new(Expr::Lit(1.into()))),
     });
-    insta::assert_snapshot!(pretty_print_expr(ast));
+    insta::assert_snapshot!(pretty(&ast));
 }
 
 #[test]
@@ -312,7 +268,7 @@ fn test_expr_struct() {
             },
         ],
     });
-    insta::assert_snapshot!(pretty_print_expr(ast));
+    insta::assert_snapshot!(pretty(&ast));
 }
 
 #[test]
@@ -320,7 +276,7 @@ fn test_expr_tuple() {
     let ast = Expr::Tuple(ExprTuple {
         elems: thin_vec![Expr::Lit(1.into()), Expr::Lit(2.into())],
     });
-    insta::assert_snapshot!(pretty_print_expr(ast));
+    insta::assert_snapshot!(pretty(&ast));
 }
 
 #[test]
@@ -341,7 +297,7 @@ fn test_long_enum() {
         ],
     });
 
-    insta::assert_snapshot!(pretty_print_item(ast));
+    insta::assert_snapshot!(pretty(&ast));
 }
 
 #[test]
@@ -357,7 +313,7 @@ fn test_single_field_struct() {
         }],
     });
 
-    insta::assert_snapshot!(pretty_print_item(ast));
+    insta::assert_snapshot!(pretty(&ast));
 }
 
 #[test]
@@ -380,29 +336,26 @@ fn test_nested_struct() {
         ],
     });
 
-    insta::assert_snapshot!(pretty_print_item(ast));
+    insta::assert_snapshot!(pretty(&ast));
 }
 
 #[test]
 fn test_long_binary_expression() {
     let ast = Item::Fn(
         fn_def("foo")
-            .block(
-                block()
-                    .statement(Stmt::Expr(Expr::Binary(ExprBinary {
-                        left: Box::new(Expr::Lit(
-                            "a_very_long_string_that_should_cause_a_line_break".into(),
-                        )),
-                        op: BinOp::Add,
-                        right: Box::new(Expr::Lit(
-                            "another_very_long_string_that_should_also_cause_a_line_break".into(),
-                        )),
-                    })))
-            )
+            .block(block().statement(Stmt::Expr(Expr::Binary(ExprBinary {
+                left: Box::new(Expr::Lit(
+                    "a_very_long_string_that_should_cause_a_line_break".into(),
+                )),
+                op: BinOp::Add,
+                right: Box::new(Expr::Lit(
+                    "another_very_long_string_that_should_also_cause_a_line_break".into(),
+                )),
+            }))))
             .build(),
     );
 
-    insta::assert_snapshot!(pretty_print_item(ast));
+    insta::assert_snapshot!(pretty(&ast));
 }
 
 #[test]
@@ -423,105 +376,84 @@ fn test_trait() {
             .build(),
     );
 
-    insta::assert_snapshot!(pretty_print_item(ast));
+    insta::assert_snapshot!(pretty(&ast));
 }
 
 #[test]
 fn test_loop_expression() {
     let ast = Item::Fn(
         fn_def("foo")
-            .block(
-                block()
-                    .statement(Stmt::Expr(Expr::Loop(ExprLoop {
-                        body: block()
-                            .statement(Stmt::Expr(Expr::Lit(1.into())))
-                            .build()
-                    })))
-            )
+            .block(block().statement(Stmt::Expr(Expr::Loop(ExprLoop {
+                body: block().statement(Stmt::Expr(Expr::Lit(1.into()))).build(),
+            }))))
             .build(),
     );
 
-    insta::assert_snapshot!(pretty_print_item(ast));
+    insta::assert_snapshot!(pretty(&ast));
 }
 
 #[test]
 fn test_while_expression() {
     let ast = Item::Fn(
         fn_def("foo")
-            .block(
-                block()
-                    .statement(Stmt::Expr(Expr::While(ExprWhile {
-                        cond: Box::new(Expr::Lit(1.into())),
-                        body: block()
-                            .statement(Stmt::Expr(Expr::Lit(2.into())))
-                            .build(),
-                    })))
-            )
+            .block(block().statement(Stmt::Expr(Expr::While(ExprWhile {
+                cond: Box::new(Expr::Lit(1.into())),
+                body: block().statement(Stmt::Expr(Expr::Lit(2.into()))).build(),
+            }))))
             .build(),
     );
 
-    insta::assert_snapshot!(pretty_print_item(ast));
+    insta::assert_snapshot!(pretty(&ast));
 }
 
 #[test]
 fn test_for_expression() {
     let ast = Item::Fn(
         fn_def("foo")
-            .block(
-                block()
-                    .statement(Stmt::Expr(Expr::For(ExprFor {
-                        pat: pat().ident("x", false),
-                        expr: Box::new(Expr::Lit(1.into())),
-                        body: block()
-                            .statement(Stmt::Expr(Expr::Lit(2.into())))
-                            .build(),
-                    })))
-            )
+            .block(block().statement(Stmt::Expr(Expr::For(ExprFor {
+                pat: pat().ident("x", false),
+                expr: Box::new(Expr::Lit(1.into())),
+                body: block().statement(Stmt::Expr(Expr::Lit(2.into()))).build(),
+            }))))
             .build(),
     );
 
-    insta::assert_snapshot!(pretty_print_item(ast));
+    insta::assert_snapshot!(pretty(&ast));
 }
 
 #[test]
 fn test_assign_expression() {
     let ast = Item::Fn(
         fn_def("foo")
-            .block(
-                block()
-                    .statement(Stmt::Expr(Expr::Assign(ExprAssign {
-                        left: Box::new(Expr::Lit("x".into())),
-                        right: Box::new(Expr::Lit(1.into())),
-                    })))
-            )
+            .block(block().statement(Stmt::Expr(Expr::Assign(ExprAssign {
+                left: Box::new(Expr::Lit("x".into())),
+                right: Box::new(Expr::Lit(1.into())),
+            }))))
             .build(),
     );
 
-    insta::assert_snapshot!(pretty_print_item(ast));
+    insta::assert_snapshot!(pretty(&ast));
 }
 
 #[test]
 fn test_macro_call_expression() {
     let ast = Item::Fn(
         fn_def("foo")
-            .block(
-                block()
-                    .statement(Stmt::Expr(Expr::MacroCall(ExprMacroCall {
-                        ident: "println".to_string(),
-                        tokens: TokenStream {
-                            tokens: thin_vec![TokenTree::Group(Group {
-                                delimiter: Delimiter::Parenthesis,
-                                stream: TokenStream {
-                                    tokens: thin_vec![TokenTree::Literal("hello".into())],
-                                },
-                            })],
+            .block(block().statement(Stmt::Expr(Expr::MacroCall(ExprMacroCall {
+                ident: "println".to_string(),
+                tokens: TokenStream {
+                    tokens: thin_vec![TokenTree::Group(Group {
+                        delimiter: Delimiter::Parenthesis,
+                        stream: TokenStream {
+                            tokens: thin_vec![TokenTree::Literal("hello".into())],
                         },
-                    })))
-            )
+                    })],
+                },
+            }))))
             .build(),
     );
 
-    insta::assert_snapshot!(pretty_print_item(ast));
+    insta::assert_snapshot!(pretty(&ast));
 }
 
 #[test]
@@ -534,7 +466,7 @@ fn test_enum() {
             .build(),
     );
 
-    insta::assert_snapshot!(pretty_print_item(ast));
+    insta::assert_snapshot!(pretty(&ast));
 }
 
 #[test]
@@ -545,7 +477,7 @@ fn test_impl() {
             .build(),
     );
 
-    insta::assert_snapshot!(pretty_print_item(ast));
+    insta::assert_snapshot!(pretty(&ast));
 }
 
 #[test]
@@ -557,7 +489,7 @@ fn test_trait_impl() {
             .build(),
     );
 
-    insta::assert_snapshot!(pretty_print_item(ast));
+    insta::assert_snapshot!(pretty(&ast));
 }
 
 #[test]
@@ -570,14 +502,14 @@ fn test_unsafe_trait_impl() {
             .build(),
     );
 
-    insta::assert_snapshot!(pretty_print_item(ast));
+    insta::assert_snapshot!(pretty(&ast));
 }
 
 #[test]
 fn test_negative_impl() {
     let ast = Item::Impl(impl_block("MyStruct").trait_("MyTrait").negative().build());
 
-    insta::assert_snapshot!(pretty_print_item(ast));
+    insta::assert_snapshot!(pretty(&ast));
 }
 
 #[test]
@@ -596,55 +528,43 @@ fn test_let_statement() {
             .build(),
     );
 
-    insta::assert_snapshot!(pretty_print_item(ast));
+    insta::assert_snapshot!(pretty(&ast));
 }
 
 #[test]
 fn test_if_expression() {
     let ast = Item::Fn(
         fn_def("foo")
-            .block(
-                block()
-                    .statement(Stmt::Expr(Expr::If(ExprIf {
-                        cond: Box::new(Expr::Lit(1.into())),
-                        then_branch: block()
-                            .statement(Stmt::Expr(Expr::Lit(2.into())))
-                            .build(),
-                        else_branch: Some(Box::new(Expr::If(ExprIf {
-                            cond: Box::new(Expr::Lit(3.into())),
-                            then_branch: block()
-                                .statement(Stmt::Expr(Expr::Lit(4.into())))
-                                .build(),
-                            else_branch: Some(Box::new(Expr::Block(ExprBlock {
-                                block: block()
-                                    .statement(Stmt::Expr(Expr::Lit(5.into())))
-                                    .build(),
-                            }))),
-                        }))),
-                    })))
-            )
+            .block(block().statement(Stmt::Expr(Expr::If(ExprIf {
+                cond: Box::new(Expr::Lit(1.into())),
+                then_branch: block().statement(Stmt::Expr(Expr::Lit(2.into()))).build(),
+                else_branch: Some(Box::new(Expr::If(ExprIf {
+                    cond: Box::new(Expr::Lit(3.into())),
+                    then_branch: block().statement(Stmt::Expr(Expr::Lit(4.into()))).build(),
+                    else_branch: Some(Box::new(Expr::Block(ExprBlock {
+                        block: block().statement(Stmt::Expr(Expr::Lit(5.into()))).build(),
+                    }))),
+                }))),
+            }))))
             .build(),
     );
 
-    insta::assert_snapshot!(pretty_print_item(ast));
+    insta::assert_snapshot!(pretty(&ast));
 }
 
 #[test]
 fn test_binary_expression() {
     let ast = Item::Fn(
         fn_def("foo")
-            .block(
-                block()
-                    .statement(Stmt::Expr(Expr::Binary(ExprBinary {
-                        left: Box::new(Expr::Lit(1.into())),
-                        op: BinOp::Add,
-                        right: Box::new(Expr::Lit(2.into())),
-                    })))
-            )
+            .block(block().statement(Stmt::Expr(Expr::Binary(ExprBinary {
+                left: Box::new(Expr::Lit(1.into())),
+                op: BinOp::Add,
+                right: Box::new(Expr::Lit(2.into())),
+            }))))
             .build(),
     );
 
-    insta::assert_snapshot!(pretty_print_item(ast));
+    insta::assert_snapshot!(pretty(&ast));
 }
 
 #[test]
@@ -659,7 +579,7 @@ fn test_expr_statement_without_semicolon() {
             .build(),
     );
 
-    insta::assert_snapshot!(pretty_print_item(ast));
+    insta::assert_snapshot!(pretty(&ast));
 }
 
 #[test]
@@ -675,7 +595,7 @@ fn test_item_statement() {
             .build(),
     );
 
-    insta::assert_snapshot!(pretty_print_item(ast));
+    insta::assert_snapshot!(pretty(&ast));
 }
 
 #[test]
@@ -696,7 +616,7 @@ fn test_macro_call_statement() {
             .build(),
     );
 
-    insta::assert_snapshot!(pretty_print_item(ast));
+    insta::assert_snapshot!(pretty(&ast));
 }
 
 #[test]
@@ -758,7 +678,7 @@ fn test_all_literals() {
             .build(),
     );
 
-    insta::assert_snapshot!(pretty_print_item(ast));
+    insta::assert_snapshot!(pretty(&ast));
 }
 
 #[test]
@@ -771,5 +691,5 @@ fn test_struct() {
             .build(),
     );
 
-    insta::assert_snapshot!(pretty_print_item(ast));
+    insta::assert_snapshot!(pretty(&ast));
 }

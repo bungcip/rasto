@@ -1,4 +1,5 @@
 use rasto::ast::*;
+use rasto::builder::{self, block};
 
 #[test]
 fn test_fn_with_attributes() {

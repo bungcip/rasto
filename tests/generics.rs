@@ -1,7 +1,7 @@
 use rasto::ast::PathSegment;
-use rasto::ast::builder::*;
 use rasto::ast::generics::*;
 use rasto::ast::types::{Type, TypePath};
+use rasto::builder::*;
 use thin_vec::thin_vec;
 
 #[test]

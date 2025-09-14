@@ -12,7 +12,8 @@
 //! Here's an example of how to build a simple function AST and pretty-print it:
 //!
 //! ```rust
-//! use rasto::ast::{builder::comment, *, Lit, LitInt};
+//! use rasto::ast::{*, Lit, LitInt};
+//! use rasto::builder::comment;
 //! use rasto::pretty_printer::*;
 //! use thin_vec::thin_vec;
 //!
@@ -61,3 +62,6 @@ pub mod ast;
 /// The `pretty_printer` module provides a flexible and efficient way to format Rust code from an
 /// Abstract Syntax Tree (AST).
 pub mod pretty_printer;
+
+/// Defines the builder API for constructing AST nodes.
+pub mod builder;

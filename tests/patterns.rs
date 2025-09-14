@@ -1,7 +1,7 @@
 //! Tests for patterns.
 
-use rasto::ast::builder::*;
 use rasto::ast::*;
+use rasto::builder::*;
 use rasto::pretty_printer::{PrettyPrinter, Printer};
 use thin_vec::thin_vec;
 
@@ -17,7 +17,7 @@ fn pretty_print(item: &impl PrettyPrinter) -> String {
 fn test_let_statement_with_ident_pattern() {
     let let_stmt = stmt()
         .local(pat().ident("x", false))
-        .expr(expr().lit(Lit::Int(LitInt::new(42))))
+        .expr(expr().lit(42))
         .build();
 
     insta::assert_snapshot!(pretty_print(&let_stmt), @"let x = 42;");
@@ -27,7 +27,7 @@ fn test_let_statement_with_ident_pattern() {
 fn test_let_statement_with_mut_ident_pattern() {
     let let_stmt = stmt()
         .local(pat().ident("x", true))
-        .expr(expr().lit(Lit::Int(LitInt::new(42))))
+        .expr(expr().lit(42))
         .build();
 
     insta::assert_snapshot!(pretty_print(&let_stmt), @"let mut x = 42;");

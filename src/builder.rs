@@ -6,7 +6,7 @@
 //! # Examples
 //!
 //! ```
-//! use rasto::ast::builder::*;
+//! use rasto::builder::*;
 //! use rasto::ast::{*, Lit, LitInt};
 //! use thin_vec::thin_vec;
 //!

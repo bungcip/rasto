@@ -1,4 +1,5 @@
-use rasto::ast::{Expr, Lit, LitInt, Stmt, builder::*};
+use rasto::ast::{Expr, ExprUnary, Lit, LitInt, PatIdent, Stmt, UnOp};
+use rasto::builder::*;
 
 #[test]
 fn test_fn_builder() {
@@ -18,8 +19,6 @@ fn test_fn_builder() {
     "#);
 }
 
-use rasto::ast::PatIdent;
-
 #[test]
 fn test_fn_builder_with_metadata() {
     let item_fn = fn_def("foo")
@@ -29,11 +28,7 @@ fn test_fn_builder_with_metadata() {
         .input(pat().ident("a", false))
         .input(pat().ident("b", false))
         .output("bool")
-        .block(
-            block()
-                .statement(stmt().expr(expr().lit("Hello, world!")))
-                
-        )
+        .block(block().statement(stmt().expr(expr().lit("Hello, world!"))))
         .build();
 
     let actual = item_fn.to_string();
@@ -76,9 +71,6 @@ fn test_stmt_builder() {
 
 #[test]
 fn test_unary_builder() {
-    use rasto::ast::builder::expr;
-    use rasto::ast::{Expr, ExprUnary, Lit, UnOp};
-
     let expr = expr().unary(UnOp::Neg, expr().lit(42));
 
     assert_eq!(
