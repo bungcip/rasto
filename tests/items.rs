@@ -1,5 +1,5 @@
 use rasto::ast::{
-    AssociatedType, Item, TokenStream, Type,
+    Item, TokenStream, Type,
     builder::{
         const_kind, def_item, extern_crate_item, fn_def, foreign_mod_item, macro_item, mod_item,
         static_kind, trait_alias_item, trait_def, type_alias_kind, union_item, use_item,
@@ -30,6 +30,7 @@ fn test_extern_crate_item() {
     insta::assert_snapshot!(item.to_string());
 }
 
+use rasto::ast::builder::associated_type;
 use rasto::ast::builder::block;
 
 #[test]
@@ -93,12 +94,6 @@ fn test_use_item() {
 
 #[test]
 fn test_trait_with_associated_type() {
-    let item = trait_def("MyTrait").associated_type(AssociatedType {
-        ident: "MyType".to_string(),
-        generics: Default::default(),
-        bounds: thin_vec![],
-        default: None,
-        md: None,
-    });
+    let item = trait_def("MyTrait").associated_type(associated_type("MyType").build());
     insta::assert_snapshot!(item.build().to_string());
 }

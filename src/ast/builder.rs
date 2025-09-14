@@ -15,8 +15,7 @@
 //!         fn_def("my_function")
 //!             .block(
 //!                 block()
-//!                     .statement(stmt().expr(expr().lit(Lit::Int(LitInt::new(42)))))
-//!                     .has_trailing_semicolon(true),
+//!                     .statement(expr().lit(42))
 //!             )
 //!             .build(),
 //!     )
@@ -190,6 +189,72 @@ impl TraitBuilder {
     }
 }
 
+/// Creates a new `AssociatedTypeBuilder` to construct an associated type for traits.
+pub fn associated_type(ident: impl Into<String>) -> AssociatedTypeBuilder {
+    AssociatedTypeBuilder::new(ident)
+}
+
+/// A builder for constructing an `AssociatedType` AST node.
+pub struct AssociatedTypeBuilder {
+    ident: String,
+    generics: GenericParams,
+    bounds: ThinVec<Type>,
+    default: Option<Type>,
+    md: Option<Box<Md>>,
+}
+
+impl AssociatedTypeBuilder {
+    /// Create a new `AssociatedTypeBuilder` with the provided identifier.
+    ///
+    /// # Parameters
+    ///
+    /// - `ident`: Name of the associated type.
+    pub fn new(ident: impl Into<String>) -> Self {
+        Self {
+            ident: ident.into(),
+            generics: GenericParams::new(),
+            bounds: thin_vec![],
+            default: None,
+            md: None,
+        }
+    }
+
+    /// Add a generic parameter to the associated type.
+    pub fn generic(mut self, g: impl Into<GenericParam>) -> Self {
+        self.generics.params.push(g.into());
+        self
+    }
+
+    /// Add a bound type to the associated type.
+    pub fn bound(mut self, t: impl Into<Type>) -> Self {
+        self.bounds.push(t.into());
+        self
+    }
+
+    /// Set a default type for the associated type.
+    pub fn default(mut self, t: impl Into<Type>) -> Self {
+        self.default = Some(t.into());
+        self
+    }
+
+    /// Set metadata for the associated type.
+    pub fn md(mut self, md: impl Into<Md>) -> Self {
+        self.md = Some(Box::new(md.into()));
+        self
+    }
+
+    /// Build the `AssociatedType` instance.
+    pub fn build(self) -> AssociatedType {
+        AssociatedType {
+            ident: self.ident,
+            generics: self.generics,
+            bounds: self.bounds,
+            default: self.default,
+            md: self.md,
+        }
+    }
+}
+
 /// Creates a new `BlockBuilder` to construct a block of statements.
 ///
 /// # Returns
@@ -200,7 +265,6 @@ pub fn block() -> BlockBuilder {
 }
 
 /// A builder for constructing a `Block` AST node.
-#[derive(Default)]
 pub struct BlockBuilder {
     stmts: ThinVec<Stmt>,
     has_trailing_semicolon: bool,
@@ -277,6 +341,17 @@ impl BlockBuilder {
             stmts: self.stmts,
             has_trailing_semicolon: self.has_trailing_semicolon,
             md,
+        }
+    }
+}
+
+impl Default for BlockBuilder {
+    fn default() -> Self {
+        Self {
+            stmts: Default::default(),
+            has_trailing_semicolon: true,
+            leading_comments: Default::default(),
+            trailing_comments: Default::default(),
         }
     }
 }

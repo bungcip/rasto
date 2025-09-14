@@ -1,4 +1,4 @@
-use rasto::ast::{Expr, Lit, LitInt, LitStr, Stmt, builder::*};
+use rasto::ast::{Expr, Lit, LitInt, Stmt, builder::*};
 
 #[test]
 fn test_fn_builder() {
@@ -6,11 +6,7 @@ fn test_fn_builder() {
         .input(pat().ident("a", false))
         .input(pat().ident("b", false))
         .output("bool")
-        .block(
-            block()
-                .statement(stmt().expr(Expr::Lit(Lit::Str(LitStr::new("Hello, world!")))))
-                .has_trailing_semicolon(true),
-        )
+        .block(block().statement(expr().lit("Hello, world!")))
         .build();
 
     let actual = item_fn.to_string();
@@ -36,7 +32,7 @@ fn test_fn_builder_with_metadata() {
         .block(
             block()
                 .statement(stmt().expr(expr().lit("Hello, world!")))
-                .has_trailing_semicolon(true),
+                
         )
         .build();
 
