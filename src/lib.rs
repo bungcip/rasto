@@ -12,31 +12,14 @@
 //! Here's an example of how to build a simple function AST and pretty-print it:
 //!
 //! ```rust
-//! use rasto::ast::{*, Lit, LitInt};
-//! use rasto::builder::comment;
-//! use rasto::pretty_printer::*;
-//! use thin_vec::thin_vec;
+//! use rasto::{Printer, PrettyPrinter};
+//! use rasto::builder::*;
 //!
-//! let ast = Item::from(
-//!     ItemFn {
-//!         md: Some(Box::new(Md {
-//!             attrs: thin_vec![],
-//!             leading_comments: thin_vec![comment().line(" A simple function.")],
-//!             trailing_comments: thin_vec![comment().line(" Trailing comment.")],
-//!         })),
-//!         sig: Signature {
-//!             ident: "foo".to_string(),
-//!             generics: Default::default(),
-//!             inputs: thin_vec![],
-//!             output: None,
-//!         },
-//!         block: Block {
-//!             stmts: thin_vec![Stmt::Expr(Expr::Lit(Lit::Int(LitInt::new(42))))],
-//!             has_trailing_semicolon: true,
-//!             ..Default::default()
-//!         },
-//!     }
-//! );
+//! let ast = fn_def("foo")
+//!     .leading_comment(comment().line(" A simple function."))
+//!     .trailing_comment(comment().line(" Trailing comment."))
+//!     .statement(expr().lit(42))
+//!     .build();
 //!
 //! let mut buf = String::new();
 //! let mut printer = Printer::new(&mut buf);
@@ -67,4 +50,4 @@ pub mod pretty_printer;
 pub mod builder;
 
 /// pretty function
-pub use pretty_printer::pretty;
+pub use pretty_printer::{pretty, PrettyPrinter, Printer};

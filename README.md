@@ -7,6 +7,7 @@ This is useful for procedural macros, code generation, or any other task that re
 ## Features
 
 -   **Abstract Syntax Tree (AST)**: A comprehensive set of data structures for representing Rust code.
+-   **Support Comment**: Support inserting comment in Item and Statement.
 -   **Pretty-Printer**: A flexible and efficient pretty-printer for generating formatted Rust code from the AST.
 -   **Builder API**: A fluent builder API for constructing AST nodes programmatically.
 
@@ -25,29 +26,16 @@ Here's an example of how to build a simple function AST and pretty-print it:
 
 ```rust
 use rasto::ast::*;
-use rasto::pretty_printer::*;
+use rasto::pretty;
 use thin_vec::thin_vec;
 
 fn main() {
-    let ast = Item::from(
-        ItemFn {
-            md: None,
-            sig: Signature {
-                ident: "foo".to_string(),
-                generics: Default::default(),
-                inputs: thin_vec![],
-                output: None,
-            },
-            block: Block {
-                leading_comments: thin_vec![],
-                stmts: thin_vec![Stmt::Expr(Expr::Lit(Lit::Int(LitInt::new(42))))],
-                has_trailing_semicolon: true,
-                trailing_comments: thin_vec![],
-            },
-        }
-    );
+    let ast = fn_def("foo")
+        .has_trailing_semicolon()
+        .statement(expr().lit(42))
+        .build();
 
-    println!("{}", ast);
+    println!("{}", pretty(&ast));
 }
 ```
 
