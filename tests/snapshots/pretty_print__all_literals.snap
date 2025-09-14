@@ -3,6 +3,14 @@ source: tests/pretty_print.rs
 expression: pretty_print_item(ast)
 ---
 fn literals() {
-    let s = "hello";let bs = b"hello";let cs = c"hello";let b = b'h';let c = 'h';let i = 42;let i_suffix = 42u32;let f = 1.23;let f_suffix = 1.23f32;let t = true;
-    
+    let s = "hello";
+    let bs = b"hello";
+    let cs = c"hello";
+    let b = b'h';
+    let c = 'h';
+    let i = 42;
+    let i_suffix = 42u32;
+    let f = 1.23;
+    let f_suffix = 1.23f32;
+    let t = true;
 }

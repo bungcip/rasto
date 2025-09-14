@@ -4,5 +4,4 @@ expression: pretty_print_item(ast)
 ---
 fn foo() {
     42
-    
 }

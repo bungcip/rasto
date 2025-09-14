@@ -921,13 +921,21 @@ impl PrettyPrinter for Block {
             let num_stmts = self.stmts.len();
             for (i, stmt) in self.stmts.iter().enumerate() {
                 stmt.pretty_print(printer)?;
-                if i == num_stmts - 1 && self.has_trailing_semicolon {
-                    printer.string(";");
+
+                let is_last = i == num_stmts - 1;
+
+                if matches!(stmt, Stmt::Expr(_)) {
+                    if !is_last || self.has_trailing_semicolon {
+                        printer.string(";");
+                    }
+                }
+
+                if !is_last {
+                    printer.hard_break();
                 }
             }
 
             pp_end(&self.md, printer)?;
-            printer.hard_break();
         }
 
         printer.end("}");
@@ -1455,7 +1463,6 @@ impl PrettyPrinter for ItemMod {
             printer.end("}");
         } else {
             printer.string(";");
-            printer.hard_break();
         }
         pp_end(&self.md, printer)?;
         Ok(())
