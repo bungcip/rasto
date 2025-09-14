@@ -4,15 +4,13 @@
 //! impl blocks, and traits. They are the top-level declarations that make up a crate.
 
 use crate::ast::generics::GenericParams;
-use crate::ast::item_const::ItemConst;
+use crate::ast::item_def::ItemDef;
 use crate::ast::item_extern_crate::ItemExternCrate;
 use crate::ast::item_foreign_mod::ItemForeignMod;
 use crate::ast::item_macro::ItemMacro;
 use crate::ast::item_mod::ItemMod;
-use crate::ast::item_static::ItemStatic;
 use crate::ast::item_trait::ItemTrait;
 use crate::ast::item_trait_alias::ItemTraitAlias;
-use crate::ast::item_type::ItemType;
 use crate::ast::item_union::ItemUnion;
 use crate::ast::item_use::ItemUse;
 use crate::ast::metadata::Md;
@@ -36,8 +34,8 @@ pub enum Item {
     Impl(ItemImpl),
     /// A trait item: `trait Foo { ... }`.
     Trait(ItemTrait),
-    /// A `const` item: `const FOO: u32 = 42;`.
-    Const(ItemConst),
+    /// A `const`, `static`, or `type` item.
+    Def(ItemDef),
     /// An `extern crate` item: `extern crate semver;`.
     ExternCrate(ItemExternCrate),
     /// A foreign module: `extern "C" { ... }`.
@@ -46,12 +44,8 @@ pub enum Item {
     Macro(ItemMacro),
     /// A module: `mod foo { ... }`.
     Mod(ItemMod),
-    /// A `static` item: `static FOO: u32 = 42;`.
-    Static(ItemStatic),
     /// A trait alias: `trait Foo = Bar;`.
     TraitAlias(ItemTraitAlias),
-    /// A type alias: `type Foo = Bar;`.
-    Type(ItemType),
     /// A `union` item: `union Foo { ... }`.
     Union(ItemUnion),
     /// A `use` item: `use std::collections::HashMap;`.
@@ -255,10 +249,10 @@ impl From<ItemTrait> for Item {
     }
 }
 
-impl From<ItemConst> for Item {
-    /// Converts an `ItemConst` into an `Item::Const` variant.
-    fn from(item: ItemConst) -> Self {
-        Item::Const(item)
+impl From<ItemDef> for Item {
+    /// Converts an `ItemDef` into an `Item::Def` variant.
+    fn from(item: ItemDef) -> Self {
+        Item::Def(item)
     }
 }
 
@@ -290,24 +284,10 @@ impl From<ItemMod> for Item {
     }
 }
 
-impl From<ItemStatic> for Item {
-    /// Converts an `ItemStatic` into an `Item::Static` variant.
-    fn from(item: ItemStatic) -> Self {
-        Item::Static(item)
-    }
-}
-
 impl From<ItemTraitAlias> for Item {
     /// Converts an `ItemTraitAlias` into an `Item::TraitAlias` variant.
     fn from(item: ItemTraitAlias) -> Self {
         Item::TraitAlias(item)
-    }
-}
-
-impl From<ItemType> for Item {
-    /// Converts an `ItemType` into an `Item::Type` variant.
-    fn from(item: ItemType) -> Self {
-        Item::Type(item)
     }
 }
 

@@ -1,17 +1,27 @@
 use rasto::ast::{
     AssociatedType, Item, TokenStream, Type,
     builder::{
-        const_item, extern_crate_item, fn_def, foreign_mod_item, macro_item, mod_item, static_item,
-        trait_alias_item, trait_def, type_item, union_item, use_item,
+        const_kind, def_item, extern_crate_item, fn_def, foreign_mod_item, macro_item, mod_item,
+        static_kind, trait_alias_item, trait_def, type_alias_kind, union_item, use_item,
     },
     expr,
 };
 use thin_vec::thin_vec;
 
 #[test]
-fn test_const_item() {
-    let item = const_item("MAX", Type::from("u16"), expr().lit(234342)).build();
-    insta::assert_snapshot!(item.to_string());
+fn test_def_item() {
+    let const_item = def_item("MAX", const_kind(Type::from("u16"), expr().lit(234342))).build();
+    insta::assert_snapshot!(const_item.to_string());
+
+    let static_item = def_item("COUNTER", static_kind(Type::from("u32"), expr().lit(0))).build();
+    insta::assert_snapshot!(static_item.to_string());
+
+    let type_item = def_item(
+        "MyResult<T>",
+        type_alias_kind(Type::from("Result<T, MyError>")),
+    )
+    .build();
+    insta::assert_snapshot!(type_item.to_string());
 }
 
 #[test]
@@ -57,24 +67,12 @@ fn test_mod_item_with_content() {
 }
 
 #[test]
-fn test_static_item() {
-    let item = static_item("COUNTER", Type::from("u32"), expr().lit(0)).build();
-    insta::assert_snapshot!(item.to_string());
-}
-
-#[test]
 fn test_trait_alias_item() {
     let item = trait_alias_item(
         "ShareableIterator",
         thin_vec!["Iterator".to_string(), "Sync".to_string()],
     )
     .build();
-    insta::assert_snapshot!(item.to_string());
-}
-
-#[test]
-fn test_type_item() {
-    let item = type_item("MyResult<T>", Type::from("Result<T, MyError>")).build();
     insta::assert_snapshot!(item.to_string());
 }
 

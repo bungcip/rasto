@@ -1,0 +1,5 @@
+---
+source: tests/items.rs
+expression: const_item.to_string()
+---
+const MAX: u16 = 234342;
