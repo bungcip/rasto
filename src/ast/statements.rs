@@ -3,11 +3,11 @@
 //! Statements are instructions that perform an action but do not produce a value.
 //! They are the building blocks of function bodies and other code blocks.
 
+use crate::ast::Md;
 use crate::ast::expressions::{Expr, ExprMacroCall};
 use crate::ast::items::Item;
 use crate::ast::patterns::Pat;
 use crate::ast::types::Type;
-use crate::ast::Md;
 use thin_vec::ThinVec;
 
 /// A block of code, enclosed in curly braces: `{ ... }`.
@@ -19,7 +19,7 @@ pub struct Block {
     pub stmts: ThinVec<Stmt>,
     /// Whether the last statement in the block has a trailing semicolon.
     pub has_trailing_semicolon: bool,
-    ///
+    /// metadata
     pub md: Option<Box<Md>>,
 }
 

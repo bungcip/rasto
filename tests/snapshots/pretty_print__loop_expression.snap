@@ -5,7 +5,7 @@ expression: pretty_print_item(ast)
 fn foo() {
     loop {
         1;
-
+        
     };
-
+    
 }

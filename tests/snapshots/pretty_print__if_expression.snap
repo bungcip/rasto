@@ -5,13 +5,13 @@ expression: pretty_print_item(ast)
 fn foo() {
     if 1 {
         2;
-
+        
     } else if 3 {
         4;
-
+        
     } else {
         5;
-
+        
     };
-
+    
 }

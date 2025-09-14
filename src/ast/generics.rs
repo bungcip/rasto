@@ -164,35 +164,3 @@ pub enum GenericArg {
     /// A const argument: `N`.
     Const(crate::ast::Expr),
 }
-
-impl PrettyPrinter for GenericArgs {
-    /// Pretty-prints the `GenericArgs` to the given printer.
-    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
-        if !self.args.is_empty() {
-            printer.string("<");
-            for (i, arg) in self.args.iter().enumerate() {
-                if i > 0 {
-                    printer.string(", ");
-                }
-                arg.pretty_print(printer)?;
-            }
-            printer.string(">");
-        }
-        Ok(())
-    }
-}
-
-impl PrettyPrinter for GenericArg {
-    /// Pretty-prints the `GenericArg` to the given printer.
-    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
-        match self {
-            GenericArg::Lifetime(lt) => {
-                printer.string("'");
-                printer.string(lt);
-                Ok(())
-            }
-            GenericArg::Type(t) => t.pretty_print(printer),
-            GenericArg::Const(c) => c.pretty_print(printer),
-        }
-    }
-}

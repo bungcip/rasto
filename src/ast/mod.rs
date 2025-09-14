@@ -8,6 +8,8 @@
 pub mod associated_type;
 /// Defines the AST nodes for attributes.
 pub mod attributes;
+/// Defines the builder API for constructing AST nodes.
+pub mod builder;
 /// Defines the AST nodes for comments.
 pub mod comments;
 /// Defines the AST nodes for expressions.
@@ -44,22 +46,22 @@ pub mod items;
 pub mod literals;
 /// Defines the AST nodes for metadata.
 pub mod metadata;
+/// Defines the AST nodes for patterns.
+pub mod patterns;
 /// Defines the AST nodes for statements.
 pub mod statements;
 /// Defines the AST nodes for tokens.
 pub mod tokens;
 /// Defines the AST nodes for types.
 pub mod types;
-/// Defines the AST nodes for patterns.
-pub mod patterns;
-/// Defines the builder API for constructing AST nodes.
-pub mod builder;
 
 pub use associated_type::*;
 pub use attributes::*;
+pub use builder::*;
 pub use comments::*;
 pub use expressions::*;
 pub use file::*;
+pub use generics::*;
 pub use item_const::*;
 pub use item_extern_crate::*;
 pub use item_foreign_mod::*;
@@ -74,9 +76,7 @@ pub use item_use::*;
 pub use items::*;
 pub use literals::*;
 pub use metadata::*;
-pub use statements::*;
-pub use types::*;
 pub use patterns::*;
-pub use builder::*;
-pub use generics::*;
+pub use statements::*;
 pub use tokens::*;
+pub use types::*;

@@ -91,9 +91,10 @@ fn test_fn() {
                     .leading_comment(Comment::Block(
                         " Block comment with single line ".to_string(),
                     ))
-                    .statement(stmt()
-                        .local(pat().ident("hello", false))
-                        .expr(expr().lit("world"))
+                    .statement(
+                        stmt()
+                            .local(pat().ident("hello", false))
+                            .expr(expr().lit("world")),
                     )
                     .statement(expr().lit(42))
                     .has_trailing_semicolon(false),

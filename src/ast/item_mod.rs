@@ -1,6 +1,6 @@
 use crate::ast::items::Item;
-use crate::ast::metadata::{self, Md};
-use crate::pretty_printer::{BreakStyle, PrettyPrinter, Printer};
+use crate::ast::metadata::Md;
+use crate::pretty_printer::{PrettyPrinter, Printer};
 use std::fmt;
 use thin_vec::ThinVec;
 
@@ -22,33 +22,5 @@ impl fmt::Display for ItemMod {
         let mut printer = Printer::new(f);
         self.pretty_print(&mut printer)?;
         printer.finish()
-    }
-}
-
-impl PrettyPrinter for ItemMod {
-    /// Pretty-prints the `ItemMod` to the given printer.
-    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
-        metadata::pp_begin(&self.md, printer)?;
-        printer.string("mod ");
-        printer.string(&self.ident);
-        if let Some(content) = &self.content {
-            printer.begin(BreakStyle::Consistent, " {");
-            if !content.is_empty() {
-                printer.hard_break();
-                let num_items = content.len();
-                for (i, item) in content.iter().enumerate() {
-                    item.pretty_print(printer)?;
-                    if i < num_items - 1 {
-                        printer.hard_break();
-                    }
-                }
-            }
-            printer.end("}");
-        } else {
-            printer.string(";");
-            printer.hard_break();
-        }
-        metadata::pp_end(&self.md, printer)?;
-        Ok(())
     }
 }

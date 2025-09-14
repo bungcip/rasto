@@ -4,8 +4,6 @@
 //! enclosed in `#[...]` for outer attributes and `#![...]` for inner attributes.
 
 use crate::ast::literals::Lit;
-use crate::pretty_printer::{PrettyPrinter, Printer};
-use std::fmt;
 use thin_vec::ThinVec;
 
 /// An attribute, such as `#[repr(C)]` or `#![allow(dead_code)]`.
@@ -51,64 +49,6 @@ pub struct MetaNameValue {
     pub path: String,
     /// The value of the meta name-value pair, e.g., `"value"`.
     pub value: Lit,
-}
-
-impl PrettyPrinter for Attribute {
-    /// Pretty-prints the `Attribute` to the given printer.
-    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
-        match self {
-            Attribute::Inner(meta) => {
-                printer.string("#![");
-                meta.pretty_print(printer)?;
-                printer.string("]");
-            }
-            Attribute::Outer(meta) => {
-                printer.string("#[");
-                meta.pretty_print(printer)?;
-                printer.string("]");
-            }
-        }
-        Ok(())
-    }
-}
-
-impl PrettyPrinter for Meta {
-    /// Pretty-prints the `Meta` to the given printer.
-    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
-        match self {
-            Meta::List(list) => list.pretty_print(printer),
-            Meta::Path(path) => {
-                printer.string(path);
-                Ok(())
-            }
-            Meta::NameValue(name_value) => name_value.pretty_print(printer),
-        }
-    }
-}
-
-impl PrettyPrinter for MetaList {
-    /// Pretty-prints the `MetaList` to the given printer.
-    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
-        printer.string(&self.path);
-        printer.string("(");
-        for (i, meta) in self.metas.iter().enumerate() {
-            if i > 0 {
-                printer.string(", ");
-            }
-            meta.pretty_print(printer)?;
-        }
-        printer.string(")");
-        Ok(())
-    }
-}
-
-impl PrettyPrinter for MetaNameValue {
-    /// Pretty-prints the `MetaNameValue` to the given printer.
-    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
-        printer.string(&self.path);
-        printer.string(" = ");
-        self.value.pretty_print(printer)
-    }
 }
 
 impl From<&str> for Meta {

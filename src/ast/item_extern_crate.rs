@@ -1,4 +1,4 @@
-use crate::ast::metadata::{self, Md};
+use crate::ast::metadata::Md;
 use crate::pretty_printer::{PrettyPrinter, Printer};
 use std::fmt;
 
@@ -17,17 +17,5 @@ impl fmt::Display for ItemExternCrate {
         let mut printer = Printer::new(f);
         self.pretty_print(&mut printer)?;
         printer.finish()
-    }
-}
-
-impl PrettyPrinter for ItemExternCrate {
-    /// Pretty-prints the `ItemExternCrate` to the given printer.
-    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
-        metadata::pp_begin(&self.md, printer)?;
-        printer.string("extern crate ");
-        printer.string(&self.ident);
-        printer.string(";");
-        metadata::pp_end(&self.md, printer)?;
-        Ok(())
     }
 }

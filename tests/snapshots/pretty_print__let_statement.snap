@@ -4,5 +4,5 @@ expression: pretty_print_item(ast)
 ---
 fn foo() {
     let x: i32 = 42;
-
+    
 }

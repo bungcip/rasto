@@ -234,7 +234,7 @@ impl BlockBuilder {
         Block {
             stmts: self.stmts,
             has_trailing_semicolon: self.has_trailing_semicolon,
-            md: md,
+            md,
         }
     }
 }
@@ -663,7 +663,6 @@ impl From<LocalBuilder> for Stmt {
         value.build()
     }
 }
-
 
 /// Creates a new `PatBuilder` to construct patterns.
 pub fn pat() -> PatBuilder {
