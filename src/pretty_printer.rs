@@ -175,31 +175,64 @@ impl<'a> Printer<'a> {
         self.scan_buffer_head = 0;
         self.right_total = 0;
 
+        let mut group_has_hard_break = vec![];
+
         for i in 0..self.tokens.len() {
             match &self.tokens[i] {
                 Token::Begin { .. } => {
                     self.scan_push(i, -self.right_total);
+                    group_has_hard_break.push(false);
                 }
-                Token::End { .. } => loop {
-                    if self.scan_buffer_head == 0 {
-                        break;
-                    }
-                    self.scan_buffer_head -= 1;
-                    let (j, offset) = self.scan_buffer[self.scan_buffer_head];
-                    match self.tokens[j] {
-                        Token::Begin { .. } => {
-                            let len = self.right_total + offset;
-                            self.sizes[j] = if len > self.margin { INFINITY } else { len };
+                Token::End { .. } => {
+                    let has_hard_break = group_has_hard_break.pop().unwrap_or(false);
+                    loop {
+                        if self.scan_buffer_head == 0 {
                             break;
                         }
-                        Token::Break { .. } | Token::HardBreak => {
-                            let len = self.right_total + offset;
-                            self.sizes[j] = if len > self.margin { INFINITY } else { len };
+                        self.scan_buffer_head -= 1;
+                        let (j, offset) = self.scan_buffer[self.scan_buffer_head];
+                        match self.tokens[j] {
+                            Token::Begin { .. } => {
+                                let len = self.right_total + offset;
+                                self.sizes[j] = if has_hard_break || len > self.margin {
+                                    INFINITY
+                                } else {
+                                    len
+                                };
+                                break;
+                            }
+                            Token::Break { .. } => {
+                                let len = self.right_total + offset;
+                                self.sizes[j] = if len > self.margin { INFINITY } else { len };
+                            }
+                            Token::HardBreak => {
+                                self.sizes[j] = INFINITY;
+                            }
+                            _ => {}
                         }
-                        _ => {}
                     }
-                },
-                Token::Break { .. } | Token::HardBreak => {
+                }
+                Token::Break { .. } => {
+                    while self.scan_buffer_head > 0 {
+                        let (j, offset) = self.scan_buffer[self.scan_buffer_head - 1];
+                        match self.tokens[j] {
+                            Token::Begin { .. } => break,
+                            Token::Break { .. } | Token::HardBreak => {
+                                self.scan_buffer_head -= 1;
+                                let len = self.right_total + offset;
+                                self.sizes[j] = if len > self.margin { INFINITY } else { len };
+                            }
+                            _ => {
+                                break;
+                            }
+                        }
+                    }
+                    self.scan_push(i, -self.right_total);
+                }
+                Token::HardBreak => {
+                    if let Some(last) = group_has_hard_break.last_mut() {
+                        *last = true;
+                    }
                     while self.scan_buffer_head > 0 {
                         let (j, offset) = self.scan_buffer[self.scan_buffer_head - 1];
                         match self.tokens[j] {
@@ -545,11 +578,13 @@ impl PrettyPrinter for BinOp {
 
 impl PrettyPrinter for ExprBinary {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        printer.begin(BreakStyle::Inconsistent, "");
         self.left.pretty_print(printer)?;
         printer.break_();
         self.op.pretty_print(printer)?;
-        printer.break_();
+        printer.string(" ");
         self.right.pretty_print(printer)?;
+        printer.end("");
         Ok(())
     }
 }
@@ -713,10 +748,13 @@ impl PrettyPrinter for ExprMatch {
         self.expr.pretty_print(printer)?;
         printer.begin(BreakStyle::Consistent, " {");
         printer.hard_break();
-        for arm in &self.arms {
+        let num_arms = self.arms.len();
+        for (i, arm) in self.arms.iter().enumerate() {
             arm.pretty_print(printer)?;
             printer.string(",");
-            printer.hard_break();
+            if i < num_arms - 1 {
+                printer.hard_break();
+            }
         }
         printer.end("}");
         Ok(())
@@ -965,7 +1003,6 @@ impl PrettyPrinter for File {
         for (i, item) in self.items.iter().enumerate() {
             if i > 0 {
                 printer.hard_break();
-                printer.hard_break();
             }
             item.pretty_print(printer)?;
         }
@@ -983,10 +1020,13 @@ impl PrettyPrinter for ItemStruct {
         printer.begin(BreakStyle::Consistent, "{");
         if !self.fields.is_empty() {
             printer.hard_break();
-            for field in &self.fields {
+            let num_fields = self.fields.len();
+            for (i, field) in self.fields.iter().enumerate() {
                 field.pretty_print(printer)?;
                 printer.string(",");
-                printer.hard_break();
+                if i < num_fields - 1 {
+                    printer.hard_break();
+                }
             }
         }
         printer.end("}");
@@ -1015,10 +1055,13 @@ impl PrettyPrinter for ItemEnum {
         printer.begin(BreakStyle::Consistent, "{");
         if !self.variants.is_empty() {
             printer.hard_break();
-            for variant in &self.variants {
+            let num_variants = self.variants.len();
+            for (i, variant) in self.variants.iter().enumerate() {
                 variant.pretty_print(printer)?;
                 printer.string(",");
-                printer.hard_break();
+                if i < num_variants - 1 {
+                    printer.hard_break();
+                }
             }
         }
         printer.end("}");
@@ -1046,9 +1089,12 @@ impl PrettyPrinter for ItemImpl {
         printer.begin(BreakStyle::Consistent, "{");
         if !self.fns.is_empty() {
             printer.hard_break();
-            for fun in &self.fns {
+            let num_fns = self.fns.len();
+            for (i, fun) in self.fns.iter().enumerate() {
                 fun.pretty_print(printer)?;
-                printer.hard_break();
+                if i < num_fns - 1 {
+                    printer.hard_break();
+                }
             }
         }
         printer.end("}");
@@ -1067,16 +1113,22 @@ impl PrettyPrinter for ItemTrait {
         printer.begin(BreakStyle::Consistent, "{");
         if !self.associated_types.is_empty() {
             printer.hard_break();
-            for associated_type in &self.associated_types {
+            let num_associated_types = self.associated_types.len();
+            for (i, associated_type) in self.associated_types.iter().enumerate() {
                 associated_type.pretty_print(printer)?;
-                printer.hard_break();
+                if i < num_associated_types - 1 || !self.items.is_empty() {
+                    printer.hard_break();
+                }
             }
         }
         if !self.items.is_empty() {
             printer.hard_break();
-            for item in &self.items {
+            let num_items = self.items.len();
+            for (i, item) in self.items.iter().enumerate() {
                 item.pretty_print(printer)?;
-                printer.hard_break();
+                if i < num_items - 1 {
+                    printer.hard_break();
+                }
             }
         }
         printer.end("}");

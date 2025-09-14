@@ -53,7 +53,7 @@ fn test_match_expression_with_rest_pattern() {
 
     insta::assert_snapshot!(pretty_print(&match_expr), @r"
     match 10 {
-    .. => 42,
+        .. => 42,
     }
     ");
 }

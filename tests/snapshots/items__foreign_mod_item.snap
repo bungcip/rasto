@@ -3,5 +3,5 @@ source: tests/items.rs
 expression: item.to_string()
 ---
 extern "C" {
-fn foo() {}
+    fn foo() {}
 }

@@ -4,6 +4,6 @@ expression: pretty_print_item(ast)
 ---
 // A simple struct.
 struct Foo {
-field1: i32,
-field2: String,
+    field1: i32,
+    field2: String,
 }

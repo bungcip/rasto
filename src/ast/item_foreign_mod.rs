@@ -29,10 +29,15 @@ impl PrettyPrinter for ItemForeignMod {
         printer.string("extern ");
         printer.string(format!("\"{}\"", self.abi));
         printer.begin(BreakStyle::Consistent, " {");
-        printer.hard_break();
-        for item in &self.items {
-            item.pretty_print(printer)?;
+        if !self.items.is_empty() {
             printer.hard_break();
+            let num_items = self.items.len();
+            for (i, item) in self.items.iter().enumerate() {
+                item.pretty_print(printer)?;
+                if i < num_items - 1 {
+                    printer.hard_break();
+                }
+            }
         }
         printer.end("}");
         metadata::pp_end(&self.md, printer)?;

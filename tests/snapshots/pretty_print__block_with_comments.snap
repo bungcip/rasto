@@ -4,8 +4,9 @@ expression: buf
 ---
 {
 
-// leading comment
-42;
-// trailing comment
+    // leading comment
+    42;
+    // trailing comment
+
 
 }

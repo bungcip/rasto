@@ -4,6 +4,6 @@ expression: pretty_print_item(ast)
 ---
 // A simple enum.
 enum MyEnum {
-Variant1,
-Variant2,
+    Variant1,
+    Variant2,
 }

@@ -3,6 +3,6 @@ source: tests/pretty_print.rs
 expression: pretty_print_expr(ast)
 ---
 match "x" {
-(Some, y) => 1,
-None if true => 2,
+    (Some, y) => 1,
+    None if true => 2,
 }
