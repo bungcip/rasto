@@ -1,0 +1,7 @@
+---
+source: tests/pretty_print.rs
+expression: pretty(&ast)
+---
+fn foo() {
+    vec![0 ;  256];
+}

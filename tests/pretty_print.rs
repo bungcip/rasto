@@ -38,6 +38,30 @@ fn test_file() {
 }
 
 #[test]
+fn test_macro_call_with_brackets() {
+    let ast = Item::Fn(
+        fn_def("foo")
+            .block(block().statement(Stmt::Expr(expr().macro_call(
+                path("vec").build(),
+                Delimiter::Bracket,
+                TokenStream {
+                    tokens: thin_vec![
+                        TokenTree::Literal(0.into()),
+                        TokenTree::Punct(Punct {
+                            ch: ';',
+                            spacing: Spacing::Alone,
+                        }),
+                        TokenTree::Literal(256.into()),
+                    ],
+                },
+            ))))
+            .build(),
+    );
+
+    insta::assert_snapshot!(pretty(&ast));
+}
+
+#[test]
 fn test_block_single_comment() {
     let single = comment().block("Block comment with single line");
     insta::assert_snapshot!(pretty(&single));
@@ -439,17 +463,30 @@ fn test_assign_expression() {
 fn test_macro_call_expression() {
     let ast = Item::Fn(
         fn_def("foo")
-            .block(block().statement(Stmt::Expr(Expr::MacroCall(ExprMacroCall {
-                ident: "println".to_string(),
-                tokens: TokenStream {
-                    tokens: thin_vec![TokenTree::Group(Group {
-                        delimiter: Delimiter::Parenthesis,
-                        stream: TokenStream {
-                            tokens: thin_vec![TokenTree::Literal("hello".into())],
-                        },
-                    })],
+            .block(block().statement(Stmt::Expr(expr().macro_call(
+                path("println").build(),
+                Delimiter::Parenthesis,
+                TokenStream {
+                    tokens: thin_vec![TokenTree::Literal("hello".into())],
                 },
-            }))))
+            ))))
+            .build(),
+    );
+
+    insta::assert_snapshot!(pretty(&ast));
+}
+
+#[test]
+fn test_macro_call_expression_with_path() {
+    let ast = Item::Fn(
+        fn_def("foo")
+            .block(block().statement(Stmt::Expr(expr().macro_call(
+                path("std").segment("println").build(),
+                Delimiter::Parenthesis,
+                TokenStream {
+                    tokens: thin_vec![TokenTree::Literal("hello".into())],
+                },
+            ))))
             .build(),
     );
 
@@ -598,19 +635,17 @@ fn test_item_statement() {
     insta::assert_snapshot!(pretty(&ast));
 }
 
+use rasto::builder::path;
+
 #[test]
 fn test_macro_call_statement() {
     let ast = Item::Fn(
         fn_def("foo")
             .block(block().statement(Stmt::MacCall(ExprMacroCall {
-                ident: "println".to_string(),
+                path: path("println").build(),
+                delimiter: Delimiter::Parenthesis,
                 tokens: TokenStream {
-                    tokens: thin_vec![TokenTree::Group(Group {
-                        delimiter: Delimiter::Parenthesis,
-                        stream: TokenStream {
-                            tokens: thin_vec![TokenTree::Literal("hello".into())],
-                        },
-                    })],
+                    tokens: thin_vec![TokenTree::Literal("hello".into())],
                 },
             })))
             .build(),
