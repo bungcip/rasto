@@ -1,19 +1,12 @@
-use rasto::ast::PathSegment;
-use rasto::ast::generics::*;
-use rasto::ast::types::{Type, TypePath};
+use rasto::ast::generics::generic_param;
+use rasto::ast::types::Type;
 use rasto::builder::*;
-use thin_vec::thin_vec;
 
 #[test]
 fn test_fn_with_generics() {
     let func = fn_def("my_function")
-        .generic(TypeParam {
-            ident: "T".to_string(),
-            bounds: vec![],
-        })
-        .generic(LifetimeParam {
-            ident: "a".to_string(),
-        })
+        .generic(generic_param().ty("T"))
+        .generic(generic_param().lifetime("a"))
         .block(block())
         .build();
 
@@ -25,10 +18,7 @@ fn test_fn_with_generics() {
 #[test]
 fn test_struct_with_generics() {
     let s = struct_def("MyStruct")
-        .generic(TypeParam {
-            ident: "T".to_string(),
-            bounds: vec![],
-        })
+        .generic(generic_param().ty("T"))
         .field("my_field", Type::from("T"))
         .build();
 
@@ -42,10 +32,7 @@ fn test_struct_with_generics() {
 #[test]
 fn test_enum_with_generics() {
     let e = enum_def("MyEnum")
-        .generic(TypeParam {
-            ident: "T".to_string(),
-            bounds: vec![],
-        })
+        .generic(generic_param().ty("T"))
         .variant("MyVariant")
         .build();
 
@@ -59,10 +46,7 @@ fn test_enum_with_generics() {
 #[test]
 fn test_impl_with_generics() {
     let i = impl_block(Type::from("MyTrait"))
-        .generic(TypeParam {
-            ident: "T".to_string(),
-            bounds: vec![],
-        })
+        .generic(generic_param().ty("T"))
         .build();
 
     insta::assert_snapshot!(i.to_string(), @r###"
@@ -73,10 +57,7 @@ fn test_impl_with_generics() {
 #[test]
 fn test_trait_with_generics() {
     let t = trait_def("MyTrait")
-        .generic(TypeParam {
-            ident: "T".to_string(),
-            bounds: vec![],
-        })
+        .generic(generic_param().ty("T"))
         .build();
 
     insta::assert_snapshot!(t.to_string(), @r###"
@@ -88,20 +69,7 @@ fn test_trait_with_generics() {
 fn test_type_with_generics() {
     let t = def_item(
         "MyType",
-        type_alias_kind(Type::Path(TypePath {
-            path: rasto::ast::expressions::Path {
-                segments: thin_vec![PathSegment {
-                    ident: "Vec".to_string(),
-                    args: Some(GenericArgs {
-                        args: vec![GenericArg::Type(Type::from("T"))],
-                    }),
-                }],
-            },
-        }))
-        .generic(TypeParam {
-            ident: "T".to_string(),
-            bounds: vec![],
-        }),
+        type_alias_kind(path("Vec").generic("T").build_type()).generic(generic_param().ty("T")),
     )
     .build();
 
@@ -113,10 +81,7 @@ fn test_type_with_generics() {
 #[test]
 fn test_union_with_generics() {
     let u = union_item("MyUnion")
-        .generic(TypeParam {
-            ident: "T".to_string(),
-            bounds: vec![],
-        })
+        .generic(generic_param().ty("T"))
         .field("my_field", Type::from("T"))
         .build();
 

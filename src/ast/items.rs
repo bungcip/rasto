@@ -238,6 +238,12 @@ impl From<ItemStruct> for Item {
     }
 }
 
+impl From<TraitItemFn> for TraitItem {
+    fn from(item: TraitItemFn) -> Self {
+        TraitItem::Fn(item)
+    }
+}
+
 impl From<ItemEnum> for Item {
     /// Converts an `ItemEnum` into an `Item::Enum` variant.
     fn from(item: ItemEnum) -> Self {

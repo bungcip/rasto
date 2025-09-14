@@ -14,6 +14,12 @@ pub struct TokenStream {
     pub tokens: ThinVec<TokenTree>,
 }
 
+impl From<ThinVec<TokenTree>> for TokenStream {
+    fn from(tokens: ThinVec<TokenTree>) -> Self {
+        Self { tokens }
+    }
+}
+
 /// A single token or a delimited sequence of token trees (e.g., `[1, (), ..]`).
 #[derive(Debug, Clone, PartialEq)]
 pub enum TokenTree {

@@ -840,6 +840,28 @@ impl LocalBuilder {
     }
 }
 
+/// Creates a new `FieldValueBuilder` to construct a field-value pair.
+pub fn field_value(member: impl Into<String>, value: impl Into<Expr>) -> FieldValue {
+    FieldValue {
+        member: member.into(),
+        value: value.into(),
+    }
+}
+
+/// Creates a new `TraitItemFnBuilder` to construct a trait item function.
+pub fn trait_item_fn(name: impl Into<String>) -> TraitItemFn {
+    TraitItemFn {
+        sig: Signature {
+            ident: name.into(),
+            generics: Default::default(),
+            inputs: thin_vec![],
+            output: None,
+        },
+        block: None,
+        md: None,
+    }
+}
+
 /// Creates a new `PatBuilder` to construct patterns.
 pub fn pat() -> PatBuilder {
     PatBuilder
@@ -909,6 +931,19 @@ impl PathBuilder {
         Path {
             segments: self.segments,
         }
+    }
+
+    /// Adds a generic argument to the last segment.
+    pub fn generic(mut self, arg: impl Into<GenericArg>) -> Self {
+        let segment = self.segments.last_mut().unwrap();
+        let args = segment.args.get_or_insert_with(Default::default);
+        args.args.push(arg.into());
+        self
+    }
+
+    /// Builds a `Type::Path` from the `PathBuilder`.
+    pub fn build_type(self) -> Type {
+        Type::Path(TypePath { path: self.build() })
     }
 }
 
@@ -1142,11 +1177,11 @@ impl ExprBuilder {
     /// - `path`: The path to the macro.
     /// - `delimiter`: The delimiter of the macro's input.
     /// - `tokens`: The token stream passed to the macro.
-    pub fn macro_call(self, path: Path, delimiter: Delimiter, tokens: TokenStream) -> Expr {
+    pub fn macro_call(self, path: impl Into<Path>, delimiter: Delimiter, tokens: impl Into<TokenStream>) -> Expr {
         Expr::MacroCall(ExprMacroCall {
-            path,
+            path: path.into(),
             delimiter,
-            tokens,
+            tokens: tokens.into(),
         })
     }
 
@@ -1910,6 +1945,26 @@ impl From<LocalBuilder> for Stmt {
 impl From<PathBuilder> for Path {
     fn from(builder: PathBuilder) -> Self {
         builder.build()
+    }
+}
+
+impl From<&str> for Path {
+    fn from(value: &str) -> Self {
+        path(value).build()
+    }
+}
+
+impl<const N: usize> From<&[&str; N]> for Path {
+    fn from(array: &[&str; N]) -> Self {
+        let array: ThinVec<PathSegment> = array.iter().map(|x| 
+            PathSegment {
+                ident: x.to_string(),
+                args: None,
+            }
+        ).collect();
+        Path {
+            segments: array
+        }
     }
 }
 

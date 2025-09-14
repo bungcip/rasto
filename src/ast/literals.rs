@@ -200,9 +200,11 @@ impl LitInt {
     /// # Arguments
     ///
     /// * `suffix` - The integer suffix.
-    pub fn with_suffix(mut self, suffix: IntSuffix) -> Self {
-        self.suffix = Some(suffix);
-        self
+    pub fn with_suffix(value: u128, suffix: IntSuffix) -> Self {
+        Self {
+            value,
+            suffix: Some(suffix),
+        }
     }
 }
 
@@ -242,9 +244,11 @@ impl LitFloat {
     /// # Arguments
     ///
     /// * `suffix` - The float suffix.
-    pub fn with_suffix(mut self, suffix: FloatSuffix) -> Self {
-        self.suffix = Some(suffix);
-        self
+    pub fn with_suffix(value: &str, suffix: FloatSuffix) -> Self {
+        Self {
+            value: value.to_string(),
+            suffix: Some(suffix),
+        }
     }
 }
 
@@ -306,5 +310,41 @@ impl From<bool> for Lit {
     /// Converts a `bool` into a `Lit::Bool` variant.
     fn from(b: bool) -> Self {
         Lit::Bool(LitBool { value: b })
+    }
+}
+
+impl From<f64> for Lit {
+    fn from(f: f64) -> Self {
+        Lit::Float(LitFloat::new(&f.to_string()))
+    }
+}
+
+impl From<char> for Lit {
+    fn from(c: char) -> Self {
+        Lit::Char(LitChar::new(c))
+    }
+}
+
+impl From<u8> for Lit {
+    fn from(b: u8) -> Self {
+        Lit::Byte(LitByte::new(b))
+    }
+}
+
+impl From<&[u8]> for Lit {
+    fn from(s: &[u8]) -> Self {
+        Lit::ByteStr(LitByteStr::new(s))
+    }
+}
+
+impl<const N: usize> From<&[u8; N]> for Lit {
+    fn from(array: &[u8; N]) -> Self {
+        Lit::ByteStr(LitByteStr::new(array.as_slice()))
+    }
+}
+
+impl<'a> From<&'a std::ffi::CStr> for Lit {
+    fn from(s: &'a std::ffi::CStr) -> Self {
+        Lit::CStr(LitCStr::new(s.to_str().unwrap()))
     }
 }

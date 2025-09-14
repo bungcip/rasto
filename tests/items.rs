@@ -37,11 +37,9 @@ use rasto::ast::Delimiter;
 #[test]
 fn test_macro_item() {
     let item = macro_item(expr().macro_call(
-        path("my_macro").build(),
+        "my_macro",
         Delimiter::Parenthesis,
-        TokenStream {
-            tokens: thin_vec![],
-        },
+        thin_vec![]
     ))
     .build();
     insta::assert_snapshot!(item.to_string());
