@@ -59,6 +59,8 @@ pub enum Expr {
     Range(ExprRange),
     /// A reference expression: `&x` or `&mut x`.
     Reference(ExprRef),
+    /// A raw reference expression: `&raw const x` or `&raw mut x`.
+    RawRef(ExprRawRef),
     /// A `return` expression: `return x`.
     Return(ExprReturn),
     /// A struct instantiation expression: `Foo { a: 1, b: 2 }`.
@@ -244,6 +246,15 @@ pub enum RangeLimits {
 #[derive(Debug, Clone, PartialEq)]
 pub struct ExprRef {
     /// `true` if the reference is mutable (`&mut`).
+    pub is_mut: bool,
+    /// The expression being referenced.
+    pub expr: Box<Expr>,
+}
+
+/// A raw reference expression, such as `&raw const x` or `&raw mut x`.
+#[derive(Debug, Clone, PartialEq)]
+pub struct ExprRawRef {
+    /// `true` if the reference is mutable (`&raw mut`).
     pub is_mut: bool,
     /// The expression being referenced.
     pub expr: Box<Expr>,

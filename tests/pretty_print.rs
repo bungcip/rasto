@@ -226,6 +226,15 @@ fn test_expr_reference() {
 }
 
 #[test]
+fn test_expr_raw_ref() {
+    let const_ast = expr().raw_ref(expr().lit("x")).build();
+    insta::assert_snapshot!(pretty(&const_ast), @"&raw const \"x\"");
+
+    let mut_ast = expr().raw_ref(expr().lit("x")).mutable().build();
+    insta::assert_snapshot!(pretty(&mut_ast), @"&raw mut \"x\"");
+}
+
+#[test]
 fn test_expr_return() {
     let ast = expr().return_expr(Some(expr().lit(1)));
     insta::assert_snapshot!(pretty(&ast));
