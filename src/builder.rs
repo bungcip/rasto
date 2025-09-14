@@ -840,6 +840,28 @@ impl LocalBuilder {
     }
 }
 
+/// Creates a new `FieldValueBuilder` to construct a field-value pair.
+pub fn field_value(member: impl Into<String>, value: impl Into<Expr>) -> FieldValue {
+    FieldValue {
+        member: member.into(),
+        value: value.into(),
+    }
+}
+
+/// Creates a new `TraitItemFnBuilder` to construct a trait item function.
+pub fn trait_item_fn(name: impl Into<String>) -> TraitItemFn {
+    TraitItemFn {
+        sig: Signature {
+            ident: name.into(),
+            generics: Default::default(),
+            inputs: thin_vec![],
+            output: None,
+        },
+        block: None,
+        md: None,
+    }
+}
+
 /// Creates a new `PatBuilder` to construct patterns.
 pub fn pat() -> PatBuilder {
     PatBuilder
@@ -909,6 +931,19 @@ impl PathBuilder {
         Path {
             segments: self.segments,
         }
+    }
+
+    /// Adds a generic argument to the last segment.
+    pub fn generic(mut self, arg: impl Into<GenericArg>) -> Self {
+        let segment = self.segments.last_mut().unwrap();
+        let args = segment.args.get_or_insert_with(Default::default);
+        args.args.push(arg.into());
+        self
+    }
+
+    /// Builds a `Type::Path` from the `PathBuilder`.
+    pub fn build_type(self) -> Type {
+        Type::Path(TypePath { path: self.build() })
     }
 }
 
