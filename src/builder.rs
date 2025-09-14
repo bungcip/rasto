@@ -1177,11 +1177,11 @@ impl ExprBuilder {
     /// - `path`: The path to the macro.
     /// - `delimiter`: The delimiter of the macro's input.
     /// - `tokens`: The token stream passed to the macro.
-    pub fn macro_call(self, path: Path, delimiter: Delimiter, tokens: TokenStream) -> Expr {
+    pub fn macro_call(self, path: impl Into<Path>, delimiter: Delimiter, tokens: impl Into<TokenStream>) -> Expr {
         Expr::MacroCall(ExprMacroCall {
-            path,
+            path: path.into(),
             delimiter,
-            tokens,
+            tokens: tokens.into(),
         })
     }
 
@@ -1945,6 +1945,26 @@ impl From<LocalBuilder> for Stmt {
 impl From<PathBuilder> for Path {
     fn from(builder: PathBuilder) -> Self {
         builder.build()
+    }
+}
+
+impl From<&str> for Path {
+    fn from(value: &str) -> Self {
+        path(value).build()
+    }
+}
+
+impl<const N: usize> From<&[&str; N]> for Path {
+    fn from(array: &[&str; N]) -> Self {
+        let array: ThinVec<PathSegment> = array.iter().map(|x| 
+            PathSegment {
+                ident: x.to_string(),
+                args: None,
+            }
+        ).collect();
+        Path {
+            segments: array
+        }
     }
 }
 

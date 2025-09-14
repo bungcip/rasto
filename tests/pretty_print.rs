@@ -38,13 +38,11 @@ fn test_file() {
     insta::assert_snapshot!(pretty(&ast));
 }
 
-use std::ffi::CStr;
-
 #[test]
 fn test_macro_call_with_brackets() {
     let ast = fn_def("foo")
         .block(block().statement(expr().macro_call(
-            path("vec").build(),
+            "vec",
             Delimiter::Bracket,
             thin_vec![
                 TokenTree::Literal(0.into()),
@@ -53,14 +51,14 @@ fn test_macro_call_with_brackets() {
                     spacing: Spacing::Alone,
                 }),
                 TokenTree::Literal(256.into()),
-            ]
-            .into(),
+            ],
         )))
         .build();
 
     insta::assert_snapshot!(pretty(&ast));
 }
 
+#[test]
 fn test_pretty_print_doc_comment() {
     let a = file()
         .item(
@@ -136,7 +134,7 @@ fn unary_expression_not() {
 
 #[test]
 fn test_expr_array() {
-    let ast = expr().array(vec![expr().lit(1), expr().lit(2)]);
+    let ast = expr().array([expr().lit(1), expr().lit(2)]);
     insta::assert_snapshot!(pretty(&ast));
 }
 
@@ -376,9 +374,9 @@ fn test_assign_expression() {
 fn test_macro_call_expression() {
     let ast = fn_def("foo")
         .block(block().statement(expr().macro_call(
-            path("println").build(),
+            "println",
             Delimiter::Parenthesis,
-            thin_vec![TokenTree::Literal("hello".into())].into(),
+            thin_vec![TokenTree::Literal("hello".into())],
         )))
         .build();
 
@@ -391,7 +389,7 @@ fn test_macro_call_expression_with_path() {
         .block(block().statement(expr().macro_call(
             path("std").segment("println").build(),
             Delimiter::Parenthesis,
-            thin_vec![TokenTree::Literal("hello".into())].into(),
+            thin_vec![TokenTree::Literal("hello".into())],
         )))
         .build();
 
@@ -528,34 +526,28 @@ fn test_macro_call_statement() {
 
 #[test]
 fn test_all_literals() {
-    let ast = fn_def("literals")
-        .block(
-            block()
-                .statement(stmt().local("s").expr(expr().lit("hello")))
-                .statement(stmt().local("bs").expr(expr().lit(b"hello".as_slice())))
-                .statement(
-                    stmt()
-                        .local("cs")
-                        .expr(expr().lit(
-                            CStr::from_bytes_with_nul(b"hello\0").unwrap(),
-                        ))
-                        .build(),
-                )
-                .statement(stmt().local("b").expr(expr().lit(b'h')))
-                .statement(stmt().local("c").expr(expr().lit('h')))
-                .statement(stmt().local("i").expr(expr().lit(42)))
-                .statement(
-                    stmt()
-                        .local("i_suffix")
-                        .expr(expr().lit(Lit::Int(LitInt::new(42).with_suffix(IntSuffix::U32)))),
-                )
-                .statement(stmt().local("f").expr(expr().lit(1.23)))
-                .statement(stmt().local("f_suffix").expr(expr().lit(Lit::Float(
-                    LitFloat::new("1.23").with_suffix(FloatSuffix::F32),
-                ))))
-                .statement(stmt().local("t").expr(expr().lit(true))),
-        )
-        .build();
+    let ast =
+        fn_def("literals")
+            .block(
+                block()
+                    .statement(stmt().local("s").expr(expr().lit("hello")))
+                    .statement(stmt().local("bs").expr(expr().lit(b"hello")))
+                    .statement(stmt().local("cs").expr(expr().lit(c"hello")))
+                    .statement(stmt().local("b").expr(expr().lit(b'h')))
+                    .statement(stmt().local("c").expr(expr().lit('h')))
+                    .statement(stmt().local("i").expr(expr().lit(42)))
+                    .statement(
+                        stmt()
+                            .local("i_suffix")
+                            .expr(expr().lit(Lit::Int(LitInt::with_suffix(42, IntSuffix::U32)))),
+                    )
+                    .statement(stmt().local("f").expr(expr().lit(1.23)))
+                    .statement(stmt().local("f_suffix").expr(
+                        expr().lit(Lit::Float(LitFloat::with_suffix("1.23", FloatSuffix::F32))),
+                    ))
+                    .statement(stmt().local("t").expr(expr().lit(true))),
+            )
+            .build();
 
     insta::assert_snapshot!(pretty(&ast));
 }

@@ -1,4 +1,4 @@
-use rasto::ast::{Item, TokenStream, Type};
+use rasto::ast::{Item, Type};
 use rasto::builder::*;
 use thin_vec::thin_vec;
 
@@ -37,11 +37,9 @@ use rasto::ast::Delimiter;
 #[test]
 fn test_macro_item() {
     let item = macro_item(expr().macro_call(
-        path("my_macro").build(),
+        "my_macro",
         Delimiter::Parenthesis,
-        TokenStream {
-            tokens: thin_vec![],
-        },
+        thin_vec![]
     ))
     .build();
     insta::assert_snapshot!(item.to_string());

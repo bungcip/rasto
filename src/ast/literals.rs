@@ -176,9 +176,11 @@ impl LitInt {
     /// # Arguments
     ///
     /// * `suffix` - The integer suffix.
-    pub fn with_suffix(mut self, suffix: IntSuffix) -> Self {
-        self.suffix = Some(suffix);
-        self
+    pub fn with_suffix(value: u128, suffix: IntSuffix) -> Self {
+        Self {
+            value,
+            suffix: Some(suffix),
+        }
     }
 }
 
@@ -218,9 +220,11 @@ impl LitFloat {
     /// # Arguments
     ///
     /// * `suffix` - The float suffix.
-    pub fn with_suffix(mut self, suffix: FloatSuffix) -> Self {
-        self.suffix = Some(suffix);
-        self
+    pub fn with_suffix(value: &str, suffix: FloatSuffix) -> Self {
+        Self {
+            value: value.to_string(),
+            suffix: Some(suffix),
+        }
     }
 }
 
@@ -306,6 +310,12 @@ impl From<u8> for Lit {
 impl From<&[u8]> for Lit {
     fn from(s: &[u8]) -> Self {
         Lit::ByteStr(LitByteStr::new(s))
+    }
+}
+
+impl<const N: usize> From<&[u8; N]> for Lit {
+    fn from(array: &[u8; N]) -> Self {
+        Lit::ByteStr(LitByteStr::new(array.as_slice()))
     }
 }
 
