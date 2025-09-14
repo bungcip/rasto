@@ -194,6 +194,45 @@ impl TraitBuilder {
     }
 }
 
+/// A builder for constructing an `Arm` AST node.
+pub struct ArmBuilder {
+    pat: Pat,
+    guard: Option<Expr>,
+    body: Expr,
+}
+
+impl ArmBuilder {
+    /// Creates a new `ArmBuilder` with the given pattern.
+    pub fn new(pat: impl Into<Pat>) -> Self {
+        Self {
+            pat: pat.into(),
+            guard: None,
+            body: expr().tuple(vec![]),
+        }
+    }
+
+    /// Sets the guard expression for the arm.
+    pub fn guard(mut self, guard: impl Into<Expr>) -> Self {
+        self.guard = Some(guard.into());
+        self
+    }
+
+    /// Sets the body of the arm.
+    pub fn body(mut self, body: impl Into<Expr>) -> Self {
+        self.body = body.into();
+        self
+    }
+
+    /// Builds the `Arm` AST node.
+    pub fn build(self) -> Arm {
+        Arm {
+            pat: self.pat,
+            guard: self.guard.map(Box::new),
+            body: Box::new(self.body),
+        }
+    }
+}
+
 /// Creates a new `AssociatedTypeBuilder` to construct an associated type for traits.
 pub fn associated_type(ident: impl Into<String>) -> AssociatedTypeBuilder {
     AssociatedTypeBuilder::new(ident)
@@ -1237,6 +1276,11 @@ impl ExprBuilder {
             expr: Box::new(expr),
             arms: arms.into_iter().collect(),
         })
+    }
+
+    /// Creates a new `ArmBuilder` to construct a match arm.
+    pub fn arm(self, pat: impl Into<Pat>) -> ArmBuilder {
+        ArmBuilder::new(pat)
     }
 
     /// Creates a method call expression.

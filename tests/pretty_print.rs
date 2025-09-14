@@ -183,16 +183,15 @@ fn test_expr_match() {
     let ast = expr().match_expr(
         expr().lit("x"),
         vec![
-            Arm {
-                pat: pat().tuple([pat().ident("Some"), pat().ident("y")]),
-                guard: None,
-                body: Box::new(expr().lit(1)),
-            },
-            Arm {
-                pat: pat().ident("None"),
-                guard: Some(Box::new(expr().lit(true))),
-                body: Box::new(expr().lit(2)),
-            },
+            expr()
+                .arm(pat().tuple([pat().ident("Some"), pat().ident("y")]))
+                .body(expr().lit(1))
+                .build(),
+            expr()
+                .arm(pat().ident("None"))
+                .guard(expr().lit(true))
+                .body(expr().lit(2))
+                .build(),
         ],
     );
     insta::assert_snapshot!(pretty(&ast));
