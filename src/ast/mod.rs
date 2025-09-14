@@ -16,6 +16,8 @@ pub mod expressions;
 pub mod file;
 /// Defines the AST nodes for generics.
 pub mod generics;
+/// Defines the AST node for an `asm!` expression.
+pub mod item_asm;
 /// Defines the AST node for a `const`, `static`, or `type` item.
 pub mod item_def;
 /// Defines the AST node for an `extern crate` item.
@@ -36,6 +38,8 @@ pub mod item_union;
 pub mod item_use;
 /// Defines the AST nodes for items.
 pub mod items;
+/// Defines the AST nodes for keywords.
+pub mod keyword;
 /// Defines the AST nodes for literals.
 pub mod literals;
 /// Defines the AST nodes for metadata.
@@ -55,6 +59,7 @@ pub use comments::*;
 pub use expressions::*;
 pub use file::*;
 pub use generics::*;
+pub use item_asm::*;
 pub use item_def::*;
 pub use item_extern_crate::*;
 pub use item_foreign_mod::*;

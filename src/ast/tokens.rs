@@ -63,7 +63,7 @@ pub enum Spacing {
 }
 
 /// A delimiter for a token stream.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub enum Delimiter {
     /// Parentheses: `( ... )`.
     Parenthesis,
@@ -72,5 +72,18 @@ pub enum Delimiter {
     /// Brackets: `[ ... ]`.
     Bracket,
     /// An implicit delimiter used in contexts where no explicit delimiter is present.
+    #[default]
     None,
 }
+
+/// The `!` token.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct Bang;
+
+/// The `,` token.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct Comma;
+
+/// The `=>` token.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct FatArrow;

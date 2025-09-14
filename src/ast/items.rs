@@ -4,6 +4,7 @@
 //! impl blocks, and traits. They are the top-level declarations that make up a crate.
 
 use crate::ast::generics::GenericParams;
+use crate::ast::item_asm::ItemAsm;
 use crate::ast::item_def::ItemDef;
 use crate::ast::item_extern_crate::ItemExternCrate;
 use crate::ast::item_foreign_mod::ItemForeignMod;
@@ -24,6 +25,8 @@ use thin_vec::ThinVec;
 /// A top-level item in a Rust file.
 #[derive(Debug, Clone, PartialEq)]
 pub enum Item {
+    /// An `asm!` block.
+    Asm(ItemAsm),
     /// A function item: `fn foo() { ... }`.
     Fn(ItemFn),
     /// A struct item: `struct Foo { ... }`.
@@ -212,6 +215,13 @@ pub struct Signature {
     pub inputs: ThinVec<Pat>,
     /// The return type of the function.
     pub output: Option<Type>,
+}
+
+impl From<ItemAsm> for Item {
+    /// Converts an `ItemAsm` into an `Item::Asm` variant.
+    fn from(item: ItemAsm) -> Self {
+        Item::Asm(item)
+    }
 }
 
 impl From<ItemFn> for Item {

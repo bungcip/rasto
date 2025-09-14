@@ -1,0 +1,111 @@
+//! Defines the AST node for an `asm!` expression.
+
+use crate::ast::{Expr, LitStr, Path};
+use crate::pretty_printer::{PrettyPrinter, Printer};
+use std::fmt;
+use thin_vec::ThinVec;
+
+/// An inline assembly expression: `asm!(...)`.
+#[derive(Debug, Clone, PartialEq)]
+pub struct ItemAsm {
+    /// The assembly template.
+    pub template: ThinVec<LitStr>,
+    /// The list of operands.
+    pub operands: ThinVec<AsmOperand>,
+    /// The options for the assembly block.
+    pub options: Option<AsmOptions>,
+}
+
+impl fmt::Display for ItemAsm {
+    /// Formats the `ItemAsm` using the pretty-printer.
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let mut printer = Printer::new(f);
+        self.pretty_print(&mut printer)?;
+        printer.finish()
+    }
+}
+
+/// An operand for an `asm!` expression.
+#[derive(Debug, Clone, PartialEq)]
+pub enum AsmOperand {
+    /// A register operand.
+    Reg(RegOperand),
+    /// A `sym` operand.
+    Sym(Path),
+    /// A `const` operand.
+    Const(Expr),
+    /// A `clobber_abi` operand.
+    ClobberAbi(ClobberAbi),
+}
+
+/// A register operand for an `asm!` expression.
+#[derive(Debug, Clone, PartialEq)]
+pub struct RegOperand {
+    /// The `in`, `out`, `inout`, `lateout`, or `inlateout` keyword.
+    pub direction: AsmDirection,
+    /// The register specifier.
+    pub reg: RegSpec,
+    /// The expression providing the value for the register.
+    pub expr: Expr,
+    /// The output expression for `inout` operands.
+    pub out_expr: Option<Expr>,
+}
+
+/// The direction of a register operand.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum AsmDirection {
+    /// `in`
+    In,
+    /// `out`
+    Out,
+    /// `lateout`
+    LateOut,
+    /// `inout`
+    InOut,
+    /// `inlateout`
+    InLateOut,
+}
+
+/// The register specifier for a register operand.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum RegSpec {
+    /// A register class, e.g., `reg`.
+    Class(String),
+    /// An explicit register, e.g., `"eax"`.
+    Explicit(LitStr),
+}
+
+/// The options for an `asm!` expression.
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
+pub struct AsmOptions {
+    /// The list of options.
+    pub options: ThinVec<AsmOption>,
+}
+
+/// An option for an `asm!` expression.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum AsmOption {
+    /// `pure`
+    Pure,
+    /// `nomem`
+    Nomem,
+    /// `readonly`
+    ReadOnly,
+    /// `preserves_flags`
+    PreservesFlags,
+    /// `noreturn`
+    NoReturn,
+    /// `nostack`
+    NoStack,
+    /// `att_syntax`
+    AttSyntax,
+    /// `raw`
+    Raw,
+}
+
+/// A `clobber_abi` operand for an `asm!` expression.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ClobberAbi {
+    /// The list of ABIs.
+    pub abis: ThinVec<LitStr>,
+}

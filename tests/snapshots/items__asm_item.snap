@@ -1,0 +1,15 @@
+---
+source: tests/items.rs
+assertion_line: 124
+expression: item.to_string()
+---
+asm!("
+        mov {tmp}, {x}
+        shl {tmp}, 1
+        shl {x}, 2
+        add {x}, {tmp}
+    ",
+    inout(reg) 42,
+    out(reg) 0,
+    options(nomem, att_syntax)
+)
