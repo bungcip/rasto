@@ -1,0 +1,7 @@
+---
+source: tests/items.rs
+expression: pretty(&pub_union)
+---
+pub union MyPublicUnion {
+    f1: u32,
+}

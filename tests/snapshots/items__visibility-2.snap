@@ -1,0 +1,7 @@
+---
+source: tests/items.rs
+expression: pretty(&crate_struct)
+---
+pub(crate) struct MyCrateStruct {
+    x: i32,
+}

@@ -1,0 +1,5 @@
+---
+source: tests/items.rs
+expression: pretty(&pub_const)
+---
+pub const MY_CONST: u8 = 5;

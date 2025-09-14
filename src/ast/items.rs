@@ -4,6 +4,7 @@
 //! impl blocks, and traits. They are the top-level declarations that make up a crate.
 
 use crate::ast::generics::GenericParams;
+use crate::ast::visibility::Visibility;
 use crate::ast::item_asm::ItemAsm;
 use crate::ast::item_def::ItemDef;
 use crate::ast::item_extern_crate::ItemExternCrate;
@@ -130,6 +131,8 @@ impl fmt::Display for ItemTrait {
 /// A struct definition.
 #[derive(Debug, Clone, PartialEq)]
 pub struct ItemStruct {
+    /// The visibility of the struct.
+    pub vis: Visibility,
     /// The name of the struct.
     pub ident: String,
     /// The generic parameters of the struct.
@@ -154,6 +157,8 @@ pub struct Field {
 /// An enum definition.
 #[derive(Debug, Clone, PartialEq)]
 pub struct ItemEnum {
+    /// The visibility of the enum.
+    pub vis: Visibility,
     /// The name of the enum.
     pub ident: String,
     /// The generic parameters of the enum.
@@ -195,6 +200,8 @@ pub struct ItemImpl {
 /// A function definition.
 #[derive(Debug, Clone, PartialEq)]
 pub struct ItemFn {
+    /// The visibility of the function.
+    pub vis: Visibility,
     /// The function signature.
     pub sig: Signature,
     /// The function body.

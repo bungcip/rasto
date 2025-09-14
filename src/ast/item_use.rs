@@ -1,10 +1,13 @@
 use crate::ast::metadata::Md;
+use crate::ast::visibility::Visibility;
 use crate::pretty_printer::{PrettyPrinter, Printer};
 use std::fmt;
 
 /// A `use` item, such as `use std::collections::HashMap;`.
 #[derive(Debug, Clone, PartialEq)]
 pub struct ItemUse {
+    /// The visibility of the use item.
+    pub vis: Visibility,
     /// The path being imported.
     pub path: String,
     /// Metadata about the use item, including attributes and comments.
