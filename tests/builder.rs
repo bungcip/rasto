@@ -22,14 +22,14 @@ fn test_fn_builder() {
     "#);
 }
 
-use rasto::ast::{Comment, PatIdent};
+use rasto::ast::PatIdent;
 
 #[test]
 fn test_fn_builder_with_metadata() {
     let item_fn = fn_def("foo")
         .attr(attr().meta("test"))
-        .leading_comment(Comment::Line(" a leading comment".to_string()))
-        .trailing_comment(Comment::Line(" a trailing comment".to_string()))
+        .leading_comment(comment().line(" a leading comment"))
+        .trailing_comment(comment().line(" a trailing comment"))
         .input(pat().ident("a", false))
         .input(pat().ident("b", false))
         .output("bool")

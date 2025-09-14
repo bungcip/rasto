@@ -67,6 +67,27 @@ impl FileBuilder {
     }
 }
 
+/// Creates a new `CommentBuilder` to construct a comment.
+pub fn comment() -> CommentBuilder {
+    CommentBuilder
+}
+
+/// A builder for constructing `Comment` AST nodes.
+#[derive(Clone, Copy)]
+pub struct CommentBuilder;
+
+impl CommentBuilder {
+    /// Creates a line comment.
+    pub fn line<S: Into<String>>(self, content: S) -> Comment {
+        Comment::Line(content.into())
+    }
+
+    /// Creates a block comment.
+    pub fn block<S: Into<String>>(self, content: S) -> Comment {
+        Comment::Block(content.into())
+    }
+}
+
 /// Creates a new `TraitBuilder` to construct a trait definition.
 ///
 /// # Parameters
