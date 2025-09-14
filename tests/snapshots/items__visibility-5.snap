@@ -1,0 +1,5 @@
+---
+source: tests/items.rs
+expression: pretty(&crate_mod)
+---
+pub(crate) mod my_crate_mod;

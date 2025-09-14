@@ -2,12 +2,15 @@ use crate::ast::expressions::Expr;
 use crate::ast::generics::GenericParams;
 use crate::ast::metadata::Md;
 use crate::ast::types::Type;
+use crate::ast::visibility::Visibility;
 use crate::pretty_printer::{PrettyPrinter, Printer};
 use std::fmt;
 
 /// An item, such as a `const`, `static`, or `type` definition.
 #[derive(Debug, Clone, PartialEq)]
 pub struct ItemDef {
+    /// The visibility of the item.
+    pub vis: Visibility,
     /// The name of the item.
     pub ident: String,
     /// Metadata about the item, including attributes and comments.

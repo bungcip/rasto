@@ -1,0 +1,7 @@
+---
+source: tests/items.rs
+expression: pretty(&default_enum)
+---
+enum MyDefaultEnum {
+    A,
+}

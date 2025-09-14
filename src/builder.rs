@@ -108,6 +108,7 @@ pub fn trait_def(name: impl Into<String>) -> TraitBuilder {
 /// A builder for constructing an `ItemTrait` (trait definition) AST node.
 pub struct TraitBuilder {
     ident: String,
+    vis: Visibility,
     generics: GenericParams,
     associated_types: ThinVec<AssociatedType>,
     items: ThinVec<TraitItem>,
@@ -123,11 +124,18 @@ impl TraitBuilder {
     pub fn new(name: impl Into<String>) -> Self {
         Self {
             ident: name.into(),
+            vis: Visibility::Default,
             generics: GenericParams::new(),
             associated_types: thin_vec![],
             items: thin_vec![],
             md: MdBuilder::new(),
         }
+    }
+
+    /// Sets the visibility of the trait.
+    pub fn vis(mut self, vis: Visibility) -> Self {
+        self.vis = vis;
+        self
     }
 
     /// Adds a generic parameter to the trait.
@@ -185,6 +193,7 @@ impl TraitBuilder {
     /// An `ItemTrait` instance.
     pub fn build(self) -> ItemTrait {
         ItemTrait {
+            vis: self.vis,
             ident: self.ident,
             generics: self.generics,
             associated_types: self.associated_types,
@@ -516,6 +525,7 @@ pub fn enum_def(name: impl Into<String>) -> EnumBuilder {
 /// A builder for constructing an `ItemEnum` (enum definition) AST node.
 pub struct EnumBuilder {
     ident: String,
+    vis: Visibility,
     generics: GenericParams,
     variants: ThinVec<Variant>,
     md: MdBuilder,
@@ -530,10 +540,17 @@ impl EnumBuilder {
     pub fn new(name: impl Into<String>) -> Self {
         Self {
             ident: name.into(),
+            vis: Visibility::Default,
             generics: GenericParams::new(),
             variants: thin_vec![],
             md: MdBuilder::new(),
         }
+    }
+
+    /// Sets the visibility of the enum.
+    pub fn vis(mut self, vis: Visibility) -> Self {
+        self.vis = vis;
+        self
     }
 
     /// Adds a generic parameter to the enum.
@@ -584,6 +601,7 @@ impl EnumBuilder {
     /// An `ItemEnum` instance.
     pub fn build(self) -> ItemEnum {
         ItemEnum {
+            vis: self.vis,
             ident: self.ident,
             generics: self.generics,
             variants: self.variants,
@@ -608,6 +626,7 @@ pub fn struct_def(name: impl Into<String>) -> StructBuilder {
 /// A builder for constructing an `ItemStruct` (struct definition) AST node.
 pub struct StructBuilder {
     ident: String,
+    vis: Visibility,
     generics: GenericParams,
     fields: ThinVec<Field>,
     md: MdBuilder,
@@ -622,10 +641,17 @@ impl StructBuilder {
     pub fn new(name: impl Into<String>) -> Self {
         Self {
             ident: name.into(),
+            vis: Visibility::Default,
             generics: GenericParams::new(),
             fields: thin_vec![],
             md: MdBuilder::new(),
         }
+    }
+
+    /// Sets the visibility of the struct.
+    pub fn vis(mut self, vis: Visibility) -> Self {
+        self.vis = vis;
+        self
     }
 
     /// Adds a generic parameter to the struct.
@@ -678,6 +704,7 @@ impl StructBuilder {
     /// An `ItemStruct` instance.
     pub fn build(self) -> ItemStruct {
         ItemStruct {
+            vis: self.vis,
             ident: self.ident,
             generics: self.generics,
             fields: self.fields,
@@ -703,6 +730,7 @@ pub fn fn_def(name: impl Into<String>) -> FnBuilder {
 #[derive(Default)]
 pub struct FnBuilder {
     ident: String,
+    vis: Visibility,
     generics: GenericParams,
     inputs: ThinVec<Pat>,
     output: Option<Type>,
@@ -719,8 +747,15 @@ impl FnBuilder {
     pub fn new(name: impl Into<String>) -> Self {
         Self {
             ident: name.into(),
+            vis: Visibility::Default,
             ..Default::default()
         }
+    }
+
+    /// Sets the visibility of the function.
+    pub fn vis(mut self, vis: Visibility) -> Self {
+        self.vis = vis;
+        self
     }
 
     /// Adds a generic parameter to the function.
@@ -804,6 +839,7 @@ impl FnBuilder {
     /// An `ItemFn` instance.
     pub fn build(self) -> ItemFn {
         ItemFn {
+            vis: self.vis,
             sig: Signature {
                 ident: self.ident,
                 generics: self.generics,
@@ -1409,6 +1445,7 @@ pub fn def_item(name: impl Into<String>, kind: impl Into<ItemDefKind>) -> ItemDe
 /// A builder for constructing an `ItemDef` AST node.
 pub struct ItemDefBuilder {
     ident: String,
+    vis: Visibility,
     kind: ItemDefKind,
     md: MdBuilder,
 }
@@ -1418,9 +1455,16 @@ impl ItemDefBuilder {
     pub fn new(name: impl Into<String>, kind: impl Into<ItemDefKind>) -> Self {
         Self {
             ident: name.into(),
+            vis: Visibility::Default,
             kind: kind.into(),
             md: MdBuilder::new(),
         }
+    }
+
+    /// Sets the visibility of the item.
+    pub fn vis(mut self, vis: Visibility) -> Self {
+        self.vis = vis;
+        self
     }
 
     /// Adds a leading comment to the item.
@@ -1444,6 +1488,7 @@ impl ItemDefBuilder {
     /// Builds the `ItemDef` AST node.
     pub fn build(self) -> ItemDef {
         ItemDef {
+            vis: self.vis,
             ident: self.ident,
             kind: self.kind,
             md: Some(Box::new(self.md.build())),
@@ -1720,6 +1765,7 @@ pub fn mod_item(name: impl Into<String>) -> ItemModBuilder {
 /// A builder for constructing an `ItemMod` AST node.
 pub struct ItemModBuilder {
     ident: String,
+    vis: Visibility,
     content: Option<ThinVec<Item>>,
     md: MdBuilder,
 }
@@ -1729,9 +1775,16 @@ impl ItemModBuilder {
     pub fn new(name: impl Into<String>) -> Self {
         Self {
             ident: name.into(),
+            vis: Visibility::Default,
             content: None,
             md: MdBuilder::new(),
         }
+    }
+
+    /// Sets the visibility of the module.
+    pub fn vis(mut self, vis: Visibility) -> Self {
+        self.vis = vis;
+        self
     }
 
     /// Sets the content of the module.
@@ -1767,6 +1820,7 @@ impl ItemModBuilder {
     /// Builds the `ItemMod` AST node.
     pub fn build(self) -> ItemMod {
         ItemMod {
+            vis: self.vis,
             ident: self.ident,
             content: self.content,
             md: Some(Box::new(self.md.build())),
@@ -1832,6 +1886,7 @@ pub fn union_item(name: impl Into<String>) -> ItemUnionBuilder {
 /// A builder for constructing an `ItemUnion` AST node.
 pub struct ItemUnionBuilder {
     ident: String,
+    vis: Visibility,
     fields: ThinVec<Field>,
     generics: GenericParams,
     md: MdBuilder,
@@ -1842,10 +1897,17 @@ impl ItemUnionBuilder {
     pub fn new(name: impl Into<String>) -> Self {
         Self {
             ident: name.into(),
+            vis: Visibility::Default,
             generics: GenericParams::new(),
             fields: thin_vec![],
             md: MdBuilder::new(),
         }
+    }
+
+    /// Sets the visibility of the union.
+    pub fn vis(mut self, vis: Visibility) -> Self {
+        self.vis = vis;
+        self
     }
 
     /// Adds a generic parameter to the union.
@@ -1889,6 +1951,7 @@ impl ItemUnionBuilder {
     /// Builds the `ItemUnion` AST node.
     pub fn build(self) -> ItemUnion {
         ItemUnion {
+            vis: self.vis,
             ident: self.ident,
             generics: self.generics,
             fields: self.fields,
@@ -1905,6 +1968,7 @@ pub fn use_item(path: impl Into<String>) -> ItemUseBuilder {
 /// A builder for constructing an `ItemUse` AST node.
 pub struct ItemUseBuilder {
     path: String,
+    vis: Visibility,
     md: MdBuilder,
 }
 
@@ -1913,8 +1977,15 @@ impl ItemUseBuilder {
     pub fn new(path: impl Into<String>) -> Self {
         Self {
             path: path.into(),
+            vis: Visibility::Default,
             md: MdBuilder::new(),
         }
+    }
+
+    /// Sets the visibility of the use item.
+    pub fn vis(mut self, vis: Visibility) -> Self {
+        self.vis = vis;
+        self
     }
 
     /// Adds a leading comment to the `use` item.
@@ -1938,6 +2009,7 @@ impl ItemUseBuilder {
     /// Builds the `ItemUse` AST node.
     pub fn build(self) -> ItemUse {
         ItemUse {
+            vis: self.vis,
             path: self.path,
             md: Some(Box::new(self.md.build())),
         }

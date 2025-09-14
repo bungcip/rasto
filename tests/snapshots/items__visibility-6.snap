@@ -1,0 +1,5 @@
+---
+source: tests/items.rs
+expression: pretty(&pub_use)
+---
+pub use std::collections::HashMap;

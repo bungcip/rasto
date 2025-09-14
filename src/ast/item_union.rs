@@ -1,6 +1,7 @@
 use crate::ast::generics::GenericParams;
 use crate::ast::items::Field;
 use crate::ast::metadata::Md;
+use crate::ast::visibility::Visibility;
 use crate::pretty_printer::{PrettyPrinter, Printer};
 use std::fmt;
 use thin_vec::ThinVec;
@@ -8,6 +9,8 @@ use thin_vec::ThinVec;
 /// A `union` definition, such as `union MyUnion { f1: u32, f2: f32 }`.
 #[derive(Debug, Clone, PartialEq)]
 pub struct ItemUnion {
+    /// The visibility of the union.
+    pub vis: Visibility,
     /// The name of the union.
     pub ident: String,
     /// The generic parameters of the union.

@@ -892,6 +892,7 @@ impl PrettyPrinter for ExprTuple {
 impl PrettyPrinter for ItemFn {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         pp_begin(&self.md, printer)?;
+        self.vis.pretty_print(printer)?;
         printer.string("fn ");
         self.sig.pretty_print(printer)?;
         printer.string(" ");
@@ -1165,6 +1166,7 @@ impl PrettyPrinter for File {
 impl PrettyPrinter for ItemStruct {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         pp_begin(&self.md, printer)?;
+        self.vis.pretty_print(printer)?;
         printer.string("struct ");
         printer.string(&self.ident);
         self.generics.pretty_print(printer)?;
@@ -1200,6 +1202,7 @@ impl PrettyPrinter for Field {
 impl PrettyPrinter for ItemEnum {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         pp_begin(&self.md, printer)?;
+        self.vis.pretty_print(printer)?;
         printer.string("enum ");
         printer.string(&self.ident);
         self.generics.pretty_print(printer)?;
@@ -1268,6 +1271,7 @@ impl PrettyPrinter for ItemImpl {
 impl PrettyPrinter for ItemTrait {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         pp_begin(&self.md, printer)?;
+        self.vis.pretty_print(printer)?;
         printer.string("trait ");
         printer.string(&self.ident);
         self.generics.pretty_print(printer)?;
@@ -1543,6 +1547,7 @@ impl PrettyPrinter for ItemDef {
     /// Pretty-prints the `ItemDef` to the given printer.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         pp_begin(&self.md, printer)?;
+        self.vis.pretty_print(printer)?;
         match &self.kind {
             ItemDefKind::Const { ty, expr } => {
                 printer.string("const ");
@@ -1626,6 +1631,7 @@ impl PrettyPrinter for ItemMod {
     /// Pretty-prints the `ItemMod` to the given printer.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         pp_begin(&self.md, printer)?;
+        self.vis.pretty_print(printer)?;
         printer.string("mod ");
         printer.string(&self.ident);
         if let Some(content) = &self.content {
@@ -1672,6 +1678,7 @@ impl PrettyPrinter for ItemUnion {
     /// Pretty-prints the `ItemUnion` to the given printer.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         pp_begin(&self.md, printer)?;
+        self.vis.pretty_print(printer)?;
         printer.string("union ");
         printer.string(&self.ident);
         self.generics.pretty_print(printer)?;
@@ -1699,6 +1706,7 @@ impl PrettyPrinter for ItemUse {
     /// Pretty-prints the `ItemUse` to the given printer.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         pp_begin(&self.md, printer)?;
+        self.vis.pretty_print(printer)?;
         printer.string("use ");
         printer.string(&self.path);
         printer.string(";");

@@ -52,6 +52,8 @@ pub mod statements;
 pub mod tokens;
 /// Defines the AST nodes for types.
 pub mod types;
+/// Defines the AST nodes for visibility.
+pub mod visibility;
 
 pub use associated_type::*;
 pub use attributes::*;
@@ -76,3 +78,4 @@ pub use patterns::*;
 pub use statements::*;
 pub use tokens::*;
 pub use types::*;
+pub use visibility::*;
