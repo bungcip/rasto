@@ -348,11 +348,14 @@ pub struct ExprAssign {
     pub right: Box<Expr>,
 }
 
+use crate::ast::tokens::Delimiter;
 /// A macro call expression, such as `foo!(...)`.
 #[derive(Debug, Clone, PartialEq)]
 pub struct ExprMacroCall {
-    /// The name of the macro being called.
-    pub ident: String,
+    /// The path to the macro being called.
+    pub path: Path,
+    /// The delimiter of the macro’s input.
+    pub delimiter: Delimiter,
     /// The token stream passed to the macro.
     pub tokens: TokenStream,
 }

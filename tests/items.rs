@@ -32,10 +32,13 @@ fn test_foreign_mod_item() {
     insta::assert_snapshot!(item.to_string());
 }
 
+use rasto::ast::Delimiter;
+
 #[test]
 fn test_macro_item() {
     let item = macro_item(expr().macro_call(
-        "my_macro",
+        path("my_macro").build(),
+        Delimiter::Parenthesis,
         TokenStream {
             tokens: thin_vec![],
         },

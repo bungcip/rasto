@@ -1230,9 +1230,21 @@ impl PrettyPrinter for ExprAssign {
 
 impl PrettyPrinter for ExprMacroCall {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
-        printer.string(&self.ident);
+        self.path.pretty_print(printer)?;
         printer.string("!");
-        self.tokens.pretty_print(printer)
+
+        let (open, close) = match self.delimiter {
+            Delimiter::Parenthesis => ("(", ")"),
+            Delimiter::Brace => ("{", "}"),
+            Delimiter::Bracket => ("[", "]"),
+            Delimiter::None => ("", ""),
+        };
+
+        printer.begin(BreakStyle::Consistent, open);
+        self.tokens.pretty_print(printer)?;
+        printer.end(close);
+
+        Ok(())
     }
 }
 

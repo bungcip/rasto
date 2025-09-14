@@ -2,4 +2,4 @@
 source: tests/items.rs
 expression: item.to_string()
 ---
-my_macro!;
+my_macro!();

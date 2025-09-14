@@ -840,12 +840,6 @@ impl LocalBuilder {
     }
 }
 
-impl From<LocalBuilder> for Stmt {
-    fn from(value: LocalBuilder) -> Self {
-        value.build()
-    }
-}
-
 /// Creates a new `PatBuilder` to construct patterns.
 pub fn pat() -> PatBuilder {
     PatBuilder
@@ -877,6 +871,44 @@ impl PatBuilder {
     /// Creates a rest pattern (`..`).
     pub fn rest(self) -> Pat {
         Pat::Rest
+    }
+}
+
+/// Creates a new `PathBuilder` to construct a path.
+pub fn path(segment: impl Into<String>) -> PathBuilder {
+    PathBuilder::new(segment)
+}
+
+/// A builder for constructing a `Path` AST node.
+pub struct PathBuilder {
+    segments: ThinVec<PathSegment>,
+}
+
+impl PathBuilder {
+    /// Creates a new `PathBuilder` with the given segment.
+    pub fn new(segment: impl Into<String>) -> Self {
+        Self {
+            segments: thin_vec![PathSegment {
+                ident: segment.into(),
+                args: None,
+            }],
+        }
+    }
+
+    /// Adds a segment to the path.
+    pub fn segment(mut self, segment: impl Into<String>) -> Self {
+        self.segments.push(PathSegment {
+            ident: segment.into(),
+            args: None,
+        });
+        self
+    }
+
+    /// Builds the `Path` AST node.
+    pub fn build(self) -> Path {
+        Path {
+            segments: self.segments,
+        }
     }
 }
 
@@ -1107,11 +1139,13 @@ impl ExprBuilder {
     ///
     /// # Parameters
     ///
-    /// - `ident`: The name of the macro.
+    /// - `path`: The path to the macro.
+    /// - `delimiter`: The delimiter of the macro's input.
     /// - `tokens`: The token stream passed to the macro.
-    pub fn macro_call(self, ident: impl Into<String>, tokens: TokenStream) -> Expr {
+    pub fn macro_call(self, path: Path, delimiter: Delimiter, tokens: TokenStream) -> Expr {
         Expr::MacroCall(ExprMacroCall {
-            ident: ident.into(),
+            path,
+            delimiter,
             tokens,
         })
     }
@@ -1864,6 +1898,18 @@ impl MetaBuilder {
             path: path.into(),
             value: value.into(),
         })
+    }
+}
+
+impl From<LocalBuilder> for Stmt {
+    fn from(value: LocalBuilder) -> Self {
+        value.build()
+    }
+}
+
+impl From<PathBuilder> for Path {
+    fn from(builder: PathBuilder) -> Self {
+        builder.build()
     }
 }
 
