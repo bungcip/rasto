@@ -911,15 +911,13 @@ impl PrettyPrinter for Signature {
 impl PrettyPrinter for Block {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.begin(BreakStyle::Consistent, "{");
-        let is_empty = self.stmts.is_empty()
-            && self.leading_comments.is_empty()
-            && self.trailing_comments.is_empty();
+
+        let is_empty = self.stmts.is_empty() && self.md.is_none();
 
         if !is_empty {
             printer.hard_break();
-            for comment in &self.leading_comments {
-                comment.pretty_print(printer)?;
-            }
+            metadata::pp_begin(&self.md, printer)?;
+
             let num_stmts = self.stmts.len();
             for (i, stmt) in self.stmts.iter().enumerate() {
                 stmt.pretty_print(printer)?;
@@ -927,9 +925,8 @@ impl PrettyPrinter for Block {
                     printer.string(";");
                 }
             }
-            for comment in &self.trailing_comments {
-                comment.pretty_print(printer)?;
-            }
+
+            metadata::pp_end(&self.md, printer)?;
             printer.hard_break();
         }
 

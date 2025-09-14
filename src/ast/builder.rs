@@ -161,10 +161,10 @@ pub fn block() -> BlockBuilder {
 /// A builder for constructing a `Block` AST node.
 #[derive(Default)]
 pub struct BlockBuilder {
-    leading_comments: ThinVec<Comment>,
     stmts: ThinVec<Stmt>,
-    trailing_comments: ThinVec<Comment>,
     has_trailing_semicolon: bool,
+    leading_comments: ThinVec<Comment>,
+    trailing_comments: ThinVec<Comment>,
 }
 
 impl BlockBuilder {
@@ -219,11 +219,22 @@ impl BlockBuilder {
     ///
     /// A `Block` instance.
     pub fn build(self) -> Block {
+        let md = if self.leading_comments.is_empty() == false
+            || self.trailing_comments.is_empty() == false
+        {
+            Some(Box::new(Md {
+                leading_comments: self.leading_comments,
+                trailing_comments: self.trailing_comments,
+                ..Default::default()
+            }))
+        } else {
+            None
+        };
+
         Block {
-            leading_comments: self.leading_comments,
             stmts: self.stmts,
-            trailing_comments: self.trailing_comments,
             has_trailing_semicolon: self.has_trailing_semicolon,
+            md: md,
         }
     }
 }
@@ -647,6 +658,13 @@ impl LocalBuilder {
     }
 }
 
+impl From<LocalBuilder> for Stmt {
+    fn from(value: LocalBuilder) -> Self {
+        value.build()
+    }
+}
+
+
 /// Creates a new `PatBuilder` to construct patterns.
 pub fn pat() -> PatBuilder {
     PatBuilder
@@ -1039,6 +1057,12 @@ impl ExprBuilder {
             cond: Box::new(cond),
             body,
         })
+    }
+}
+
+impl From<Expr> for Stmt {
+    fn from(value: Expr) -> Stmt {
+        Stmt::Expr(value)
     }
 }
 

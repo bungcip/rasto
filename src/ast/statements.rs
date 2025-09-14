@@ -3,11 +3,11 @@
 //! Statements are instructions that perform an action but do not produce a value.
 //! They are the building blocks of function bodies and other code blocks.
 
-use crate::ast::comments::Comment;
 use crate::ast::expressions::{Expr, ExprMacroCall};
 use crate::ast::items::Item;
 use crate::ast::patterns::Pat;
 use crate::ast::types::Type;
+use crate::ast::Md;
 use thin_vec::ThinVec;
 
 /// A block of code, enclosed in curly braces: `{ ... }`.
@@ -15,14 +15,22 @@ use thin_vec::ThinVec;
 /// A block contains a sequence of statements and is also an expression.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Block {
-    /// Comments that appear at the beginning of the block, before any statements.
-    pub leading_comments: ThinVec<Comment>,
     /// The statements within the block.
     pub stmts: ThinVec<Stmt>,
     /// Whether the last statement in the block has a trailing semicolon.
     pub has_trailing_semicolon: bool,
-    /// Comments that appear at the end of the block, after all statements.
-    pub trailing_comments: ThinVec<Comment>,
+    ///
+    pub md: Option<Box<Md>>,
+}
+
+impl Default for Block {
+    fn default() -> Self {
+        Self {
+            stmts: Default::default(),
+            has_trailing_semicolon: true,
+            md: Default::default(),
+        }
+    }
 }
 
 /// A statement in a block.

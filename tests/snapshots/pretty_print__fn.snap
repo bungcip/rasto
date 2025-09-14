@@ -3,8 +3,8 @@ source: tests/pretty_print.rs
 expression: pretty_print_item(ast)
 ---
 fn foo(a) -> i32 {
-
+    
     /* Block comment with single line */
-    42;
-
+    let hello = "world";42
+    
 }
