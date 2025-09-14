@@ -61,6 +61,22 @@ fn test_macro_call_with_brackets() {
     insta::assert_snapshot!(pretty(&ast));
 }
 
+fn test_pretty_print_doc_comment() {
+    let a = file()
+        .item(
+            fn_def("foo")
+                .leading_comment(comment().doc(" This is a doc comment."))
+                .block(block())
+                .build(),
+        )
+        .build();
+
+    insta::assert_snapshot!(pretty(&a), @r"
+    /// This is a doc comment.
+    fn foo() {}
+    ");
+}
+
 #[test]
 fn test_block_single_comment() {
     let single = comment().block("Block comment with single line");

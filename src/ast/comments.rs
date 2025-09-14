@@ -25,4 +25,14 @@ pub enum Comment {
     /// /* This is a block comment. */
     /// ```
     Block(String),
+    /// A doc comment, starting with `///`.
+    ///
+    /// The string contains the content of the comment, without the `///`.
+    ///
+    /// # Example
+    ///
+    /// ```text
+    /// /// This is a doc comment.
+    /// ```
+    Doc(String),
 }

@@ -85,6 +85,11 @@ impl CommentBuilder {
     pub fn block<S: Into<String>>(self, content: S) -> Comment {
         Comment::Block(content.into())
     }
+
+    /// Creates a doc comment.
+    pub fn doc<S: Into<String>>(self, content: S) -> Comment {
+        Comment::Doc(content.into())
+    }
 }
 
 /// Creates a new `TraitBuilder` to construct a trait definition.
