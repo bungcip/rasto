@@ -32,11 +32,7 @@ fn test_for_expression_with_ident_pattern() {
 fn test_match_expression_with_rest_pattern() {
     let match_expr = expr().match_expr(
         expr().lit(10),
-        [Arm {
-            pat: pat().rest(),
-            guard: None,
-            body: Box::new(expr().lit(42)),
-        }],
+        [expr().arm(pat().rest()).body(expr().lit(42)).build()],
     );
 
     insta::assert_snapshot!(pretty(&match_expr), @r"
