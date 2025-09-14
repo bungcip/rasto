@@ -1,4 +1,6 @@
-use rasto::ast::builder::{block, comment, file, fn_def, pat, stmt};
+use rasto::ast::builder::{
+    block, comment, enum_def, file, fn_def, pat, stmt, struct_def, trait_def,
+};
 use rasto::ast::*;
 use rasto::pretty_printer::{PrettyPrinter, Printer};
 use thin_vec::thin_vec;
@@ -28,27 +30,13 @@ fn pretty_print_file(file: File) -> String {
 #[test]
 fn test_file() {
     let ast = file()
-        .item(Item::Struct(ItemStruct {
-            md: Some(Box::new(Md {
-                attrs: thin_vec![],
-                leading_comments: thin_vec![comment().line(" A simple struct.")],
-                trailing_comments: thin_vec![],
-            })),
-            ident: "Foo".to_string(),
-            generics: Default::default(),
-            fields: thin_vec![
-                Field {
-                    md: None,
-                    ident: "field1".to_string(),
-                    ty: "i32".into(),
-                },
-                Field {
-                    md: None,
-                    ident: "field2".to_string(),
-                    ty: "String".into(),
-                },
-            ],
-        }))
+        .item(
+            struct_def("Foo")
+                .leading_comment(comment().line(" A simple struct."))
+                .field("field1", "i32")
+                .field("field2", "String")
+                .build(),
+        )
         .item(
             fn_def("foo")
                 .input(pat().ident("a", false))
@@ -424,26 +412,21 @@ fn test_long_binary_expression() {
 
 #[test]
 fn test_trait() {
-    let ast = Item::Trait(ItemTrait {
-        md: Some(Box::new(Md {
-            attrs: thin_vec![],
-            leading_comments: thin_vec![comment().line(" A simple trait.")],
-            trailing_comments: thin_vec![],
-        })),
-        ident: "MyTrait".to_string(),
-        generics: Default::default(),
-        associated_types: thin_vec![],
-        items: thin_vec![TraitItem::Fn(TraitItemFn {
-            md: None,
-            sig: Signature {
-                ident: "my_func".to_string(),
-                generics: Default::default(),
-                inputs: thin_vec![],
-                output: None,
-            },
-            block: None,
-        })],
-    });
+    let ast = Item::Trait(
+        trait_def("MyTrait")
+            .leading_comment(comment().line(" A simple trait."))
+            .item(TraitItem::Fn(TraitItemFn {
+                md: None,
+                sig: Signature {
+                    ident: "my_func".to_string(),
+                    generics: Default::default(),
+                    inputs: thin_vec![],
+                    output: None,
+                },
+                block: None,
+            }))
+            .build(),
+    );
 
     insta::assert_snapshot!(pretty_print_item(ast));
 }
@@ -556,25 +539,13 @@ fn test_macro_call_expression() {
 
 #[test]
 fn test_enum() {
-    let ast = Item::Enum(ItemEnum {
-        md: Some(Box::new(Md {
-            attrs: thin_vec![],
-            leading_comments: thin_vec![comment().line(" A simple enum.")],
-            trailing_comments: thin_vec![],
-        })),
-        ident: "MyEnum".to_string(),
-        generics: Default::default(),
-        variants: thin_vec![
-            Variant {
-                md: None,
-                ident: "Variant1".to_string(),
-            },
-            Variant {
-                md: None,
-                ident: "Variant2".to_string(),
-            },
-        ],
-    });
+    let ast = Item::Enum(
+        enum_def("MyEnum")
+            .leading_comment(comment().line(" A simple enum."))
+            .variant("Variant1")
+            .variant("Variant2")
+            .build(),
+    );
 
     insta::assert_snapshot!(pretty_print_item(ast));
 }
@@ -810,27 +781,13 @@ fn test_all_literals() {
 
 #[test]
 fn test_struct() {
-    let ast = Item::Struct(ItemStruct {
-        md: Some(Box::new(Md {
-            attrs: thin_vec![],
-            leading_comments: thin_vec![comment().line(" A simple struct.")],
-            trailing_comments: thin_vec![],
-        })),
-        ident: "Foo".to_string(),
-        generics: Default::default(),
-        fields: thin_vec![
-            Field {
-                md: None,
-                ident: "field1".to_string(),
-                ty: "i32".into(),
-            },
-            Field {
-                md: None,
-                ident: "field2".to_string(),
-                ty: "String".into(),
-            },
-        ],
-    });
+    let ast = Item::Struct(
+        struct_def("Foo")
+            .leading_comment(comment().line(" A simple struct."))
+            .field("field1", "i32")
+            .field("field2", "String")
+            .build(),
+    );
 
     insta::assert_snapshot!(pretty_print_item(ast));
 }
