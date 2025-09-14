@@ -256,6 +256,9 @@ pub fn impl_block(ty: impl Into<Type>) -> ImplBuilder {
 pub struct ImplBuilder {
     generics: GenericParams,
     ty: Type,
+    trait_: Option<Type>,
+    is_unsafe: bool,
+    is_negative: bool,
     fns: ThinVec<ItemFn>,
 }
 
@@ -269,6 +272,9 @@ impl ImplBuilder {
         Self {
             generics: GenericParams::new(),
             ty: ty.into(),
+            trait_: None,
+            is_unsafe: false,
+            is_negative: false,
             fns: thin_vec![],
         }
     }
@@ -280,6 +286,28 @@ impl ImplBuilder {
     /// - `param`: The generic parameter to add.
     pub fn generic(mut self, param: impl Into<GenericParam>) -> Self {
         self.generics.params.push(param.into());
+        self
+    }
+
+    /// Sets the trait for the impl block.
+    ///
+    /// # Parameters
+    ///
+    /// - `trait_`: The trait to implement.
+    pub fn trait_(mut self, trait_: impl Into<Type>) -> Self {
+        self.trait_ = Some(trait_.into());
+        self
+    }
+
+    /// Marks the impl block as `unsafe`.
+    pub fn unsafe_(mut self) -> Self {
+        self.is_unsafe = true;
+        self
+    }
+
+    /// Marks the impl block as negative.
+    pub fn negative(mut self) -> Self {
+        self.is_negative = true;
         self
     }
 
@@ -302,6 +330,9 @@ impl ImplBuilder {
         ItemImpl {
             generics: self.generics,
             ty: self.ty,
+            trait_: self.trait_,
+            is_unsafe: self.is_unsafe,
+            is_negative: self.is_negative,
             fns: self.fns,
             md: None,
         }

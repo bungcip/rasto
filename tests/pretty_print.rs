@@ -585,16 +585,43 @@ fn test_enum() {
 
 #[test]
 fn test_impl() {
-    let ast = Item::Impl(ItemImpl {
-        md: Some(Box::new(Md {
-            attrs: thin_vec![],
-            leading_comments: thin_vec![Comment::Line(" A simple impl.".to_string())],
-            trailing_comments: thin_vec![],
-        })),
-        generics: Default::default(),
-        ty: "MyStruct".into(),
-        fns: thin_vec![fn_def("new").block(block()).build()],
-    });
+    let ast = Item::Impl(
+        impl_block("MyStruct")
+            .function(fn_def("new").block(block()).build())
+            .build(),
+    );
+
+    insta::assert_snapshot!(pretty_print_item(ast));
+}
+
+#[test]
+fn test_trait_impl() {
+    let ast = Item::Impl(
+        impl_block("MyStruct")
+            .trait_("MyTrait")
+            .function(fn_def("new").block(block()).build())
+            .build(),
+    );
+
+    insta::assert_snapshot!(pretty_print_item(ast));
+}
+
+#[test]
+fn test_unsafe_trait_impl() {
+    let ast = Item::Impl(
+        impl_block("MyStruct")
+            .trait_("MyTrait")
+            .unsafe_()
+            .function(fn_def("new").block(block()).build())
+            .build(),
+    );
+
+    insta::assert_snapshot!(pretty_print_item(ast));
+}
+
+#[test]
+fn test_negative_impl() {
+    let ast = Item::Impl(impl_block("MyStruct").trait_("MyTrait").negative().build());
 
     insta::assert_snapshot!(pretty_print_item(ast));
 }

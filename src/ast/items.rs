@@ -181,6 +181,12 @@ pub struct Variant {
 pub struct ItemImpl {
     /// The type the `impl` block is for.
     pub ty: Type,
+    /// The trait being implemented, if any.
+    pub trait_: Option<Type>,
+    /// Whether the `impl` is `unsafe`.
+    pub is_unsafe: bool,
+    /// Whether the `impl` is negative.
+    pub is_negative: bool,
     /// The generic parameters of the `impl` block.
     pub generics: GenericParams,
     /// The functions within the `impl` block.

@@ -2,6 +2,6 @@
 source: tests/pretty_print.rs
 expression: pretty_print_item(ast)
 ---
-impl MyStruct {
+impl MyTrait for MyStruct {
     fn new() {}
 }
