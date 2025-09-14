@@ -4,8 +4,8 @@ use rasto::builder::*;
 #[test]
 fn test_fn_builder() {
     let item_fn = fn_def("foo")
-        .input(pat().ident("a", false))
-        .input(pat().ident("b", false))
+        .input("a")
+        .input("b")
         .output("bool")
         .statement(expr().lit("Hello, world!"))
         .build();
@@ -25,8 +25,8 @@ fn test_fn_builder_with_metadata() {
         .attr(attr().meta("test"))
         .leading_comment(comment().line(" a leading comment"))
         .trailing_comment(comment().line(" a trailing comment"))
-        .input(pat().ident("a", false))
-        .input(pat().ident("b", false))
+        .input("a")
+        .input("b")
         .output("bool")
         .statement(expr().lit("Hello, world!"))
         .build();
@@ -46,11 +46,7 @@ fn test_fn_builder_with_metadata() {
 
 #[test]
 fn test_stmt_builder() {
-    let local_stmt = stmt()
-        .local(pat().ident("x", false))
-        .ty("i32")
-        .expr(expr().lit(42))
-        .build();
+    let local_stmt = stmt().local("x").ty("i32").expr(expr().lit(42)).build();
 
     assert_eq!(
         local_stmt,

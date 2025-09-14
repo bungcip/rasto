@@ -1,7 +1,7 @@
 use rasto::ast::*;
 use rasto::builder::{
     block, comment, enum_def, expr, field_value, file, fn_def, impl_block, pat, stmt, struct_def,
-    trait_def, trait_item_fn,
+    trait_def, trait_item_fn, tt,
 };
 use rasto::pretty;
 use thin_vec::thin_vec;
@@ -20,7 +20,7 @@ fn test_file() {
         )
         .item(
             fn_def("foo")
-                .input(pat().ident("a", false))
+                .input("a")
                 .output("i32")
                 .statement(expr().lit(42))
                 .build(),
@@ -36,14 +36,7 @@ fn test_macro_call_with_brackets() {
         .statement(expr().macro_call(
             "vec",
             Delimiter::Bracket,
-            thin_vec![
-                TokenTree::Literal(0.into()),
-                TokenTree::Punct(Punct {
-                    ch: ';',
-                    spacing: Spacing::Alone,
-                }),
-                TokenTree::Literal(256.into()),
-            ],
+            thin_vec![tt().lit(0), tt().punct(';', Spacing::Alone), tt().lit(256)],
         ))
         .build();
 
@@ -82,16 +75,12 @@ fn test_block_multiline_comment() {
 #[test]
 fn test_fn() {
     let ast = fn_def("foo")
-        .input(pat().ident("a", false))
+        .input("a")
         .output("i32")
         .block(
             block()
                 .leading_comment(comment().block(" Block comment with single line "))
-                .statement(
-                    stmt()
-                        .local(pat().ident("hello", false))
-                        .expr(expr().lit("world")),
-                )
+                .statement(stmt().local("hello").expr(expr().lit("world")))
                 .statement(expr().lit(42))
                 .has_trailing_semicolon(false),
         )
@@ -149,7 +138,7 @@ fn test_expr_break() {
 
 #[test]
 fn test_expr_call() {
-    let ast = expr().call(expr().lit("foo"), vec![expr().lit(1), expr().lit(2)]);
+    let ast = expr().call(expr().lit("foo"), [expr().lit(1), expr().lit(2)]);
     insta::assert_snapshot!(pretty(&ast));
 }
 
@@ -161,10 +150,7 @@ fn test_expr_cast() {
 
 #[test]
 fn test_expr_closure() {
-    let ast = expr().closure(
-        vec![pat().ident("a", false), pat().ident("b", false)],
-        expr().lit(1),
-    );
+    let ast = expr().closure([pat().ident("a"), pat().ident("b")], expr().lit(1));
     insta::assert_snapshot!(pretty(&ast));
 }
 
@@ -198,12 +184,12 @@ fn test_expr_match() {
         expr().lit("x"),
         vec![
             Arm {
-                pat: pat().tuple(vec![pat().ident("Some", false), pat().ident("y", false)]),
+                pat: pat().tuple([pat().ident("Some"), pat().ident("y")]),
                 guard: None,
                 body: Box::new(expr().lit(1)),
             },
             Arm {
-                pat: pat().ident("None", false),
+                pat: pat().ident("None"),
                 guard: Some(Box::new(expr().lit(true))),
                 body: Box::new(expr().lit(2)),
             },
@@ -214,11 +200,7 @@ fn test_expr_match() {
 
 #[test]
 fn test_expr_method_call() {
-    let ast = expr().method_call(
-        expr().lit("obj"),
-        "method",
-        vec![expr().lit(1), expr().lit(2)],
-    );
+    let ast = expr().method_call(expr().lit("obj"), "method", [expr().lit(1), expr().lit(2)]);
     insta::assert_snapshot!(pretty(&ast));
 }
 
@@ -339,11 +321,7 @@ fn test_while_expression() {
 #[test]
 fn test_for_expression() {
     let ast = fn_def("foo")
-        .statement(expr().for_loop(
-            pat().ident("x", false),
-            expr().lit(1),
-            block().statement(expr().lit(2)).build(),
-        ))
+        .statement(expr().for_loop("x", expr().lit(1), block().statement(expr().lit(2)).build()))
         .build();
 
     insta::assert_snapshot!(pretty(&ast));
@@ -364,7 +342,7 @@ fn test_macro_call_expression() {
         .statement(expr().macro_call(
             "println",
             Delimiter::Parenthesis,
-            thin_vec![TokenTree::Literal("hello".into())],
+            thin_vec![tt().lit("hello")],
         ))
         .build();
 
@@ -377,7 +355,7 @@ fn test_macro_call_expression_with_path() {
         .statement(expr().macro_call(
             path("std").segment("println").build(),
             Delimiter::Parenthesis,
-            thin_vec![TokenTree::Literal("hello".into())],
+            thin_vec![tt().lit("hello")],
         ))
         .build();
 
@@ -435,13 +413,7 @@ fn test_negative_impl() {
 #[test]
 fn test_let_statement() {
     let ast = fn_def("foo")
-        .statement(
-            stmt()
-                .local(pat().ident("x", false))
-                .ty("i32")
-                .expr(expr().lit(42))
-                .build(),
-        )
+        .statement(stmt().local("x").ty("i32").expr(expr().lit(42)).build())
         .build();
 
     insta::assert_snapshot!(pretty(&ast));
@@ -500,7 +472,7 @@ fn test_macro_call_statement() {
         .statement(stmt().mac_call(ExprMacroCall {
             path: path("println").build(),
             delimiter: Delimiter::Parenthesis,
-            tokens: thin_vec![TokenTree::Literal("hello".into())].into(),
+            tokens: thin_vec![tt().lit("hello")].into(),
         }))
         .build();
 

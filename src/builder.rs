@@ -871,12 +871,14 @@ pub fn trait_item_fn(name: impl Into<String>) -> TraitItemFn {
 
 /// Creates a new `PatBuilder` to construct patterns.
 pub fn pat() -> PatBuilder {
-    PatBuilder
+    PatBuilder::default()
 }
 
 /// A builder for constructing `Pat` AST nodes.
-#[derive(Clone, Copy)]
-pub struct PatBuilder;
+#[derive(Clone, Copy, Default)]
+pub struct PatBuilder {
+    mutability: bool,
+}
 
 impl PatBuilder {
     /// Creates a wildcard pattern (`_`).
@@ -884,11 +886,17 @@ impl PatBuilder {
         Pat::Wild
     }
 
+    /// set mutability of pattern
+    pub fn mutable(mut self) -> Self {
+        self.mutability = true;
+        self
+    }
+
     /// Creates an identifier pattern.
-    pub fn ident(self, name: impl Into<String>, is_mut: bool) -> Pat {
+    pub fn ident(self, name: impl Into<String>) -> Pat {
         Pat::Ident(PatIdent {
             ident: name.into(),
-            is_mut,
+            is_mut: self.mutability,
         })
     }
 
@@ -1171,6 +1179,11 @@ impl ExprBuilder {
     /// create int literal with suffix
     pub fn int_lit_with_suffix(self, value: i32, suffix: IntSuffix) -> Expr {
         Expr::Lit(Lit::Int(LitInt::with_suffix(value as u128, suffix)))
+    }
+
+    /// create float literal with suffix
+    pub fn float_lit_with_suffix(self, value: &str, suffix: FloatSuffix) -> Expr {
+        Expr::Lit(Lit::Float(LitFloat::with_suffix(value, suffix)))
     }
 
     /// Creates a `loop` expression.
@@ -1950,6 +1963,32 @@ impl MetaBuilder {
             path: path.into(),
             value: value.into(),
         })
+    }
+}
+
+/// token tree builder
+pub fn tt() -> TokenTreeBuilder {
+    TokenTreeBuilder {}
+}
+
+/// A builder for constructing `TokenTree` AST nodes.
+#[derive(Clone, Copy, Default)]
+pub struct TokenTreeBuilder;
+
+impl TokenTreeBuilder {
+    /// create TokenTree::Literal
+    pub fn lit(self, value: impl Into<Lit>) -> TokenTree {
+        TokenTree::Literal(value.into())
+    }
+
+    /// create TokenTree::Ident
+    pub fn ident(self, value: impl Into<String>) -> TokenTree {
+        TokenTree::Ident(value.into())
+    }
+
+    /// create TokenTree::Punct
+    pub fn punct(self, ch: char, spacing: Spacing) -> TokenTree {
+        TokenTree::Punct(Punct { ch, spacing })
     }
 }
 
