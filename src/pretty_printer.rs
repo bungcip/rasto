@@ -33,6 +33,9 @@ const LINE_WIDTH: isize = 100;
 /// A large integer value used to represent an infinitely long line.
 const INFINITY: isize = 0xffff;
 
+/// indent space size.
+const INDENT_SIZE: usize = 4;
+
 /// The style of a break.
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub enum BreakStyle {
@@ -85,6 +88,15 @@ impl<T: PrettyPrinter + ?Sized> PrettyPrinter for Box<T> {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         (**self).pretty_print(printer)
     }
+}
+
+/// pretty print an ast datastructure to string
+pub fn pretty(ast: &impl PrettyPrinter) -> String {
+    let mut buf = String::new();
+    let mut printer = Printer::new(&mut buf);
+    ast.pretty_print(&mut printer).unwrap();
+    printer.finish().unwrap();
+    buf
 }
 
 /// A pretty-printer for the Rust AST.
@@ -285,7 +297,7 @@ impl<'a> Printer<'a> {
                     self.writer.write_str(open)?;
                     self.space -= open.len() as isize;
                     if is_broken {
-                        self.indent += 4;
+                        self.indent += INDENT_SIZE;
                     }
                 }
                 Token::End { close } => {

@@ -1,5 +1,6 @@
 use rasto::ast::*;
-use rasto::builder::{self, block};
+use rasto::builder;
+use rasto::pretty;
 
 #[test]
 fn test_fn_with_attributes() {
@@ -10,11 +11,10 @@ fn test_fn_with_attributes() {
                 "derive",
                 [builder::meta().path("Debug"), builder::meta().path("Clone")],
             )))
-            .block(block())
             .build(),
     );
 
-    insta::assert_snapshot!(item.to_string(), @r###"
+    insta::assert_snapshot!(pretty(&item), @r###"
     #[test]
     #[derive(Debug, Clone)]
     fn my_func() {}

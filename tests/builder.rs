@@ -7,7 +7,7 @@ fn test_fn_builder() {
         .input(pat().ident("a", false))
         .input(pat().ident("b", false))
         .output("bool")
-        .block(block().statement(expr().lit("Hello, world!")))
+        .statement(expr().lit("Hello, world!"))
         .build();
 
     let actual = item_fn.to_string();
@@ -28,7 +28,7 @@ fn test_fn_builder_with_metadata() {
         .input(pat().ident("a", false))
         .input(pat().ident("b", false))
         .output("bool")
-        .block(block().statement(stmt().expr(expr().lit("Hello, world!"))))
+        .statement(expr().lit("Hello, world!"))
         .build();
 
     let actual = item_fn.to_string();

@@ -1,4 +1,4 @@
-use rasto::ast::{AsmDirection, AsmOption, Item, LitStr, RegSpec, TokenStream, Type};
+use rasto::ast::{AsmDirection, AsmOption, Item, LitStr, RegSpec, Type};
 use rasto::builder::*;
 use thin_vec::thin_vec;
 
@@ -27,7 +27,7 @@ fn test_extern_crate_item() {
 #[test]
 fn test_foreign_mod_item() {
     let item = foreign_mod_item("C")
-        .item(Item::Fn(fn_def("foo").block(block()).build()))
+        .item(Item::Fn(fn_def("foo").build()))
         .build();
     insta::assert_snapshot!(item.to_string());
 }
@@ -36,12 +36,8 @@ use rasto::ast::Delimiter;
 
 #[test]
 fn test_macro_item() {
-    let item = macro_item(expr().macro_call(
-        "my_macro",
-        Delimiter::Parenthesis,
-        thin_vec![]
-    ))
-    .build();
+    let item =
+        macro_item(expr().macro_call("my_macro", Delimiter::Parenthesis, thin_vec![])).build();
     insta::assert_snapshot!(item.to_string());
 }
 
@@ -54,7 +50,7 @@ fn test_mod_item() {
 #[test]
 fn test_mod_item_with_content() {
     let item = mod_item("my_module")
-        .content(thin_vec![Item::Fn(fn_def("foo").block(block()).build())])
+        .content(thin_vec![Item::Fn(fn_def("foo").build())])
         .build();
     insta::assert_snapshot!(item.to_string());
 }

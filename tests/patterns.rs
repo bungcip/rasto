@@ -2,16 +2,8 @@
 
 use rasto::ast::*;
 use rasto::builder::*;
-use rasto::pretty_printer::{PrettyPrinter, Printer};
+use rasto::pretty;
 use thin_vec::thin_vec;
-
-fn pretty_print(item: &impl PrettyPrinter) -> String {
-    let mut buffer = String::new();
-    let mut printer = Printer::new(&mut buffer);
-    item.pretty_print(&mut printer).unwrap();
-    printer.finish().unwrap();
-    buffer
-}
 
 #[test]
 fn test_let_statement_with_ident_pattern() {
@@ -20,7 +12,7 @@ fn test_let_statement_with_ident_pattern() {
         .expr(expr().lit(42))
         .build();
 
-    insta::assert_snapshot!(pretty_print(&let_stmt), @"let x = 42;");
+    insta::assert_snapshot!(pretty(&let_stmt), @"let x = 42;");
 }
 
 #[test]
@@ -30,14 +22,14 @@ fn test_let_statement_with_mut_ident_pattern() {
         .expr(expr().lit(42))
         .build();
 
-    insta::assert_snapshot!(pretty_print(&let_stmt), @"let mut x = 42;");
+    insta::assert_snapshot!(pretty(&let_stmt), @"let mut x = 42;");
 }
 
 #[test]
 fn test_for_expression_with_ident_pattern() {
     let for_expr = expr().for_loop(pat().ident("x", false), expr().lit(10), block().build());
 
-    insta::assert_snapshot!(pretty_print(&for_expr), @"for x in 10 {}");
+    insta::assert_snapshot!(pretty(&for_expr), @"for x in 10 {}");
 }
 
 #[test]
@@ -51,7 +43,7 @@ fn test_match_expression_with_rest_pattern() {
         }],
     );
 
-    insta::assert_snapshot!(pretty_print(&match_expr), @r"
+    insta::assert_snapshot!(pretty(&match_expr), @r"
     match 10 {
         .. => 42,
     }
@@ -62,7 +54,7 @@ fn test_match_expression_with_rest_pattern() {
 fn test_let_statement_with_wildcard_pattern() {
     let let_stmt = stmt().local(pat().wild()).build();
 
-    insta::assert_snapshot!(pretty_print(&let_stmt), @"let _;");
+    insta::assert_snapshot!(pretty(&let_stmt), @"let _;");
 }
 
 #[test]
@@ -72,15 +64,14 @@ fn test_let_statement_with_tuple_pattern() {
         .expr(expr().tuple(thin_vec![expr().lit(1), expr().lit(2)]))
         .build();
 
-    insta::assert_snapshot!(pretty_print(&let_stmt), @"let (x, y) = (1, 2);");
+    insta::assert_snapshot!(pretty(&let_stmt), @"let (x, y) = (1, 2);");
 }
 
 #[test]
 fn test_function_with_tuple_pattern_in_arg() {
     let fn_def = fn_def("foo")
         .input(pat().tuple(thin_vec![pat().ident("x", false), pat().ident("y", false)]))
-        .block(block())
         .build();
 
-    insta::assert_snapshot!(pretty_print(&fn_def), @"fn foo((x, y)) {}");
+    insta::assert_snapshot!(pretty(&fn_def), @"fn foo((x, y)) {}");
 }

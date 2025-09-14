@@ -3,18 +3,10 @@ use rasto::builder::{
     block, comment, enum_def, expr, field_value, file, fn_def, impl_block, pat, stmt, struct_def,
     trait_def, trait_item_fn,
 };
-use rasto::pretty_printer::{PrettyPrinter, Printer};
+use rasto::pretty;
 use thin_vec::thin_vec;
 
 mod patterns;
-
-fn pretty(ast: &dyn PrettyPrinter) -> String {
-    let mut buf = String::new();
-    let mut printer = Printer::new(&mut buf);
-    ast.pretty_print(&mut printer).unwrap();
-    printer.finish().unwrap();
-    buf
-}
 
 #[test]
 fn test_file() {
@@ -30,7 +22,7 @@ fn test_file() {
             fn_def("foo")
                 .input(pat().ident("a", false))
                 .output("i32")
-                .block(block().statement(expr().lit(42)))
+                .statement(expr().lit(42))
                 .build(),
         )
         .build();
@@ -41,7 +33,7 @@ fn test_file() {
 #[test]
 fn test_macro_call_with_brackets() {
     let ast = fn_def("foo")
-        .block(block().statement(expr().macro_call(
+        .statement(expr().macro_call(
             "vec",
             Delimiter::Bracket,
             thin_vec![
@@ -52,7 +44,7 @@ fn test_macro_call_with_brackets() {
                 }),
                 TokenTree::Literal(256.into()),
             ],
-        )))
+        ))
         .build();
 
     insta::assert_snapshot!(pretty(&ast));
@@ -64,7 +56,6 @@ fn test_pretty_print_doc_comment() {
         .item(
             fn_def("foo")
                 .leading_comment(comment().doc(" This is a doc comment."))
-                .block(block())
                 .build(),
         )
         .build();
@@ -307,11 +298,11 @@ fn test_nested_struct() {
 #[test]
 fn test_long_binary_expression() {
     let ast = fn_def("foo")
-        .block(block().statement(expr().binary(
+        .statement(expr().binary(
             expr().lit("a_very_long_string_that_should_cause_a_line_break"),
             BinOp::Add,
             expr().lit("another_very_long_string_that_should_also_cause_a_line_break"),
-        )))
+        ))
         .build();
 
     insta::assert_snapshot!(pretty(&ast));
@@ -330,7 +321,7 @@ fn test_trait() {
 #[test]
 fn test_loop_expression() {
     let ast = fn_def("foo")
-        .block(block().statement(expr().loop_expr(block().statement(expr().lit(1)).build())))
+        .statement(expr().loop_expr(block().statement(expr().lit(1)).build()))
         .build();
 
     insta::assert_snapshot!(pretty(&ast));
@@ -338,12 +329,9 @@ fn test_loop_expression() {
 
 #[test]
 fn test_while_expression() {
-    let ast =
-        fn_def("foo")
-            .block(block().statement(
-                expr().while_loop(expr().lit(1), block().statement(expr().lit(2)).build()),
-            ))
-            .build();
+    let ast = fn_def("foo")
+        .statement(expr().while_loop(expr().lit(1), block().statement(expr().lit(2)).build()))
+        .build();
 
     insta::assert_snapshot!(pretty(&ast));
 }
@@ -351,11 +339,11 @@ fn test_while_expression() {
 #[test]
 fn test_for_expression() {
     let ast = fn_def("foo")
-        .block(block().statement(expr().for_loop(
+        .statement(expr().for_loop(
             pat().ident("x", false),
             expr().lit(1),
             block().statement(expr().lit(2)).build(),
-        )))
+        ))
         .build();
 
     insta::assert_snapshot!(pretty(&ast));
@@ -364,7 +352,7 @@ fn test_for_expression() {
 #[test]
 fn test_assign_expression() {
     let ast = fn_def("foo")
-        .block(block().statement(expr().assign(expr().lit("x"), expr().lit(1))))
+        .statement(expr().assign(expr().lit("x"), expr().lit(1)))
         .build();
 
     insta::assert_snapshot!(pretty(&ast));
@@ -373,11 +361,11 @@ fn test_assign_expression() {
 #[test]
 fn test_macro_call_expression() {
     let ast = fn_def("foo")
-        .block(block().statement(expr().macro_call(
+        .statement(expr().macro_call(
             "println",
             Delimiter::Parenthesis,
             thin_vec![TokenTree::Literal("hello".into())],
-        )))
+        ))
         .build();
 
     insta::assert_snapshot!(pretty(&ast));
@@ -386,11 +374,11 @@ fn test_macro_call_expression() {
 #[test]
 fn test_macro_call_expression_with_path() {
     let ast = fn_def("foo")
-        .block(block().statement(expr().macro_call(
+        .statement(expr().macro_call(
             path("std").segment("println").build(),
             Delimiter::Parenthesis,
             thin_vec![TokenTree::Literal("hello".into())],
-        )))
+        ))
         .build();
 
     insta::assert_snapshot!(pretty(&ast));
@@ -410,7 +398,7 @@ fn test_enum() {
 #[test]
 fn test_impl() {
     let ast = impl_block("MyStruct")
-        .function(fn_def("new").block(block()).build())
+        .function(fn_def("new").build())
         .build();
 
     insta::assert_snapshot!(pretty(&ast));
@@ -420,7 +408,7 @@ fn test_impl() {
 fn test_trait_impl() {
     let ast = impl_block("MyStruct")
         .trait_("MyTrait")
-        .function(fn_def("new").block(block()).build())
+        .function(fn_def("new").build())
         .build();
 
     insta::assert_snapshot!(pretty(&ast));
@@ -431,7 +419,7 @@ fn test_unsafe_trait_impl() {
     let ast = impl_block("MyStruct")
         .trait_("MyTrait")
         .unsafe_()
-        .function(fn_def("new").block(block()).build())
+        .function(fn_def("new").build())
         .build();
 
     insta::assert_snapshot!(pretty(&ast));
@@ -447,14 +435,12 @@ fn test_negative_impl() {
 #[test]
 fn test_let_statement() {
     let ast = fn_def("foo")
-        .block(
-            block().statement(
-                stmt()
-                    .local(pat().ident("x", false))
-                    .ty("i32")
-                    .expr(expr().lit(42))
-                    .build(),
-            ),
+        .statement(
+            stmt()
+                .local(pat().ident("x", false))
+                .ty("i32")
+                .expr(expr().lit(42))
+                .build(),
         )
         .build();
 
@@ -464,7 +450,7 @@ fn test_let_statement() {
 #[test]
 fn test_if_expression() {
     let ast = fn_def("foo")
-        .block(block().statement(expr().if_expr(
+        .statement(expr().if_expr(
             expr().lit(1),
             block().statement(expr().lit(2)).build(),
             Some(expr().if_expr(
@@ -472,7 +458,7 @@ fn test_if_expression() {
                 block().statement(expr().lit(4)).build(),
                 Some(expr().block(block().statement(expr().lit(5)).build())),
             )),
-        )))
+        ))
         .build();
 
     insta::assert_snapshot!(pretty(&ast));
@@ -481,7 +467,7 @@ fn test_if_expression() {
 #[test]
 fn test_binary_expression() {
     let ast = fn_def("foo")
-        .block(block().statement(expr().binary(expr().lit(1), BinOp::Add, expr().lit(2))))
+        .statement(expr().binary(expr().lit(1), BinOp::Add, expr().lit(2)))
         .build();
 
     insta::assert_snapshot!(pretty(&ast));
@@ -490,11 +476,8 @@ fn test_binary_expression() {
 #[test]
 fn test_expr_statement_without_semicolon() {
     let ast = fn_def("foo")
-        .block(
-            block()
-                .statement(expr().lit(42))
-                .has_trailing_semicolon(false),
-        )
+        .has_trailing_semicolon(false)
+        .statement(expr().lit(42))
         .build();
 
     insta::assert_snapshot!(pretty(&ast));
@@ -503,7 +486,7 @@ fn test_expr_statement_without_semicolon() {
 #[test]
 fn test_item_statement() {
     let ast = fn_def("foo")
-        .block(block().statement(stmt().item(struct_def("MyStruct").build())))
+        .statement(stmt().item(struct_def("MyStruct").build()))
         .build();
 
     insta::assert_snapshot!(pretty(&ast));
@@ -514,11 +497,11 @@ use rasto::builder::path;
 #[test]
 fn test_macro_call_statement() {
     let ast = fn_def("foo")
-        .block(block().statement(stmt().mac_call(ExprMacroCall {
+        .statement(stmt().mac_call(ExprMacroCall {
             path: path("println").build(),
             delimiter: Delimiter::Parenthesis,
             tokens: thin_vec![TokenTree::Literal("hello".into())].into(),
-        })))
+        }))
         .build();
 
     insta::assert_snapshot!(pretty(&ast));
@@ -526,28 +509,26 @@ fn test_macro_call_statement() {
 
 #[test]
 fn test_all_literals() {
-    let ast =
-        fn_def("literals")
-            .block(
-                block()
-                    .statement(stmt().local("s").expr(expr().lit("hello")))
-                    .statement(stmt().local("bs").expr(expr().lit(b"hello")))
-                    .statement(stmt().local("cs").expr(expr().lit(c"hello")))
-                    .statement(stmt().local("b").expr(expr().lit(b'h')))
-                    .statement(stmt().local("c").expr(expr().lit('h')))
-                    .statement(stmt().local("i").expr(expr().lit(42)))
-                    .statement(
-                        stmt()
-                            .local("i_suffix")
-                            .expr(expr().lit(Lit::Int(LitInt::with_suffix(42, IntSuffix::U32)))),
-                    )
-                    .statement(stmt().local("f").expr(expr().lit(1.23)))
-                    .statement(stmt().local("f_suffix").expr(
-                        expr().lit(Lit::Float(LitFloat::with_suffix("1.23", FloatSuffix::F32))),
-                    ))
-                    .statement(stmt().local("t").expr(expr().lit(true))),
-            )
-            .build();
+    let ast = fn_def("literals")
+        .statement(stmt().local("s").expr(expr().lit("hello")))
+        .statement(stmt().local("bs").expr(expr().lit(b"hello")))
+        .statement(stmt().local("cs").expr(expr().lit(c"hello")))
+        .statement(stmt().local("b").expr(expr().lit(b'h')))
+        .statement(stmt().local("c").expr(expr().lit('h')))
+        .statement(stmt().local("i").expr(expr().lit(42)))
+        .statement(
+            stmt()
+                .local("i_suffix")
+                .expr(expr().int_lit_with_suffix(42, IntSuffix::U32)),
+        )
+        .statement(stmt().local("f").expr(expr().lit(1.23)))
+        .statement(
+            stmt()
+                .local("f_suffix")
+                .expr(expr().lit(Lit::Float(LitFloat::with_suffix("1.23", FloatSuffix::F32)))),
+        )
+        .statement(stmt().local("t").expr(expr().lit(true)))
+        .build();
 
     insta::assert_snapshot!(pretty(&ast));
 }

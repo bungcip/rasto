@@ -65,3 +65,6 @@ pub mod pretty_printer;
 
 /// Defines the builder API for constructing AST nodes.
 pub mod builder;
+
+/// pretty function
+pub use pretty_printer::pretty;

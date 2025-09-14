@@ -661,12 +661,13 @@ pub fn fn_def(name: impl Into<String>) -> FnBuilder {
 }
 
 /// A builder for constructing an `ItemFn` (function definition) AST node.
+#[derive(Default)]
 pub struct FnBuilder {
     ident: String,
     generics: GenericParams,
     inputs: ThinVec<Pat>,
     output: Option<Type>,
-    block: Option<Block>,
+    block: Block,
     md: MdBuilder,
 }
 
@@ -679,11 +680,7 @@ impl FnBuilder {
     pub fn new(name: impl Into<String>) -> Self {
         Self {
             ident: name.into(),
-            inputs: thin_vec![],
-            output: None,
-            block: None,
-            md: MdBuilder::new(),
-            generics: GenericParams::new(),
+            ..Default::default()
         }
     }
 
@@ -723,7 +720,19 @@ impl FnBuilder {
     ///
     /// - `block`: The `Block` containing the function's body.
     pub fn block(mut self, block: BlockBuilder) -> Self {
-        self.block = Some(block.build());
+        self.block = block.build();
+        self
+    }
+
+    /// has trailing semicolon
+    pub fn has_trailing_semicolon(mut self, value: bool) -> Self {
+        self.block.has_trailing_semicolon = value;
+        self
+    }
+
+    /// insert statement
+    pub fn statement(mut self, stmt: impl Into<Stmt>) -> Self {
+        self.block.stmts.push(stmt.into());
         self
     }
 
@@ -755,8 +764,6 @@ impl FnBuilder {
     ///
     /// An `ItemFn` instance.
     pub fn build(self) -> ItemFn {
-        let block = self.block.expect("block is required");
-
         ItemFn {
             sig: Signature {
                 ident: self.ident,
@@ -764,7 +771,7 @@ impl FnBuilder {
                 inputs: self.inputs,
                 output: self.output,
             },
-            block,
+            block: self.block,
             md: Some(Box::new(self.md.build())),
         }
     }
@@ -1161,6 +1168,11 @@ impl ExprBuilder {
         Expr::Lit(lit.into())
     }
 
+    /// create int literal with suffix
+    pub fn int_lit_with_suffix(self, value: i32, suffix: IntSuffix) -> Expr {
+        Expr::Lit(Lit::Int(LitInt::with_suffix(value as u128, suffix)))
+    }
+
     /// Creates a `loop` expression.
     ///
     /// # Parameters
@@ -1177,7 +1189,12 @@ impl ExprBuilder {
     /// - `path`: The path to the macro.
     /// - `delimiter`: The delimiter of the macro's input.
     /// - `tokens`: The token stream passed to the macro.
-    pub fn macro_call(self, path: impl Into<Path>, delimiter: Delimiter, tokens: impl Into<TokenStream>) -> Expr {
+    pub fn macro_call(
+        self,
+        path: impl Into<Path>,
+        delimiter: Delimiter,
+        tokens: impl Into<TokenStream>,
+    ) -> Expr {
         Expr::MacroCall(ExprMacroCall {
             path: path.into(),
             delimiter,
@@ -1956,15 +1973,14 @@ impl From<&str> for Path {
 
 impl<const N: usize> From<&[&str; N]> for Path {
     fn from(array: &[&str; N]) -> Self {
-        let array: ThinVec<PathSegment> = array.iter().map(|x| 
-            PathSegment {
+        let array: ThinVec<PathSegment> = array
+            .iter()
+            .map(|x| PathSegment {
                 ident: x.to_string(),
                 args: None,
-            }
-        ).collect();
-        Path {
-            segments: array
-        }
+            })
+            .collect();
+        Path { segments: array }
     }
 }
 

@@ -7,7 +7,6 @@ fn test_fn_with_generics() {
     let func = fn_def("my_function")
         .generic(generic_param().ty("T"))
         .generic(generic_param().lifetime("a"))
-        .block(block())
         .build();
 
     insta::assert_snapshot!(func.to_string(), @r###"
