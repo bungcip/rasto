@@ -3,7 +3,6 @@
 use rasto::ast::*;
 use rasto::builder::*;
 use rasto::pretty;
-use thin_vec::thin_vec;
 
 #[test]
 fn test_let_statement_with_ident_pattern() {
@@ -24,7 +23,7 @@ fn test_let_statement_with_mut_ident_pattern() {
 
 #[test]
 fn test_for_expression_with_ident_pattern() {
-    let for_expr = expr().for_loop("x", expr().lit(10), block().build());
+    let for_expr = expr().for_loop("x", expr().lit(10), []);
 
     insta::assert_snapshot!(pretty(&for_expr), @"for x in 10 {}");
 }
@@ -33,7 +32,7 @@ fn test_for_expression_with_ident_pattern() {
 fn test_match_expression_with_rest_pattern() {
     let match_expr = expr().match_expr(
         expr().lit(10),
-        thin_vec![Arm {
+        [Arm {
             pat: pat().rest(),
             guard: None,
             body: Box::new(expr().lit(42)),
@@ -57,7 +56,7 @@ fn test_let_statement_with_wildcard_pattern() {
 #[test]
 fn test_let_statement_with_tuple_pattern() {
     let let_stmt = stmt()
-        .local(pat().tuple([pat().ident("x"), pat().ident("y")]))
+        .local(pat().tuple(["x", "y"]))
         .expr(expr().tuple([expr().lit(1), expr().lit(2)]))
         .build();
 
@@ -66,9 +65,7 @@ fn test_let_statement_with_tuple_pattern() {
 
 #[test]
 fn test_function_with_tuple_pattern_in_arg() {
-    let fn_def = fn_def("foo")
-        .input(pat().tuple(thin_vec![pat().ident("x"), pat().ident("y")]))
-        .build();
+    let fn_def = fn_def("foo").input(pat().tuple(["x", "y"])).build();
 
     insta::assert_snapshot!(pretty(&fn_def), @"fn foo((x, y)) {}");
 }

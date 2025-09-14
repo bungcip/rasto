@@ -1,18 +1,12 @@
-use rasto::ast::*;
-use rasto::builder;
+use rasto::builder::{attr, fn_def, meta};
 use rasto::pretty;
 
 #[test]
 fn test_fn_with_attributes() {
-    let item = Item::from(
-        builder::fn_def("my_func")
-            .attr(builder::attr().meta(builder::meta().path("test")))
-            .attr(builder::attr().meta(builder::meta().list(
-                "derive",
-                [builder::meta().path("Debug"), builder::meta().path("Clone")],
-            )))
-            .build(),
-    );
+    let item = fn_def("my_func")
+        .attr(attr().meta("test"))
+        .attr(attr().meta(meta().list("derive", ["Debug", "Clone"])))
+        .build();
 
     insta::assert_snapshot!(pretty(&item), @r###"
     #[test]

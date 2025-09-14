@@ -1,18 +1,16 @@
 use rasto::ast::{Expr, ExprUnary, Lit, LitInt, PatIdent, Stmt, UnOp};
-use rasto::builder::*;
+use rasto::{builder::*, pretty};
 
 #[test]
 fn test_fn_builder() {
-    let item_fn = fn_def("foo")
+    let ast = fn_def("foo")
         .input("a")
         .input("b")
         .output("bool")
         .statement(expr().lit("Hello, world!"))
         .build();
 
-    let actual = item_fn.to_string();
-
-    insta::assert_snapshot!(actual, @r#"
+    insta::assert_snapshot!(pretty(&ast), @r#"
     fn foo(a, b) -> bool {
         "Hello, world!";
     }
@@ -21,7 +19,7 @@ fn test_fn_builder() {
 
 #[test]
 fn test_fn_builder_with_metadata() {
-    let item_fn = fn_def("foo")
+    let ast = fn_def("foo")
         .attr(attr().meta("test"))
         .leading_comment(comment().line(" a leading comment"))
         .trailing_comment(comment().line(" a trailing comment"))
@@ -31,9 +29,7 @@ fn test_fn_builder_with_metadata() {
         .statement(expr().lit("Hello, world!"))
         .build();
 
-    let actual = item_fn.to_string();
-
-    insta::assert_snapshot!(actual, @r#"
+    insta::assert_snapshot!(pretty(&ast), @r#"
     #[test]
 
     // a leading comment

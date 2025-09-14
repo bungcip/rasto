@@ -438,8 +438,8 @@ impl ImplBuilder {
     /// # Parameters
     ///
     /// - `func`: The function to add.
-    pub fn function(mut self, func: ItemFn) -> Self {
-        self.fns.push(func);
+    pub fn function(mut self, func: impl Into<ItemFn>) -> Self {
+        self.fns.push(func.into());
         self
     }
 
@@ -901,8 +901,8 @@ impl PatBuilder {
     }
 
     /// Creates a tuple pattern.
-    pub fn tuple(self, pats: impl IntoIterator<Item = Pat>) -> Pat {
-        Pat::Tuple(pats.into_iter().collect())
+    pub fn tuple(self, pats: impl IntoIterator<Item = impl Into<Pat>>) -> Pat {
+        Pat::Tuple(pats.into_iter().map(Into::into).collect())
     }
 
     /// Creates a rest pattern (`..`).
@@ -1014,8 +1014,10 @@ impl ExprBuilder {
     /// # Parameters
     ///
     /// - `block`: The block of statements inside the `async` block.
-    pub fn async_block(self, block: Block) -> Expr {
-        Expr::Async(ExprAsync { block })
+    pub fn async_block(self, block: impl Into<Block>) -> Expr {
+        Expr::Async(ExprAsync {
+            block: block.into(),
+        })
     }
 
     /// Creates an `await` expression.
@@ -1049,8 +1051,10 @@ impl ExprBuilder {
     /// # Parameters
     ///
     /// - `block`: The block of statements.
-    pub fn block(self, block: Block) -> Expr {
-        Expr::Block(ExprBlock { block })
+    pub fn block(self, block: impl Into<Block>) -> Expr {
+        Expr::Block(ExprBlock {
+            block: block.into(),
+        })
     }
 
     /// Creates a `break` expression.
@@ -1102,8 +1106,10 @@ impl ExprBuilder {
     /// # Parameters
     ///
     /// - `block`: The block of statements inside the `const` block.
-    pub fn const_block(self, block: Block) -> Expr {
-        Expr::Const(ExprConst { block })
+    pub fn const_block(self, block: impl Into<Block>) -> Expr {
+        Expr::Const(ExprConst {
+            block: block.into(),
+        })
     }
 
     /// Creates a `continue` expression.
@@ -1131,11 +1137,11 @@ impl ExprBuilder {
     /// - `pat`: The pattern to bind the elements of the iterator.
     /// - `expr`: The expression to iterate over.
     /// - `body`: The body of the loop.
-    pub fn for_loop(self, pat: impl Into<Pat>, expr: Expr, body: Block) -> Expr {
+    pub fn for_loop(self, pat: impl Into<Pat>, expr: Expr, body: impl Into<Block>) -> Expr {
         Expr::For(ExprFor {
             pat: pat.into(),
             expr: Box::new(expr),
-            body,
+            body: body.into(),
         })
     }
 
@@ -1146,10 +1152,15 @@ impl ExprBuilder {
     /// - `cond`: The condition expression.
     /// - `then_branch`: The block to execute if the condition is true.
     /// - `else_branch`: An optional `else` branch.
-    pub fn if_expr(self, cond: Expr, then_branch: Block, else_branch: Option<Expr>) -> Expr {
+    pub fn if_expr(
+        self,
+        cond: Expr,
+        then_branch: impl Into<Block>,
+        else_branch: Option<Expr>,
+    ) -> Expr {
         Expr::If(ExprIf {
             cond: Box::new(cond),
-            then_branch,
+            then_branch: then_branch.into(),
             else_branch: else_branch.map(Box::new),
         })
     }
@@ -1191,8 +1202,8 @@ impl ExprBuilder {
     /// # Parameters
     ///
     /// - `body`: The body of the loop.
-    pub fn loop_expr(self, body: Block) -> Expr {
-        Expr::Loop(ExprLoop { body })
+    pub fn loop_expr(self, body: impl Into<Block>) -> Expr {
+        Expr::Loop(ExprLoop { body: body.into() })
     }
 
     /// Creates a macro call expression.
@@ -1332,10 +1343,10 @@ impl ExprBuilder {
     ///
     /// - `cond`: The condition expression.
     /// - `body`: The body of the loop.
-    pub fn while_loop(self, cond: Expr, body: Block) -> Expr {
+    pub fn while_loop(self, cond: Expr, body: impl Into<Block>) -> Expr {
         Expr::While(ExprWhile {
             cond: Box::new(cond),
-            body,
+            body: body.into(),
         })
     }
 }
@@ -1685,6 +1696,12 @@ impl ItemModBuilder {
         self
     }
 
+    /// add new item in it
+    pub fn item(mut self, item: impl Into<Item>) -> Self {
+        self.content.get_or_insert_default().push(item.into());
+        self
+    }
+
     /// Adds a leading comment to the module item.
     pub fn leading_comment(mut self, comment: impl Into<Comment>) -> Self {
         self.md = self.md.leading_comment(comment.into());
@@ -1945,10 +1962,14 @@ pub struct MetaBuilder;
 
 impl MetaBuilder {
     /// Creates a meta list.
-    pub fn list(self, path: impl Into<String>, metas: impl IntoIterator<Item = Meta>) -> Meta {
+    pub fn list(
+        self,
+        path: impl Into<String>,
+        metas: impl IntoIterator<Item = impl Into<Meta>>,
+    ) -> Meta {
         Meta::List(MetaList {
             path: path.into(),
-            metas: metas.into_iter().collect(),
+            metas: metas.into_iter().map(Into::into).collect(),
         })
     }
 
@@ -2029,6 +2050,57 @@ impl From<&str> for Pat {
             ident: val.into(),
             is_mut: false,
         })
+    }
+}
+
+impl From<BlockBuilder> for Block {
+    fn from(val: BlockBuilder) -> Self {
+        val.build()
+    }
+}
+
+impl From<FnBuilder> for ItemFn {
+    fn from(val: FnBuilder) -> Self {
+        val.build()
+    }
+}
+
+impl From<FnBuilder> for Item {
+    fn from(val: FnBuilder) -> Self {
+        Item::Fn(val.into())
+    }
+}
+
+impl From<AssociatedTypeBuilder> for AssociatedType {
+    fn from(val: AssociatedTypeBuilder) -> Self {
+        val.build()
+    }
+}
+
+impl From<Vec<Stmt>> for Block {
+    fn from(array: Vec<Stmt>) -> Self {
+        Block {
+            stmts: array.into(),
+            ..Default::default()
+        }
+    }
+}
+
+impl From<Vec<Expr>> for Block {
+    fn from(array: Vec<Expr>) -> Self {
+        Block {
+            stmts: array.into_iter().map(Stmt::Expr).collect(),
+            ..Default::default()
+        }
+    }
+}
+
+impl<const N: usize> From<[Expr; N]> for Block {
+    fn from(array: [Expr; N]) -> Self {
+        Block {
+            stmts: array.into_iter().map(Stmt::Expr).collect(),
+            ..Default::default()
+        }
     }
 }
 

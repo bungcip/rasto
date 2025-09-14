@@ -120,7 +120,7 @@ fn test_expr_array() {
 
 #[test]
 fn test_expr_async() {
-    let ast = expr().async_block(block().statement(expr().lit(1)).build());
+    let ast = expr().async_block([expr().lit(1)]);
     insta::assert_snapshot!(pretty(&ast));
 }
 
@@ -156,7 +156,7 @@ fn test_expr_closure() {
 
 #[test]
 fn test_expr_const() {
-    let ast = expr().const_block(block().statement(expr().lit(1)).build());
+    let ast = expr().const_block([expr().lit(1)]);
     insta::assert_snapshot!(pretty(&ast));
 }
 
@@ -303,7 +303,7 @@ fn test_trait() {
 #[test]
 fn test_loop_expression() {
     let ast = fn_def("foo")
-        .statement(expr().loop_expr(block().statement(expr().lit(1)).build()))
+        .statement(expr().loop_expr([expr().lit(1)]))
         .build();
 
     insta::assert_snapshot!(pretty(&ast));
@@ -312,7 +312,7 @@ fn test_loop_expression() {
 #[test]
 fn test_while_expression() {
     let ast = fn_def("foo")
-        .statement(expr().while_loop(expr().lit(1), block().statement(expr().lit(2)).build()))
+        .statement(expr().while_loop(expr().lit(1), [expr().lit(2)]))
         .build();
 
     insta::assert_snapshot!(pretty(&ast));
@@ -321,7 +321,7 @@ fn test_while_expression() {
 #[test]
 fn test_for_expression() {
     let ast = fn_def("foo")
-        .statement(expr().for_loop("x", expr().lit(1), block().statement(expr().lit(2)).build()))
+        .statement(expr().for_loop("x", expr().lit(1), [expr().lit(2)]))
         .build();
 
     insta::assert_snapshot!(pretty(&ast));
@@ -353,7 +353,7 @@ fn test_macro_call_expression() {
 fn test_macro_call_expression_with_path() {
     let ast = fn_def("foo")
         .statement(expr().macro_call(
-            path("std").segment("println").build(),
+            path("std").segment("println"),
             Delimiter::Parenthesis,
             thin_vec![tt().lit("hello")],
         ))
@@ -375,9 +375,7 @@ fn test_enum() {
 
 #[test]
 fn test_impl() {
-    let ast = impl_block("MyStruct")
-        .function(fn_def("new").build())
-        .build();
+    let ast = impl_block("MyStruct").function(fn_def("new")).build();
 
     insta::assert_snapshot!(pretty(&ast));
 }
@@ -386,7 +384,7 @@ fn test_impl() {
 fn test_trait_impl() {
     let ast = impl_block("MyStruct")
         .trait_("MyTrait")
-        .function(fn_def("new").build())
+        .function(fn_def("new"))
         .build();
 
     insta::assert_snapshot!(pretty(&ast));
@@ -397,7 +395,7 @@ fn test_unsafe_trait_impl() {
     let ast = impl_block("MyStruct")
         .trait_("MyTrait")
         .unsafe_()
-        .function(fn_def("new").build())
+        .function(fn_def("new"))
         .build();
 
     insta::assert_snapshot!(pretty(&ast));
@@ -413,7 +411,7 @@ fn test_negative_impl() {
 #[test]
 fn test_let_statement() {
     let ast = fn_def("foo")
-        .statement(stmt().local("x").ty("i32").expr(expr().lit(42)).build())
+        .statement(stmt().local("x").ty("i32").expr(expr().lit(42)))
         .build();
 
     insta::assert_snapshot!(pretty(&ast));
@@ -424,11 +422,11 @@ fn test_if_expression() {
     let ast = fn_def("foo")
         .statement(expr().if_expr(
             expr().lit(1),
-            block().statement(expr().lit(2)).build(),
+            [expr().lit(2)],
             Some(expr().if_expr(
                 expr().lit(3),
-                block().statement(expr().lit(4)).build(),
-                Some(expr().block(block().statement(expr().lit(5)).build())),
+                [expr().lit(4)],
+                Some(expr().block([expr().lit(5)])),
             )),
         ))
         .build();
