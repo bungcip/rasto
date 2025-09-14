@@ -1078,9 +1078,19 @@ impl PrettyPrinter for Variant {
 impl PrettyPrinter for ItemImpl {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         pp_begin(&self.md, printer)?;
+        if self.is_unsafe {
+            printer.string("unsafe ");
+        }
         printer.string("impl");
         self.generics.pretty_print(printer)?;
         printer.string(" ");
+        if self.is_negative {
+            printer.string("!");
+        }
+        if let Some(trait_) = &self.trait_ {
+            trait_.pretty_print(printer)?;
+            printer.string(" for ");
+        }
         self.ty.pretty_print(printer)?;
         printer.string(" ");
         printer.begin(BreakStyle::Consistent, "{");
