@@ -1,5 +1,0 @@
----
-source: tests/items.rs
-expression: item.to_string()
----
-type MyResult<T> = Result<T, MyError>;
