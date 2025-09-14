@@ -370,6 +370,7 @@ impl PrettyPrinter for Comment {
                 }
                 printer.string("*/");
             }
+            Comment::Doc(s) => printer.string(format!("///{s}")),
         }
         printer.hard_break();
         Ok(())

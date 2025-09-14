@@ -81,3 +81,24 @@ fn test_unary_builder() {
         })
     );
 }
+
+#[test]
+fn test_comment_builder() {
+    let line_comment = comment().line(" a line comment");
+    assert_eq!(
+        line_comment,
+        rasto::ast::Comment::Line(" a line comment".to_string())
+    );
+
+    let block_comment = comment().block(" a block comment");
+    assert_eq!(
+        block_comment,
+        rasto::ast::Comment::Block(" a block comment".to_string())
+    );
+
+    let doc_comment = comment().doc(" a doc comment");
+    assert_eq!(
+        doc_comment,
+        rasto::ast::Comment::Doc(" a doc comment".to_string())
+    );
+}
