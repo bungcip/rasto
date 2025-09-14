@@ -988,14 +988,12 @@ impl PrettyPrinter for Item {
             Item::Enum(item_enum) => item_enum.pretty_print(printer),
             Item::Impl(item_impl) => item_impl.pretty_print(printer),
             Item::Trait(item_trait) => item_trait.pretty_print(printer),
-            Item::Const(item_const) => item_const.pretty_print(printer),
+            Item::Def(item_def) => item_def.pretty_print(printer),
             Item::ExternCrate(item_extern_crate) => item_extern_crate.pretty_print(printer),
             Item::ForeignMod(item_foreign_mod) => item_foreign_mod.pretty_print(printer),
             Item::Macro(item_macro) => item_macro.pretty_print(printer),
             Item::Mod(item_mod) => item_mod.pretty_print(printer),
-            Item::Static(item_static) => item_static.pretty_print(printer),
             Item::TraitAlias(item_trait_alias) => item_trait_alias.pretty_print(printer),
-            Item::Type(item_type) => item_type.pretty_print(printer),
             Item::Union(item_union) => item_union.pretty_print(printer),
             Item::Use(item_use) => item_use.pretty_print(printer),
         }
@@ -1379,17 +1377,38 @@ impl PrettyPrinter for GenericArg {
     }
 }
 
-impl PrettyPrinter for ItemConst {
-    /// Pretty-prints the `ItemConst` to the given printer.
+impl PrettyPrinter for ItemDef {
+    /// Pretty-prints the `ItemDef` to the given printer.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         pp_begin(&self.md, printer)?;
-        printer.string("const ");
-        printer.string(&self.ident);
-        printer.string(": ");
-        self.ty.pretty_print(printer)?;
-        printer.string(" = ");
-        self.expr.pretty_print(printer)?;
-        printer.string(";");
+        match &self.kind {
+            ItemDefKind::Const { ty, expr } => {
+                printer.string("const ");
+                printer.string(&self.ident);
+                printer.string(": ");
+                ty.pretty_print(printer)?;
+                printer.string(" = ");
+                expr.pretty_print(printer)?;
+                printer.string(";");
+            }
+            ItemDefKind::Static { ty, expr } => {
+                printer.string("static ");
+                printer.string(&self.ident);
+                printer.string(": ");
+                ty.pretty_print(printer)?;
+                printer.string(" = ");
+                expr.pretty_print(printer)?;
+                printer.string(";");
+            }
+            ItemDefKind::TypeAlias { generics, ty } => {
+                printer.string("type ");
+                printer.string(&self.ident);
+                generics.pretty_print(printer)?;
+                printer.string(" = ");
+                ty.pretty_print(printer)?;
+                printer.string(";");
+            }
+        }
         pp_end(&self.md, printer)?;
         Ok(())
     }
@@ -1468,22 +1487,6 @@ impl PrettyPrinter for ItemMod {
     }
 }
 
-impl PrettyPrinter for ItemStatic {
-    /// Pretty-prints the `ItemStatic` to the given printer.
-    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
-        pp_begin(&self.md, printer)?;
-        printer.string("static ");
-        printer.string(&self.ident);
-        printer.string(": ");
-        self.ty.pretty_print(printer)?;
-        printer.string(" = ");
-        self.expr.pretty_print(printer)?;
-        printer.string(";");
-        pp_end(&self.md, printer)?;
-        Ok(())
-    }
-}
-
 impl PrettyPrinter for ItemTraitAlias {
     /// Pretty-prints the `ItemTraitAlias` to the given printer.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
@@ -1497,21 +1500,6 @@ impl PrettyPrinter for ItemTraitAlias {
             }
             printer.string(bound);
         }
-        printer.string(";");
-        pp_end(&self.md, printer)?;
-        Ok(())
-    }
-}
-
-impl PrettyPrinter for ItemType {
-    /// Pretty-prints the `ItemType` to the given printer.
-    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
-        pp_begin(&self.md, printer)?;
-        printer.string("type ");
-        printer.string(&self.ident);
-        self.generics.pretty_print(printer)?;
-        printer.string(" = ");
-        self.ty.pretty_print(printer)?;
         printer.string(";");
         pp_end(&self.md, printer)?;
         Ok(())

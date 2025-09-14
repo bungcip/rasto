@@ -1117,35 +1117,29 @@ impl From<Expr> for Stmt {
     }
 }
 
-/// Creates a new `ItemConstBuilder` to construct a `const` item.
-pub fn const_item(
-    name: impl Into<String>,
-    ty: impl Into<Type>,
-    expr: impl Into<Expr>,
-) -> ItemConstBuilder {
-    ItemConstBuilder::new(name, ty, expr)
+/// Creates a new `ItemDefBuilder` to construct a `const`, `static`, or `type` item.
+pub fn def_item(name: impl Into<String>, kind: impl Into<ItemDefKind>) -> ItemDefBuilder {
+    ItemDefBuilder::new(name, kind)
 }
 
-/// A builder for constructing an `ItemConst` AST node.
-pub struct ItemConstBuilder {
+/// A builder for constructing an `ItemDef` AST node.
+pub struct ItemDefBuilder {
     ident: String,
-    ty: Type,
-    expr: Box<Expr>,
+    kind: ItemDefKind,
     md: Option<Box<Md>>,
 }
 
-impl ItemConstBuilder {
-    /// Creates a new `ItemConstBuilder`.
-    pub fn new(name: impl Into<String>, ty: impl Into<Type>, expr: impl Into<Expr>) -> Self {
+impl ItemDefBuilder {
+    /// Creates a new `ItemDefBuilder`.
+    pub fn new(name: impl Into<String>, kind: impl Into<ItemDefKind>) -> Self {
         Self {
             ident: name.into(),
-            ty: ty.into(),
-            expr: Box::new(expr.into()),
+            kind: kind.into(),
             md: None,
         }
     }
 
-    /// Adds a leading comment to the `const` item.
+    /// Adds a leading comment to the item.
     pub fn leading_comment(mut self, comment: impl Into<Comment>) -> Self {
         self.md
             .get_or_insert_with(Default::default)
@@ -1154,7 +1148,7 @@ impl ItemConstBuilder {
         self
     }
 
-    /// Adds a trailing comment to the `const` item.
+    /// Adds a trailing comment to the item.
     pub fn trailing_comment(mut self, comment: impl Into<Comment>) -> Self {
         self.md
             .get_or_insert_with(Default::default)
@@ -1163,7 +1157,7 @@ impl ItemConstBuilder {
         self
     }
 
-    /// Adds an attribute to the `const` item.
+    /// Adds an attribute to the item.
     pub fn attr(mut self, attr: impl Into<Attribute>) -> Self {
         self.md
             .get_or_insert_with(Default::default)
@@ -1172,14 +1166,124 @@ impl ItemConstBuilder {
         self
     }
 
-    /// Builds the `ItemConst` AST node.
-    pub fn build(self) -> ItemConst {
-        ItemConst {
+    /// Builds the `ItemDef` AST node.
+    pub fn build(self) -> ItemDef {
+        ItemDef {
             ident: self.ident,
-            ty: self.ty,
-            expr: self.expr,
+            kind: self.kind,
             md: self.md,
         }
+    }
+}
+
+/// Creates a new `ConstKindBuilder` to construct an `ItemDefKind::Const`.
+pub fn const_kind(ty: impl Into<Type>, expr: impl Into<Expr>) -> ConstKindBuilder {
+    ConstKindBuilder::new(ty, expr)
+}
+
+/// A builder for `ItemDefKind::Const`.
+pub struct ConstKindBuilder {
+    ty: Type,
+    expr: Box<Expr>,
+}
+
+impl ConstKindBuilder {
+    /// Creates a new `ConstKindBuilder`.
+    pub fn new(ty: impl Into<Type>, expr: impl Into<Expr>) -> Self {
+        Self {
+            ty: ty.into(),
+            expr: Box::new(expr.into()),
+        }
+    }
+
+    /// Builds the `ItemDefKind::Const`.
+    pub fn build(self) -> ItemDefKind {
+        ItemDefKind::Const {
+            ty: self.ty,
+            expr: self.expr,
+        }
+    }
+}
+
+impl From<ConstKindBuilder> for ItemDefKind {
+    fn from(builder: ConstKindBuilder) -> Self {
+        builder.build()
+    }
+}
+
+/// Creates a new `StaticKindBuilder` to construct an `ItemDefKind::Static`.
+pub fn static_kind(ty: impl Into<Type>, expr: impl Into<Expr>) -> StaticKindBuilder {
+    StaticKindBuilder::new(ty, expr)
+}
+
+/// A builder for `ItemDefKind::Static`.
+pub struct StaticKindBuilder {
+    ty: Type,
+    expr: Box<Expr>,
+}
+
+impl StaticKindBuilder {
+    /// Creates a new `StaticKindBuilder`.
+    pub fn new(ty: impl Into<Type>, expr: impl Into<Expr>) -> Self {
+        Self {
+            ty: ty.into(),
+            expr: Box::new(expr.into()),
+        }
+    }
+
+    /// Builds the `ItemDefKind::Static`.
+    pub fn build(self) -> ItemDefKind {
+        ItemDefKind::Static {
+            ty: self.ty,
+            expr: self.expr,
+        }
+    }
+}
+
+impl From<StaticKindBuilder> for ItemDefKind {
+    fn from(builder: StaticKindBuilder) -> Self {
+        builder.build()
+    }
+}
+
+/// Creates a new `TypeAliasKindBuilder` to construct an `ItemDefKind::TypeAlias`.
+pub fn type_alias_kind(ty: impl Into<Type>) -> TypeAliasKindBuilder {
+    TypeAliasKindBuilder::new(ty)
+}
+
+/// A builder for `ItemDefKind::TypeAlias`.
+pub struct TypeAliasKindBuilder {
+    generics: GenericParams,
+    ty: Type,
+}
+
+impl TypeAliasKindBuilder {
+    /// Creates a new `TypeAliasKindBuilder`.
+    pub fn new(ty: impl Into<Type>) -> Self {
+        Self {
+            generics: GenericParams::new(),
+            ty: ty.into(),
+        }
+    }
+
+    /// Adds a generic parameter to the type alias.
+    pub fn generic(mut self, param: impl Into<GenericParam>) -> Self {
+        self.generics.params.push(param.into());
+        self
+    }
+
+    /// Builds the `ItemDefKind::TypeAlias`.
+    pub fn build(self) -> ItemDefKind {
+        ItemDefKind::TypeAlias {
+            generics: self.generics,
+            ty: self.ty,
+        }
+    }
+}
+
+impl From<TypeAliasKindBuilder> for ItemDefKind {
+    fn from(builder: TypeAliasKindBuilder) -> Self {
+        builder.build()
     }
 }
 
@@ -1425,72 +1529,6 @@ impl ItemModBuilder {
     }
 }
 
-/// Creates a new `ItemStaticBuilder` to construct a `static` item.
-pub fn static_item(
-    name: impl Into<String>,
-    ty: impl Into<Type>,
-    expr: impl Into<Expr>,
-) -> ItemStaticBuilder {
-    ItemStaticBuilder::new(name, ty, expr)
-}
-
-/// A builder for constructing an `ItemStatic` AST node.
-pub struct ItemStaticBuilder {
-    ident: String,
-    ty: Type,
-    expr: Box<Expr>,
-    md: Option<Box<Md>>,
-}
-
-impl ItemStaticBuilder {
-    /// Creates a new `ItemStaticBuilder`.
-    pub fn new(name: impl Into<String>, ty: impl Into<Type>, expr: impl Into<Expr>) -> Self {
-        Self {
-            ident: name.into(),
-            ty: ty.into(),
-            expr: Box::new(expr.into()),
-            md: None,
-        }
-    }
-
-    /// Adds a leading comment to the `static` item.
-    pub fn leading_comment(mut self, comment: impl Into<Comment>) -> Self {
-        self.md
-            .get_or_insert_with(Default::default)
-            .leading_comments
-            .push(comment.into());
-        self
-    }
-
-    /// Adds a trailing comment to the `static` item.
-    pub fn trailing_comment(mut self, comment: impl Into<Comment>) -> Self {
-        self.md
-            .get_or_insert_with(Default::default)
-            .trailing_comments
-            .push(comment.into());
-        self
-    }
-
-    /// Adds an attribute to the `static` item.
-    pub fn attr(mut self, attr: impl Into<Attribute>) -> Self {
-        self.md
-            .get_or_insert_with(Default::default)
-            .attrs
-            .push(attr.into());
-        self
-    }
-
-    /// Builds the `ItemStatic` AST node.
-    pub fn build(self) -> ItemStatic {
-        ItemStatic {
-            ident: self.ident,
-            ty: self.ty,
-            expr: self.expr,
-            md: self.md,
-        }
-    }
-}
-
 /// Creates a new `ItemTraitAliasBuilder` to construct a trait alias.
 pub fn trait_alias_item(name: impl Into<String>, bounds: ThinVec<String>) -> ItemTraitAliasBuilder {
     ItemTraitAliasBuilder::new(name, bounds)
@@ -1545,78 +1583,6 @@ impl ItemTraitAliasBuilder {
         ItemTraitAlias {
             ident: self.ident,
             bounds: self.bounds,
-            md: self.md,
-        }
-    }
-}
-
-/// Creates a new `ItemTypeBuilder` to construct a type alias.
-pub fn type_item(name: impl Into<String>, ty: impl Into<Type>) -> ItemTypeBuilder {
-    ItemTypeBuilder::new(name, ty)
-}
-
-/// A builder for constructing an `ItemType` AST node.
-pub struct ItemTypeBuilder {
-    ident: String,
-    generics: GenericParams,
-    ty: Type,
-    md: Option<Box<Md>>,
-}
-
-impl ItemTypeBuilder {
-    /// Creates a new `ItemTypeBuilder`.
-    pub fn new(name: impl Into<String>, ty: impl Into<Type>) -> Self {
-        Self {
-            ident: name.into(),
-            generics: GenericParams::new(),
-            ty: ty.into(),
-            md: None,
-        }
-    }
-
-    /// Adds a generic parameter to the type alias.
-    ///
-    /// # Parameters
-    ///
-    /// - `param`: The generic parameter to add.
-    pub fn generic(mut self, param: impl Into<GenericParam>) -> Self {
-        self.generics.params.push(param.into());
-        self
-    }
-
-    /// Adds a leading comment to the type alias.
-    pub fn leading_comment(mut self, comment: impl Into<Comment>) -> Self {
-        self.md
-            .get_or_insert_with(Default::default)
-            .leading_comments
-            .push(comment.into());
-        self
-    }
-
-    /// Adds a trailing comment to the type alias.
-    pub fn trailing_comment(mut self, comment: impl Into<Comment>) -> Self {
-        self.md
-            .get_or_insert_with(Default::default)
-            .trailing_comments
-            .push(comment.into());
-        self
-    }
-
-    /// Adds an attribute to the type alias.
-    pub fn attr(mut self, attr: impl Into<Attribute>) -> Self {
-        self.md
-            .get_or_insert_with(Default::default)
-            .attrs
-            .push(attr.into());
-        self
-    }
-
-    /// Builds the `ItemType` AST node.
-    pub fn build(self) -> ItemType {
-        ItemType {
-            ident: self.ident,
-            generics: self.generics,
-            ty: self.ty,
             md: self.md,
         }
     }

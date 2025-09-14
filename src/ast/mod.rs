@@ -18,8 +18,8 @@ pub mod expressions;
 pub mod file;
 /// Defines the AST nodes for generics.
 pub mod generics;
-/// Defines the AST node for a `const` item.
-pub mod item_const;
+/// Defines the AST node for a `const`, `static`, or `type` item.
+pub mod item_def;
 /// Defines the AST node for an `extern crate` item.
 pub mod item_extern_crate;
 /// Defines the AST node for a foreign module.
@@ -28,14 +28,10 @@ pub mod item_foreign_mod;
 pub mod item_macro;
 /// Defines the AST node for a module.
 pub mod item_mod;
-/// Defines the AST node for a `static` item.
-pub mod item_static;
 /// Defines the AST node for a trait.
 pub mod item_trait;
 /// Defines the AST node for a trait alias.
 pub mod item_trait_alias;
-/// Defines the AST node for a type alias.
-pub mod item_type;
 /// Defines the AST node for a `union` item.
 pub mod item_union;
 /// Defines the AST node for a `use` item.
@@ -62,15 +58,13 @@ pub use comments::*;
 pub use expressions::*;
 pub use file::*;
 pub use generics::*;
-pub use item_const::*;
+pub use item_def::*;
 pub use item_extern_crate::*;
 pub use item_foreign_mod::*;
 pub use item_macro::*;
 pub use item_mod::*;
-pub use item_static::*;
 pub use item_trait::*;
 pub use item_trait_alias::*;
-pub use item_type::*;
 pub use item_union::*;
 pub use item_use::*;
 pub use items::*;

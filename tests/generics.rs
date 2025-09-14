@@ -86,9 +86,9 @@ fn test_trait_with_generics() {
 
 #[test]
 fn test_type_with_generics() {
-    let t = type_item(
+    let t = def_item(
         "MyType",
-        Type::Path(TypePath {
+        type_alias_kind(Type::Path(TypePath {
             path: rasto::ast::expressions::Path {
                 segments: thin_vec![PathSegment {
                     ident: "Vec".to_string(),
@@ -97,12 +97,12 @@ fn test_type_with_generics() {
                     }),
                 }],
             },
+        }))
+        .generic(TypeParam {
+            ident: "T".to_string(),
+            bounds: vec![],
         }),
     )
-    .generic(TypeParam {
-        ident: "T".to_string(),
-        bounds: vec![],
-    })
     .build();
 
     insta::assert_snapshot!(t.to_string(), @r###"
