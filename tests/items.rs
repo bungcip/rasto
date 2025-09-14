@@ -109,5 +109,5 @@ fn test_asm_item() {
                 .build(),
         )
         .build();
-    insta::assert_snapshot!(item.to_string());
+    insta::assert_snapshot!(pretty(&item));
 }
