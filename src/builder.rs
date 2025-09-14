@@ -1921,3 +1921,188 @@ impl From<&str> for Pat {
         })
     }
 }
+
+/// Creates a new `AsmBuilder` to construct an `asm!` item.
+pub fn asm_item(template: impl Into<LitStr>) -> AsmBuilder {
+    AsmBuilder::new(template)
+}
+
+/// A builder for constructing an `ItemAsm` AST node.
+pub struct AsmBuilder {
+    template: ThinVec<LitStr>,
+    operands: ThinVec<AsmOperand>,
+    options: Option<AsmOptions>,
+}
+
+impl AsmBuilder {
+    /// Creates a new `AsmBuilder` with the given template.
+    pub fn new(template: impl Into<LitStr>) -> Self {
+        Self {
+            template: thin_vec![template.into()],
+            operands: thin_vec![],
+            options: None,
+        }
+    }
+
+    /// Adds a template string to the `asm!` item.
+    pub fn template(mut self, template: impl Into<LitStr>) -> Self {
+        self.template.push(template.into());
+        self
+    }
+
+    /// Adds an operand to the `asm!` item.
+    pub fn operand(mut self, operand: impl Into<AsmOperand>) -> Self {
+        self.operands.push(operand.into());
+        self
+    }
+
+    /// Sets the options for the `asm!` item.
+    pub fn options(mut self, options: AsmOptions) -> Self {
+        self.options = Some(options);
+        self
+    }
+
+    /// Builds the `ItemAsm` AST node.
+    pub fn build(self) -> ItemAsm {
+        ItemAsm {
+            template: self.template,
+            operands: self.operands,
+            options: self.options,
+        }
+    }
+}
+
+/// Creates a new `AsmOperandBuilder` to construct an `AsmOperand`.
+pub fn asm_operand() -> AsmOperandBuilder {
+    AsmOperandBuilder
+}
+
+/// A builder for constructing `AsmOperand` AST nodes.
+#[derive(Clone, Copy)]
+pub struct AsmOperandBuilder;
+
+impl AsmOperandBuilder {
+    /// Creates a register operand.
+    pub fn reg(self, direction: AsmDirection, reg: RegSpec, expr: Expr) -> RegOperandBuilder {
+        RegOperandBuilder::new(direction, reg, expr)
+    }
+
+    /// Creates a `sym` operand.
+    pub fn sym(self, path: Path) -> AsmOperand {
+        AsmOperand::Sym(path)
+    }
+
+    /// Creates a `const` operand.
+    pub fn const_(self, expr: Expr) -> AsmOperand {
+        AsmOperand::Const(expr)
+    }
+
+    /// Creates a `clobber_abi` operand.
+    pub fn clobber_abi(self, abi: impl Into<LitStr>) -> ClobberAbiBuilder {
+        ClobberAbiBuilder::new(abi)
+    }
+}
+
+/// A builder for constructing a `RegOperand` AST node.
+pub struct RegOperandBuilder {
+    direction: AsmDirection,
+    reg: RegSpec,
+    expr: Expr,
+    out_expr: Option<Expr>,
+}
+
+impl RegOperandBuilder {
+    /// Creates a new `RegOperandBuilder`.
+    pub fn new(direction: AsmDirection, reg: RegSpec, expr: Expr) -> Self {
+        Self {
+            direction,
+            reg,
+            expr,
+            out_expr: None,
+        }
+    }
+
+    /// Sets the output expression for an `inout` operand.
+    pub fn out_expr(mut self, expr: Expr) -> Self {
+        self.out_expr = Some(expr);
+        self
+    }
+
+    /// Builds the `RegOperand` AST node.
+    pub fn build(self) -> AsmOperand {
+        AsmOperand::Reg(RegOperand {
+            direction: self.direction,
+            reg: self.reg,
+            expr: self.expr,
+            out_expr: self.out_expr,
+        })
+    }
+}
+
+impl From<RegOperandBuilder> for AsmOperand {
+    fn from(builder: RegOperandBuilder) -> Self {
+        builder.build()
+    }
+}
+
+/// A builder for constructing a `ClobberAbi` AST node.
+pub struct ClobberAbiBuilder {
+    abis: ThinVec<LitStr>,
+}
+
+impl ClobberAbiBuilder {
+    /// Creates a new `ClobberAbiBuilder`.
+    pub fn new(abi: impl Into<LitStr>) -> Self {
+        Self {
+            abis: thin_vec![abi.into()],
+        }
+    }
+
+    /// Adds an ABI to the list of clobbered ABIs.
+    pub fn abi(mut self, abi: impl Into<LitStr>) -> Self {
+        self.abis.push(abi.into());
+        self
+    }
+
+    /// Builds the `ClobberAbi` AST node.
+    pub fn build(self) -> AsmOperand {
+        AsmOperand::ClobberAbi(ClobberAbi { abis: self.abis })
+    }
+}
+
+impl From<ClobberAbiBuilder> for AsmOperand {
+    fn from(builder: ClobberAbiBuilder) -> Self {
+        builder.build()
+    }
+}
+
+/// Creates a new `AsmOptionsBuilder` to construct an `AsmOptions` AST node.
+pub fn asm_options() -> AsmOptionsBuilder {
+    AsmOptionsBuilder::new()
+}
+
+/// A builder for constructing an `AsmOptions` AST node.
+#[derive(Default)]
+pub struct AsmOptionsBuilder {
+    options: ThinVec<AsmOption>,
+}
+
+impl AsmOptionsBuilder {
+    /// Creates a new `AsmOptionsBuilder`.
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Adds an option.
+    pub fn option(mut self, option: AsmOption) -> Self {
+        self.options.push(option);
+        self
+    }
+
+    /// Builds the `AsmOptions` AST node.
+    pub fn build(self) -> AsmOptions {
+        AsmOptions {
+            options: self.options,
+        }
+    }
+}

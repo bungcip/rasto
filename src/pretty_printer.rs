@@ -996,7 +996,145 @@ impl PrettyPrinter for Item {
             Item::TraitAlias(item_trait_alias) => item_trait_alias.pretty_print(printer),
             Item::Union(item_union) => item_union.pretty_print(printer),
             Item::Use(item_use) => item_use.pretty_print(printer),
+            Item::Asm(item_asm) => item_asm.pretty_print(printer),
         }
+    }
+}
+
+impl PrettyPrinter for ItemAsm {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        printer.string("asm!(");
+        printer.begin(BreakStyle::Consistent, "");
+        for (i, lit) in self.template.iter().enumerate() {
+            if i > 0 {
+                printer.string(", ");
+            }
+            lit.pretty_print(printer)?;
+        }
+
+        if !self.operands.is_empty() || self.options.is_some() {
+            printer.string(",");
+            printer.break_();
+        }
+
+        for (i, operand) in self.operands.iter().enumerate() {
+            if i > 0 {
+                printer.string(",");
+                printer.break_();
+            }
+            operand.pretty_print(printer)?;
+        }
+
+        if !self.operands.is_empty() && self.options.is_some() {
+            printer.string(",");
+            printer.break_();
+        }
+
+        if let Some(options) = &self.options {
+            options.pretty_print(printer)?;
+        }
+
+        printer.end(")");
+        Ok(())
+    }
+}
+
+impl PrettyPrinter for AsmOperand {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        match self {
+            AsmOperand::Reg(reg) => reg.pretty_print(printer),
+            AsmOperand::Sym(path) => {
+                printer.string("sym ");
+                path.pretty_print(printer)
+            }
+            AsmOperand::Const(expr) => {
+                printer.string("const ");
+                expr.pretty_print(printer)
+            }
+            AsmOperand::ClobberAbi(clobber) => clobber.pretty_print(printer),
+        }
+    }
+}
+
+impl PrettyPrinter for RegOperand {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        self.direction.pretty_print(printer)?;
+        printer.string("(");
+        self.reg.pretty_print(printer)?;
+        printer.string(") ");
+        self.expr.pretty_print(printer)?;
+        if let Some(out_expr) = &self.out_expr {
+            printer.string(" => ");
+            out_expr.pretty_print(printer)?;
+        }
+        Ok(())
+    }
+}
+
+impl PrettyPrinter for AsmDirection {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        match self {
+            AsmDirection::In => printer.string("in"),
+            AsmDirection::Out => printer.string("out"),
+            AsmDirection::LateOut => printer.string("lateout"),
+            AsmDirection::InOut => printer.string("inout"),
+            AsmDirection::InLateOut => printer.string("inlateout"),
+        }
+        Ok(())
+    }
+}
+
+impl PrettyPrinter for RegSpec {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        match self {
+            RegSpec::Class(class) => printer.string(class),
+            RegSpec::Explicit(reg) => reg.pretty_print(printer)?,
+        }
+        Ok(())
+    }
+}
+
+impl PrettyPrinter for AsmOptions {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        printer.string("options(");
+        for (i, option) in self.options.iter().enumerate() {
+            if i > 0 {
+                printer.string(", ");
+            }
+            option.pretty_print(printer)?;
+        }
+        printer.string(")");
+        Ok(())
+    }
+}
+
+impl PrettyPrinter for AsmOption {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        match self {
+            AsmOption::Pure => printer.string("pure"),
+            AsmOption::Nomem => printer.string("nomem"),
+            AsmOption::ReadOnly => printer.string("readonly"),
+            AsmOption::PreservesFlags => printer.string("preserves_flags"),
+            AsmOption::NoReturn => printer.string("noreturn"),
+            AsmOption::NoStack => printer.string("nostack"),
+            AsmOption::AttSyntax => printer.string("att_syntax"),
+            AsmOption::Raw => printer.string("raw"),
+        }
+        Ok(())
+    }
+}
+
+impl PrettyPrinter for ClobberAbi {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        printer.string("clobber_abi(");
+        for (i, abi) in self.abis.iter().enumerate() {
+            if i > 0 {
+                printer.string(", ");
+            }
+            abi.pretty_print(printer)?;
+        }
+        printer.string(")");
+        Ok(())
     }
 }
 

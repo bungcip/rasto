@@ -3,6 +3,8 @@
 //! Literals are values that are written directly in the source code, such as strings,
 //! numbers, and booleans.
 
+use std::str::FromStr;
+
 /// A literal expression.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Lit {
@@ -25,7 +27,7 @@ pub enum Lit {
 }
 
 /// A string literal, e.g., `"hello"`.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct LitStr {
     /// The value of the string literal.
     pub value: String,
@@ -40,6 +42,28 @@ impl LitStr {
     pub fn new(value: &str) -> Self {
         Self {
             value: value.to_string(),
+        }
+    }
+}
+
+impl FromStr for LitStr {
+    type Err = ();
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        if s.starts_with('"') && s.ends_with('"') {
+            Ok(LitStr {
+                value: s[1..s.len() - 1].to_string(),
+            })
+        } else {
+            Err(())
+        }
+    }
+}
+
+impl From<&str> for LitStr {
+    fn from(s: &str) -> Self {
+        Self {
+            value: s.to_string(),
         }
     }
 }
