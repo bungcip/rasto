@@ -5,6 +5,40 @@ use crate::ast::types::Type;
 use crate::pretty_printer::{PrettyPrinter, Printer};
 use std::fmt;
 
+/// Creates a new `GenericParamBuilder`.
+pub fn generic_param() -> GenericParamBuilder {
+    GenericParamBuilder
+}
+
+/// A builder for creating `GenericParam`s.
+#[derive(Clone, Copy)]
+pub struct GenericParamBuilder;
+
+impl GenericParamBuilder {
+    /// Creates a new `TypeParam`.
+    pub fn ty(self, ident: impl Into<String>) -> TypeParam {
+        TypeParam {
+            ident: ident.into(),
+            bounds: vec![],
+        }
+    }
+
+    /// Creates a new `LifetimeParam`.
+    pub fn lifetime(self, ident: impl Into<String>) -> LifetimeParam {
+        LifetimeParam {
+            ident: ident.into(),
+        }
+    }
+
+    /// Creates a new `ConstParam`.
+    pub fn const_(self, ident: impl Into<String>, ty: impl Into<Type>) -> ConstParam {
+        ConstParam {
+            ident: ident.into(),
+            ty: ty.into(),
+        }
+    }
+}
+
 /// A set of generic parameters, such as `<'a, T: Trait, const N: usize>`.
 #[derive(Debug, Clone, PartialEq, Default)]
 pub struct GenericParams {
@@ -163,4 +197,10 @@ pub enum GenericArg {
     Type(Type),
     /// A const argument: `N`.
     Const(crate::ast::Expr),
+}
+
+impl From<&str> for GenericArg {
+    fn from(s: &str) -> Self {
+        GenericArg::Type(Type::from(s))
+    }
 }

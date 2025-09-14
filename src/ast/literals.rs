@@ -284,3 +284,33 @@ impl From<bool> for Lit {
         Lit::Bool(LitBool { value: b })
     }
 }
+
+impl From<f64> for Lit {
+    fn from(f: f64) -> Self {
+        Lit::Float(LitFloat::new(&f.to_string()))
+    }
+}
+
+impl From<char> for Lit {
+    fn from(c: char) -> Self {
+        Lit::Char(LitChar::new(c))
+    }
+}
+
+impl From<u8> for Lit {
+    fn from(b: u8) -> Self {
+        Lit::Byte(LitByte::new(b))
+    }
+}
+
+impl From<&[u8]> for Lit {
+    fn from(s: &[u8]) -> Self {
+        Lit::ByteStr(LitByteStr::new(s))
+    }
+}
+
+impl<'a> From<&'a std::ffi::CStr> for Lit {
+    fn from(s: &'a std::ffi::CStr) -> Self {
+        Lit::CStr(LitCStr::new(s.to_str().unwrap()))
+    }
+}
