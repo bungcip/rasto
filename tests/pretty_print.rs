@@ -1,4 +1,4 @@
-use rasto::ast::builder::{file, fn_def, pat, stmt};
+use rasto::ast::builder::{block, comment, file, fn_def, pat, stmt};
 use rasto::ast::*;
 use rasto::pretty_printer::{PrettyPrinter, Printer};
 use thin_vec::thin_vec;
@@ -25,15 +25,13 @@ fn pretty_print_file(file: File) -> String {
     file.to_string()
 }
 
-use rasto::ast::builder::block;
-
 #[test]
 fn test_file() {
     let ast = file()
         .item(Item::Struct(ItemStruct {
             md: Some(Box::new(Md {
                 attrs: thin_vec![],
-                leading_comments: thin_vec![Comment::Line(" A simple struct.".to_string())],
+                leading_comments: thin_vec![comment().line(" A simple struct.")],
                 trailing_comments: thin_vec![],
             })),
             ident: "Foo".to_string(),
@@ -69,14 +67,14 @@ fn test_file() {
 
 #[test]
 fn test_block_single_comment() {
-    let single = Comment::Block("Block comment with single line".into());
+    let single = comment().block("Block comment with single line");
     insta::assert_snapshot!(pretty_print_comment(single));
 }
 
 #[test]
 fn test_block_multiline_comment() {
     let single =
-        Comment::Block("Block comment with multi line 1\nBlock comment with multi line 2".into());
+        comment().block("Block comment with multi line 1\nBlock comment with multi line 2");
     insta::assert_snapshot!(pretty_print_comment(single));
 }
 
@@ -88,9 +86,7 @@ fn test_fn() {
             .output("i32")
             .block(
                 block()
-                    .leading_comment(Comment::Block(
-                        " Block comment with single line ".to_string(),
-                    ))
+                    .leading_comment(comment().block(" Block comment with single line "))
                     .statement(
                         stmt()
                             .local(pat().ident("hello", false))
@@ -108,10 +104,10 @@ fn test_fn() {
 #[test]
 fn test_block_with_comments() {
     let ast = block()
-        .leading_comment(Comment::Line(" leading comment".to_string()))
+        .leading_comment(comment().line(" leading comment"))
         .statement(Stmt::Expr(Expr::Lit(42.into())))
         .has_trailing_semicolon(true)
-        .trailing_comment(Comment::Line(" trailing comment".to_string()))
+        .trailing_comment(comment().line(" trailing comment"))
         .build();
 
     let mut buf = String::new();
@@ -431,7 +427,7 @@ fn test_trait() {
     let ast = Item::Trait(ItemTrait {
         md: Some(Box::new(Md {
             attrs: thin_vec![],
-            leading_comments: thin_vec![Comment::Line(" A simple trait.".to_string())],
+            leading_comments: thin_vec![comment().line(" A simple trait.")],
             trailing_comments: thin_vec![],
         })),
         ident: "MyTrait".to_string(),
@@ -563,7 +559,7 @@ fn test_enum() {
     let ast = Item::Enum(ItemEnum {
         md: Some(Box::new(Md {
             attrs: thin_vec![],
-            leading_comments: thin_vec![Comment::Line(" A simple enum.".to_string())],
+            leading_comments: thin_vec![comment().line(" A simple enum.")],
             trailing_comments: thin_vec![],
         })),
         ident: "MyEnum".to_string(),
@@ -817,7 +813,7 @@ fn test_struct() {
     let ast = Item::Struct(ItemStruct {
         md: Some(Box::new(Md {
             attrs: thin_vec![],
-            leading_comments: thin_vec![Comment::Line(" A simple struct.".to_string())],
+            leading_comments: thin_vec![comment().line(" A simple struct.")],
             trailing_comments: thin_vec![],
         })),
         ident: "Foo".to_string(),

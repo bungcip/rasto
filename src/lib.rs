@@ -12,7 +12,7 @@
 //! Here's an example of how to build a simple function AST and pretty-print it:
 //!
 //! ```rust
-//! use rasto::ast::{*, Lit, LitInt};
+//! use rasto::ast::{builder::comment, *, Lit, LitInt};
 //! use rasto::pretty_printer::*;
 //! use thin_vec::thin_vec;
 //!
@@ -20,8 +20,8 @@
 //!     ItemFn {
 //!         md: Some(Box::new(Md {
 //!             attrs: thin_vec![],
-//!             leading_comments: thin_vec![Comment::Line(" A simple function.".to_string())],
-//!             trailing_comments: thin_vec![Comment::Line(" Trailing comment.".to_string())],
+//!             leading_comments: thin_vec![comment().line(" A simple function.")],
+//!             trailing_comments: thin_vec![comment().line(" Trailing comment.")],
 //!         })),
 //!         sig: Signature {
 //!             ident: "foo".to_string(),
