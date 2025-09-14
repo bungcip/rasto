@@ -638,6 +638,7 @@ impl PrettyPrinter for Expr {
             Expr::Paren(expr) => expr.pretty_print(printer),
             Expr::Range(expr) => expr.pretty_print(printer),
             Expr::Reference(expr) => expr.pretty_print(printer),
+            Expr::RawRef(expr) => expr.pretty_print(printer),
             Expr::Return(expr) => expr.pretty_print(printer),
             Expr::Struct(expr) => expr.pretty_print(printer),
             Expr::Tuple(expr) => expr.pretty_print(printer),
@@ -833,6 +834,18 @@ impl PrettyPrinter for ExprRef {
         printer.string("&");
         if self.is_mut {
             printer.string("mut ");
+        }
+        self.expr.pretty_print(printer)
+    }
+}
+
+impl PrettyPrinter for ExprRawRef {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        printer.string("&raw ");
+        if self.is_mut {
+            printer.string("mut ");
+        } else {
+            printer.string("const ");
         }
         self.expr.pretty_print(printer)
     }

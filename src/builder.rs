@@ -1035,6 +1035,15 @@ impl ExprBuilder {
         })
     }
 
+    /// Creates a raw reference expression.
+    ///
+    /// # Parameters
+    ///
+    /// - `expr`: The expression to reference.
+    pub fn raw_ref(self, expr: Expr) -> ExprRawRefBuilder {
+        ExprRawRefBuilder::new(expr)
+    }
+
     /// Creates an assignment expression.
     ///
     /// # Parameters
@@ -1392,6 +1401,42 @@ impl ExprBuilder {
             cond: Box::new(cond),
             body: body.into(),
         })
+    }
+}
+
+/// A builder for constructing a raw reference expression.
+pub struct ExprRawRefBuilder {
+    expr: Expr,
+    is_mut: bool,
+}
+
+impl ExprRawRefBuilder {
+    /// Creates a new `ExprRawRefBuilder`.
+    pub fn new(expr: Expr) -> Self {
+        Self {
+            expr,
+            is_mut: false,
+        }
+    }
+
+    /// Marks the raw reference as mutable.
+    pub fn mutable(mut self) -> Self {
+        self.is_mut = true;
+        self
+    }
+
+    /// Builds the `Expr::RawRef`.
+    pub fn build(self) -> Expr {
+        Expr::RawRef(ExprRawRef {
+            expr: Box::new(self.expr),
+            is_mut: self.is_mut,
+        })
+    }
+}
+
+impl From<ExprRawRefBuilder> for Expr {
+    fn from(builder: ExprRawRefBuilder) -> Self {
+        builder.build()
     }
 }
 
