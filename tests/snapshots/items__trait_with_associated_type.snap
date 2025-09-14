@@ -3,5 +3,5 @@ source: tests/items.rs
 expression: item.build().to_string()
 ---
 trait MyTrait {
-type MyType;
+    type MyType;
 }

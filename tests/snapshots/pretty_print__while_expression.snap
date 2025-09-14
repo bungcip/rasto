@@ -3,7 +3,9 @@ source: tests/pretty_print.rs
 expression: pretty_print_item(ast)
 ---
 fn foo() {
-while 1 {
-2;
-};
+    while 1 {
+        2;
+
+    };
+
 }

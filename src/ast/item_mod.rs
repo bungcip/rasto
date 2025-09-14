@@ -30,10 +30,15 @@ impl PrettyPrinter for ItemMod {
         printer.string(&self.ident);
         if let Some(content) = &self.content {
             printer.begin(BreakStyle::Consistent, " {");
-            printer.hard_break();
-            for item in content {
-                item.pretty_print(printer)?;
+            if !content.is_empty() {
                 printer.hard_break();
+                let num_items = content.len();
+                for (i, item) in content.iter().enumerate() {
+                    item.pretty_print(printer)?;
+                    if i < num_items - 1 {
+                        printer.hard_break();
+                    }
+                }
             }
             printer.end("}");
         } else {

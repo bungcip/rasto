@@ -3,5 +3,6 @@ source: tests/pretty_print.rs
 expression: pretty_print_expr(ast)
 ---
 const {
-1;
+    1;
+
 }

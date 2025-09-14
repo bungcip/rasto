@@ -4,5 +4,5 @@ expression: pretty_print_item(ast)
 ---
 // A simple trait.
 trait MyTrait {
-fn my_func();
+    fn my_func();
 }

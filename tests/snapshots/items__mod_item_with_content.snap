@@ -3,5 +3,5 @@ source: tests/items.rs
 expression: item.to_string()
 ---
 mod my_module {
-fn foo() {}
+    fn foo() {}
 }

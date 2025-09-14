@@ -34,7 +34,7 @@ fn test_struct_with_generics() {
 
     insta::assert_snapshot!(s.to_string(), @r"
     struct MyStruct<T> {
-    my_field: T,
+        my_field: T,
     }
     ");
 }
@@ -51,7 +51,7 @@ fn test_enum_with_generics() {
 
     insta::assert_snapshot!(e.to_string(), @r"
     enum MyEnum<T> {
-    MyVariant,
+        MyVariant,
     }
     ");
 }
@@ -122,7 +122,7 @@ fn test_union_with_generics() {
 
     insta::assert_snapshot!(u.to_string(), @r"
     union MyUnion<T> {
-    my_field: T,
+        my_field: T,
     }
     ");
 }

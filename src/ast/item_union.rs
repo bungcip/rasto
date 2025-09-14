@@ -36,10 +36,13 @@ impl PrettyPrinter for ItemUnion {
         printer.begin(BreakStyle::Consistent, "{");
         if !self.fields.is_empty() {
             printer.hard_break();
-            for field in &self.fields {
+            let num_fields = self.fields.len();
+            for (i, field) in self.fields.iter().enumerate() {
                 field.pretty_print(printer)?;
                 printer.string(",");
-                printer.hard_break();
+                if i < num_fields - 1 {
+                    printer.hard_break();
+                }
             }
         }
         printer.end("}");

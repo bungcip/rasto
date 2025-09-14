@@ -3,5 +3,6 @@ source: tests/pretty_print.rs
 expression: pretty_print_item(ast)
 ---
 fn foo() {
-struct MyStruct {}
+    struct MyStruct {}
+
 }
