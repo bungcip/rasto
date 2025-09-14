@@ -924,10 +924,9 @@ impl PrettyPrinter for Block {
 
                 let is_last = i == num_stmts - 1;
 
-                if matches!(stmt, Stmt::Expr(_))
-                    && (!is_last || self.has_trailing_semicolon) {
-                        printer.string(";");
-                    }
+                if matches!(stmt, Stmt::Expr(_)) && (!is_last || self.has_trailing_semicolon) {
+                    printer.string(";");
+                }
 
                 if !is_last {
                     printer.hard_break();
