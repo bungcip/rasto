@@ -4,7 +4,7 @@ use crate::ast::items::TraitItem;
 use crate::ast::metadata::Md;
 use thin_vec::ThinVec;
 
-/// A trait item: `trait Foo { ... }`.
+/// A trait definition, such as `trait Foo { ... }`.
 #[derive(Debug, Clone, PartialEq)]
 pub struct ItemTrait {
     /// The name of the trait.
@@ -13,8 +13,8 @@ pub struct ItemTrait {
     pub generics: GenericParams,
     /// The associated types of the trait.
     pub associated_types: ThinVec<AssociatedType>,
-    /// The items within the trait.
+    /// The items within the trait, such as methods and associated types.
     pub items: ThinVec<TraitItem>,
-    /// Metadata about the trait.
+    /// Metadata about the trait, including attributes and comments.
     pub md: Option<Box<Md>>,
 }

@@ -2,16 +2,17 @@ use crate::ast::metadata::{self, Md};
 use crate::pretty_printer::{PrettyPrinter, Printer};
 use std::fmt;
 
-/// An `extern crate` item: `extern crate serde;`
+/// An `extern crate` item, such as `extern crate serde;`.
 #[derive(Debug, Clone, PartialEq)]
 pub struct ItemExternCrate {
-    /// The name of the crate.
+    /// The name of the crate being imported.
     pub ident: String,
-    /// Metadata about the extern crate item.
+    /// Metadata about the extern crate item, including attributes and comments.
     pub md: Option<Box<Md>>,
 }
 
 impl fmt::Display for ItemExternCrate {
+    /// Formats the `ItemExternCrate` using the pretty-printer.
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut printer = Printer::new(f);
         self.pretty_print(&mut printer)?;
@@ -20,6 +21,7 @@ impl fmt::Display for ItemExternCrate {
 }
 
 impl PrettyPrinter for ItemExternCrate {
+    /// Pretty-prints the `ItemExternCrate` to the given printer.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         metadata::pp_begin(&self.md, printer)?;
         printer.string("extern crate ");

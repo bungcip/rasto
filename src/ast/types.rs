@@ -11,7 +11,7 @@ use thin_vec::{ThinVec, thin_vec};
 /// A Rust type.
 #[derive(Debug, Clone, PartialEq)]
 pub enum Type {
-    /// A fixed size array type: `[T; n]`.
+    /// A fixed-size array type: `[T; n]`.
     Array(TypeArray),
 
     /// A bare function type: `fn(usize) -> bool`.
@@ -57,7 +57,7 @@ pub enum Type {
     Tuple(ThinVec<Type>),
 }
 
-/// A fixed size array type: `[T; n]`.
+/// A fixed-size array type, such as `[T; n]`.
 #[derive(Debug, Clone, PartialEq)]
 pub struct TypeArray {
     /// The element type.
@@ -66,17 +66,19 @@ pub struct TypeArray {
     pub len: Box<Expr>,
 }
 
-/// A bare function type: `fn(usize) -> bool`.
+/// A bare function type, such as `fn(usize) -> bool`.
 #[derive(Debug, Clone, PartialEq)]
 pub struct TypeBareFn {
-    /// The input types.
+    /// The input types of the function.
     pub inputs: ThinVec<Type>,
-    /// The output type.
+    /// The output type of the function.
     pub output: Option<Box<Type>>,
 }
 
-/// A path like `std::slice::Iter`, optionally qualified with a
-/// self-type as in `<Vec<T> as SomeTrait>::Associated`.
+/// A path to a type, such as `std::slice::Iter`.
+///
+/// This can be optionally qualified with a self-type, as in
+/// `<Vec<T> as SomeTrait>::Associated`.
 #[derive(Debug, Clone, PartialEq)]
 pub struct TypePath {
     /// The path itself.
@@ -84,7 +86,7 @@ pub struct TypePath {
     // Note: We are not including generics for now for simplicity.
 }
 
-/// A raw pointer type: `*const T` or `*mut T`.
+/// A raw pointer type, such as `*const T` or `*mut T`.
 #[derive(Debug, Clone, PartialEq)]
 pub struct TypePtr {
     /// The pointed-to type.
@@ -93,7 +95,7 @@ pub struct TypePtr {
     pub mutable: bool,
 }
 
-/// A reference type: `&'a T` or `&'a mut T`.
+/// A reference type, such as `&'a T` or `&'a mut T`.
 #[derive(Debug, Clone, PartialEq)]
 pub struct TypeReference {
     /// The lifetime of the reference.
@@ -105,6 +107,9 @@ pub struct TypeReference {
 }
 
 impl From<&str> for Type {
+    /// Converts a string slice into a `Type::Path`.
+    ///
+    /// This is a convenience function for creating simple path-based types.
     fn from(s: &str) -> Self {
         Type::Path(TypePath {
             path: Path {
@@ -118,6 +123,7 @@ impl From<&str> for Type {
 }
 
 impl PrettyPrinter for Type {
+    /// Pretty-prints the `Type` to the given printer.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         match self {
             Type::Array(array) => array.pretty_print(printer),
@@ -174,6 +180,7 @@ impl PrettyPrinter for Type {
 }
 
 impl PrettyPrinter for TypeArray {
+    /// Pretty-prints the `TypeArray` to the given printer.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string("[");
         self.elem.pretty_print(printer)?;
@@ -185,6 +192,7 @@ impl PrettyPrinter for TypeArray {
 }
 
 impl PrettyPrinter for TypeBareFn {
+    /// Pretty-prints the `TypeBareFn` to the given printer.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string("fn(");
         for (i, ty) in self.inputs.iter().enumerate() {
@@ -203,12 +211,14 @@ impl PrettyPrinter for TypeBareFn {
 }
 
 impl PrettyPrinter for TypePath {
+    /// Pretty-prints the `TypePath` to the given printer.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         self.path.pretty_print(printer)
     }
 }
 
 impl PrettyPrinter for TypePtr {
+    /// Pretty-prints the `TypePtr` to the given printer.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string("*");
         if self.mutable {
@@ -221,6 +231,7 @@ impl PrettyPrinter for TypePtr {
 }
 
 impl PrettyPrinter for TypeReference {
+    /// Pretty-prints the `TypeReference` to the given printer.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string("&");
         if let Some(lifetime) = &self.lifetime {

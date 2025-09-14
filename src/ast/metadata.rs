@@ -17,7 +17,9 @@ pub struct Md {
     pub trailing_comments: ThinVec<Comment>,
 }
 
+/// Pretty-prints the leading metadata of an AST node.
 ///
+/// This includes attributes and leading comments.
 pub fn pp_begin<'a>(md: &'a Option<Box<Md>>, printer: &mut Printer<'a>) -> fmt::Result {
     if let Some(md) = &md {
         for attr in &md.attrs {
@@ -31,7 +33,9 @@ pub fn pp_begin<'a>(md: &'a Option<Box<Md>>, printer: &mut Printer<'a>) -> fmt::
     Ok(())
 }
 
+/// Pretty-prints the trailing metadata of an AST node.
 ///
+/// This includes trailing comments.
 pub fn pp_end<'a>(md: &'a Option<Box<Md>>, printer: &mut Printer<'a>) -> fmt::Result {
     if let Some(md) = &md {
         for comment in &md.trailing_comments {
