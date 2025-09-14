@@ -5,6 +5,6 @@ expression: pretty_print_item(ast)
 fn foo(a) -> i32 {
     
     /* Block comment with single line */
-    let hello = "world";42
-    
+    let hello = "world";
+    42
 }

@@ -18,7 +18,6 @@ fn test_fn_builder() {
     insta::assert_snapshot!(actual, @r#"
     fn foo(a, b) -> bool {
         "Hello, world!";
-        
     }
     "#);
 }
@@ -49,7 +48,6 @@ fn test_fn_builder_with_metadata() {
     // a leading comment
     fn foo(a, b) -> bool {
         "Hello, world!";
-        
     }
     // a trailing comment
     "#);
