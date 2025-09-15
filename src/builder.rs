@@ -1040,7 +1040,7 @@ impl StmtBuilder {
     ///
     /// - `mac`: The `ExprMacroCall` to be used as a statement.
     pub fn mac_call(self, mac: ExprMacroCall) -> Stmt {
-        Stmt::MacCall(mac)
+        Stmt::Expr(Expr::MacroCall(mac))
     }
 }
 
