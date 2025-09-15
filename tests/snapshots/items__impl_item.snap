@@ -1,0 +1,10 @@
+---
+source: tests/items.rs
+assertion_line: 128
+expression: pretty(&item)
+---
+impl MyType {
+    fn my_func() {}
+    type MyType;
+    const MY_CONST: u8 = 5;
+}

@@ -22,6 +22,7 @@
 //!     .build();
 //! ```
 
+use crate::ast::items::*;
 use crate::ast::*;
 use thin_vec::{ThinVec, thin_vec};
 
@@ -226,6 +227,55 @@ impl TraitBuilder {
             generics: self.generics,
             associated_types: self.associated_types,
             items: self.items,
+            md: Some(Box::new(self.md.build())),
+        }
+    }
+}
+
+/// Creates a new `AssociatedConstBuilder` to construct an associated constant.
+pub fn associated_const(
+    ident: impl Into<String>,
+    ty: impl Into<Type>,
+    expr: impl Into<Expr>,
+) -> AssociatedConstBuilder {
+    AssociatedConstBuilder::new(ident, ty, expr)
+}
+
+/// A builder for constructing an `AssociatedConst` AST node.
+pub struct AssociatedConstBuilder {
+    ident: String,
+    ty: Type,
+    expr: Expr,
+    md: MdBuilder,
+}
+
+impl AssociatedConstBuilder {
+    /// Create a new `AssociatedConstBuilder` with the provided identifier.
+    ///
+    /// # Parameters
+    ///
+    /// - `ident`: Name of the associated constant.
+    /// - `ty`: Type of the associated constant.
+    /// - `expr`: Value of the associated constant.
+    pub fn new(ident: impl Into<String>, ty: impl Into<Type>, expr: impl Into<Expr>) -> Self {
+        Self {
+            ident: ident.into(),
+            ty: ty.into(),
+            expr: expr.into(),
+            md: MdBuilder::new(),
+        }
+    }
+
+    /// Builds the `AssociatedConst` instance.
+    ///
+    /// # Returns
+    ///
+    /// An `AssociatedConst` instance.
+    pub fn build(self) -> AssociatedConst {
+        AssociatedConst {
+            ident: self.ident,
+            ty: self.ty,
+            expr: self.expr,
             md: Some(Box::new(self.md.build())),
         }
     }
@@ -493,7 +543,7 @@ pub struct ImplBuilder {
     trait_: Option<Type>,
     is_unsafe: bool,
     is_negative: bool,
-    fns: ThinVec<ItemFn>,
+    items: ThinVec<ImplItem>,
 }
 
 impl ImplBuilder {
@@ -509,7 +559,7 @@ impl ImplBuilder {
             trait_: None,
             is_unsafe: false,
             is_negative: false,
-            fns: thin_vec![],
+            items: thin_vec![],
         }
     }
 
@@ -557,13 +607,13 @@ impl ImplBuilder {
         self
     }
 
-    /// Adds a function to the impl block.
+    /// Adds an item to the impl block.
     ///
     /// # Parameters
     ///
-    /// - `func`: The function to add.
-    pub fn function(mut self, func: impl Into<ItemFn>) -> Self {
-        self.fns.push(func.into());
+    /// - `item`: The item to add.
+    pub fn item(mut self, item: impl Into<ImplItem>) -> Self {
+        self.items.push(item.into());
         self
     }
 
@@ -579,7 +629,7 @@ impl ImplBuilder {
             trait_: self.trait_,
             is_unsafe: self.is_unsafe,
             is_negative: self.is_negative,
-            fns: self.fns,
+            items: self.items,
             md: None,
         }
     }

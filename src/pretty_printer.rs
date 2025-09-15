@@ -23,6 +23,7 @@
 //! pretty-printed. This trait provides a `pretty_print` method that
 //! converts the AST node into a sequence of tokens for the `Printer`.
 
+use crate::ast::items::*;
 use crate::ast::*;
 use std::borrow::Cow;
 use std::fmt::{self, Write};
@@ -392,6 +393,20 @@ impl PrettyPrinter for Comment {
             Comment::Doc(s) => printer.string(format!("///{s}")),
         }
         printer.hard_break();
+        Ok(())
+    }
+}
+
+impl PrettyPrinter for AssociatedConst {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        pp_begin(&self.md, printer)?;
+        printer.string("const ");
+        printer.string(&self.ident);
+        printer.string(": ");
+        self.ty.pretty_print(printer)?;
+        printer.string(" = ");
+        self.expr.pretty_print(printer)?;
+        printer.string(";");
         Ok(())
     }
 }
@@ -1253,6 +1268,16 @@ impl PrettyPrinter for Variant {
     }
 }
 
+impl PrettyPrinter for ImplItem {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        match self {
+            ImplItem::Fn(item_fn) => item_fn.pretty_print(printer),
+            ImplItem::Type(associated_type) => associated_type.pretty_print(printer),
+            ImplItem::Const(associated_const) => associated_const.pretty_print(printer),
+        }
+    }
+}
+
 impl PrettyPrinter for ItemImpl {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         pp_begin(&self.md, printer)?;
@@ -1272,12 +1297,12 @@ impl PrettyPrinter for ItemImpl {
         self.ty.pretty_print(printer)?;
         printer.string(" ");
         printer.begin(BreakStyle::Consistent, "{");
-        if !self.fns.is_empty() {
+        if !self.items.is_empty() {
             printer.hard_break();
-            let num_fns = self.fns.len();
-            for (i, fun) in self.fns.iter().enumerate() {
-                fun.pretty_print(printer)?;
-                if i < num_fns - 1 {
+            let num_items = self.items.len();
+            for (i, item) in self.items.iter().enumerate() {
+                item.pretty_print(printer)?;
+                if i < num_items - 1 {
                     printer.hard_break();
                 }
             }
