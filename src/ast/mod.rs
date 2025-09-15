@@ -4,6 +4,8 @@
 //! It includes nodes for expressions, statements, items, literals, and more. The AST is used
 //! by the pretty-printer to generate formatted Rust code.
 
+/// Defines the AST node for an associated const in a trait.
+pub mod associated_const;
 /// Defines the AST node for an associated type in a trait.
 pub mod associated_type;
 /// Defines the AST nodes for attributes.
@@ -57,6 +59,7 @@ pub mod types;
 /// Defines the AST nodes for visibility.
 pub mod visibility;
 
+pub use associated_const::*;
 pub use associated_type::*;
 pub use attributes::*;
 pub use comments::*;

@@ -233,19 +233,15 @@ impl TraitBuilder {
 }
 
 /// Creates a new `AssociatedConstBuilder` to construct an associated constant.
-pub fn associated_const(
-    ident: impl Into<String>,
-    ty: impl Into<Type>,
-    expr: impl Into<Expr>,
-) -> AssociatedConstBuilder {
-    AssociatedConstBuilder::new(ident, ty, expr)
+pub fn associated_const(ident: impl Into<String>, ty: impl Into<Type>) -> AssociatedConstBuilder {
+    AssociatedConstBuilder::new(ident, ty)
 }
 
 /// A builder for constructing an `AssociatedConst` AST node.
 pub struct AssociatedConstBuilder {
     ident: String,
     ty: Type,
-    expr: Expr,
+    expr: Option<Box<Expr>>,
     md: MdBuilder,
 }
 
@@ -256,14 +252,23 @@ impl AssociatedConstBuilder {
     ///
     /// - `ident`: Name of the associated constant.
     /// - `ty`: Type of the associated constant.
-    /// - `expr`: Value of the associated constant.
-    pub fn new(ident: impl Into<String>, ty: impl Into<Type>, expr: impl Into<Expr>) -> Self {
+    pub fn new(ident: impl Into<String>, ty: impl Into<Type>) -> Self {
         Self {
             ident: ident.into(),
             ty: ty.into(),
-            expr: expr.into(),
+            expr: None,
             md: MdBuilder::new(),
         }
+    }
+
+    /// Sets the expression of the associated const.
+    ///
+    /// # Parameters
+    ///
+    /// - `expr`: The `Expr` of the associated const.
+    pub fn expr(mut self, expr: impl Into<Expr>) -> Self {
+        self.expr = Some(Box::new(expr.into()));
+        self
     }
 
     /// Builds the `AssociatedConst` instance.
