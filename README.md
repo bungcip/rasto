@@ -1,16 +1,25 @@
 # rasto
 
-`rasto` is a Rust crate that provides a comprehensive set of data structures for representing a Rust Abstract Syntax Tree (AST) and a powerful pretty-printer to format the AST back into well-structured Rust code.
+`rasto` is a Rust crate for programmatic manipulation of Rust code.
 
-This library is designed for tasks such as procedural macros, code generation, source code analysis, and any other application that requires programmatic manipulation of Rust code.
+It provides a set of data structures for representing a Rust Abstract Syntax Tree (AST) and a pretty-printer to format the AST back into well-structured Rust code.
 
-## Features
+## Philosophy
 
--   **Comprehensive AST**: A rich set of data structures for representing all aspects of Rust's syntax, including expressions, statements, items, types, and attributes.
--   **Full Comment Support**: Easily attach leading, trailing, and inner comments to any item or statement, preserving the full context of the source code.
--   **Fluent Builder API**: A powerful and intuitive builder pattern for programmatically constructing complex AST nodes with ease.
--   **High-Quality Pretty-Printer**: A flexible and efficient pretty-printer based on Philip Wadler's "A Prettier Printer" that generates beautifully formatted Rust code from the AST.
--   **Snapshot Testing**: The project uses `insta` for robust snapshot testing, ensuring the correctness of the pretty-printer's output.
+`rasto` is an opinionated library with a specific focus on AST manipulation and code generation. It is designed with the following principles in mind:
+
+-   **Opinionated Comment Placement**: `rasto` enforces a specific style of comment placement. Not all AST nodes can have comments attached to them. This is a deliberate design choice to ensure that the generated code is always well-formatted and readable.
+
+-   **No Parser**: `rasto` does not include a parser. The focus of the library is on AST manipulation and pretty-printing. Parsing is considered a separate concern and is out of the scope of this project. For parsing Rust code, we recommend using other libraries like `syn`.
+
+## Comparison with other crates
+
+| Crate | AST Manipulation | Parsing | Pretty Printing | Focus |
+| --- | --- | --- | --- | --- |
+| `rasto` | Yes | No | Yes | Opinionated AST manipulation and pretty-printing |
+| `syn` | Yes | Yes | No | Parsing Rust code into a syntax tree |
+| `quote` | No | No | Yes | Turning a syntax tree back into Rust code |
+| `proc-macro2` | No | No | No | A wrapper around the compiler's `proc_macro` API |
 
 ## Setup
 
@@ -71,23 +80,11 @@ pub fn my_function<T>(arg) -> T {
 
 ## Contributing
 
-Contributions are welcome! If you find a bug or have a feature request, please open an issue on GitHub. Pull requests are also greatly appreciated.
-
-When contributing, please ensure that any new public items are fully documented. The build will fail if any public item is missing documentation.
+Contributions are welcome! Please open an issue or submit a pull request on GitHub.
 
 ### Testing
 
-This project uses snapshot testing with `insta`. To run the tests, use:
-
-```bash
-cargo test
-```
-
-If you make a change that affects the output of the pretty-printer, you can review and update the snapshots with:
-
-```bash
-cargo insta review
-```
+To run the tests, use `cargo test`.
 
 ## License
 
