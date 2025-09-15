@@ -76,17 +76,29 @@ pub fn comment() -> CommentBuilder {
 pub struct CommentBuilder;
 
 impl CommentBuilder {
-    /// Creates a line comment.
+    /// Creates a line comment, e.g., `// A line comment.`
+    ///
+    /// # Parameters
+    ///
+    /// - `content`: The text of the comment.
     pub fn line<S: Into<String>>(self, content: S) -> Comment {
         Comment::Line(content.into())
     }
 
-    /// Creates a block comment.
+    /// Creates a block comment, e.g., `/* A block comment. */`
+    ///
+    /// # Parameters
+    ///
+    /// - `content`: The text of the comment.
     pub fn block<S: Into<String>>(self, content: S) -> Comment {
         Comment::Block(content.into())
     }
 
-    /// Creates a doc comment.
+    /// Creates a doc comment, e.g., `/// A doc comment.`
+    ///
+    /// # Parameters
+    ///
+    /// - `content`: The text of the comment.
     pub fn doc<S: Into<String>>(self, content: S) -> Comment {
         Comment::Doc(content.into())
     }
@@ -133,6 +145,10 @@ impl TraitBuilder {
     }
 
     /// Sets the visibility of the trait.
+    ///
+    /// # Parameters
+    ///
+    /// - `vis`: The `Visibility` to set.
     pub fn vis(mut self, vis: Visibility) -> Self {
         self.vis = vis;
         self
@@ -169,18 +185,30 @@ impl TraitBuilder {
     }
 
     /// Adds a leading comment to the trait.
+    ///
+    /// # Parameters
+    ///
+    /// - `comment`: The `Comment` to add.
     pub fn leading_comment(mut self, comment: impl Into<Comment>) -> Self {
         self.md = self.md.leading_comment(comment.into());
         self
     }
 
     /// Adds a trailing comment to the trait.
+    ///
+    /// # Parameters
+    ///
+    /// - `comment`: The `Comment` to add.
     pub fn trailing_comment(mut self, comment: impl Into<Comment>) -> Self {
         self.md = self.md.trailing_comment(comment.into());
         self
     }
 
     /// Adds an attribute to the trait.
+    ///
+    /// # Parameters
+    ///
+    /// - `attr`: The `Attribute` to add.
     pub fn attr(mut self, attr: impl Into<Attribute>) -> Self {
         self.md = self.md.attr(attr.into());
         self
@@ -212,6 +240,10 @@ pub struct ArmBuilder {
 
 impl ArmBuilder {
     /// Creates a new `ArmBuilder` with the given pattern.
+    ///
+    /// # Parameters
+    ///
+    /// - `pat`: The pattern for the arm.
     pub fn new(pat: impl Into<Pat>) -> Self {
         Self {
             pat: pat.into(),
@@ -221,18 +253,30 @@ impl ArmBuilder {
     }
 
     /// Sets the guard expression for the arm.
+    ///
+    /// # Parameters
+    ///
+    /// - `guard`: The expression for the guard.
     pub fn guard(mut self, guard: impl Into<Expr>) -> Self {
         self.guard = Some(guard.into());
         self
     }
 
     /// Sets the body of the arm.
+    ///
+    /// # Parameters
+    ///
+    /// - `body`: The expression for the body.
     pub fn body(mut self, body: impl Into<Expr>) -> Self {
         self.body = body.into();
         self
     }
 
     /// Builds the `Arm` AST node.
+    ///
+    /// # Returns
+    ///
+    /// An `Arm` instance.
     pub fn build(self) -> Arm {
         Arm {
             pat: self.pat,
@@ -272,31 +316,51 @@ impl AssociatedTypeBuilder {
         }
     }
 
-    /// Add a generic parameter to the associated type.
+    /// Adds a generic parameter to the associated type.
+    ///
+    /// # Parameters
+    ///
+    /// - `g`: The generic parameter to add.
     pub fn generic(mut self, g: impl Into<GenericParam>) -> Self {
         self.generics.params.push(g.into());
         self
     }
 
-    /// Add a bound type to the associated type.
+    /// Adds a bound to the associated type.
+    ///
+    /// # Parameters
+    ///
+    /// - `t`: The bound to add.
     pub fn bound(mut self, t: impl Into<Type>) -> Self {
         self.bounds.push(t.into());
         self
     }
 
-    /// Set a default type for the associated type.
+    /// Sets the default type for the associated type.
+    ///
+    /// # Parameters
+    ///
+    /// - `t`: The default type.
     pub fn default(mut self, t: impl Into<Type>) -> Self {
         self.default = Some(t.into());
         self
     }
 
-    /// Set metadata for the associated type.
+    /// Sets the metadata for the associated type.
+    ///
+    /// # Parameters
+    ///
+    /// - `md`: The metadata to set.
     pub fn md(mut self, md: impl Into<Md>) -> Self {
         self.md = Some(Box::new(md.into()));
         self
     }
 
-    /// Build the `AssociatedType` instance.
+    /// Builds the `AssociatedType` instance.
+    ///
+    /// # Returns
+    ///
+    /// An `AssociatedType` instance.
     pub fn build(self) -> AssociatedType {
         AssociatedType {
             ident: self.ident,
@@ -335,7 +399,7 @@ impl BlockBuilder {
     ///
     /// # Parameters
     ///
-    /// - `comment`: The comment to add.
+    /// - `comment`: The `Comment` to add.
     pub fn leading_comment(mut self, comment: impl Into<Comment>) -> Self {
         self.leading_comments.push(comment.into());
         self
@@ -345,7 +409,7 @@ impl BlockBuilder {
     ///
     /// # Parameters
     ///
-    /// - `stmt`: The statement to add.
+    /// - `stmt`: The `Stmt` to add.
     pub fn statement(mut self, stmt: impl Into<Stmt>) -> Self {
         self.stmts.push(stmt.into());
         self
@@ -355,7 +419,7 @@ impl BlockBuilder {
     ///
     /// # Parameters
     ///
-    /// - `has_trailing_semicolon`: Whether the block has a trailing semicolon.
+    /// - `has_trailing_semicolon`: `true` if the block should have a trailing semicolon.
     pub fn has_trailing_semicolon(mut self, has_trailing_semicolon: bool) -> Self {
         self.has_trailing_semicolon = has_trailing_semicolon;
         self
@@ -365,7 +429,7 @@ impl BlockBuilder {
     ///
     /// # Parameters
     ///
-    /// - `comment`: The comment to add.
+    /// - `comment`: The `Comment` to add.
     pub fn trailing_comment(mut self, comment: impl Into<Comment>) -> Self {
         self.trailing_comments.push(comment.into());
         self
@@ -470,12 +534,24 @@ impl ImplBuilder {
     }
 
     /// Marks the impl block as `unsafe`.
+    ///
+    /// # Example
+    ///
+    /// ```rust,ignore
+    /// unsafe impl MyTrait for MyType { ... }
+    /// ```
     pub fn unsafe_(mut self) -> Self {
         self.is_unsafe = true;
         self
     }
 
-    /// Marks the impl block as negative.
+    /// Marks the impl block as negative, e.g., `impl !MyTrait for MyType { ... }`.
+    ///
+    /// # Example
+    ///
+    /// ```rust,ignore
+    /// impl !MyTrait for MyType { ... }
+    /// ```
     pub fn negative(mut self) -> Self {
         self.is_negative = true;
         self
@@ -548,6 +624,10 @@ impl EnumBuilder {
     }
 
     /// Sets the visibility of the enum.
+    ///
+    /// # Parameters
+    ///
+    /// - `vis`: The `Visibility` to set.
     pub fn vis(mut self, vis: Visibility) -> Self {
         self.vis = vis;
         self
@@ -577,18 +657,30 @@ impl EnumBuilder {
     }
 
     /// Adds a leading comment to the enum.
+    ///
+    /// # Parameters
+    ///
+    /// - `comment`: The `Comment` to add.
     pub fn leading_comment(mut self, comment: impl Into<Comment>) -> Self {
         self.md = self.md.leading_comment(comment.into());
         self
     }
 
     /// Adds a trailing comment to the enum.
+    ///
+    /// # Parameters
+    ///
+    /// - `comment`: The `Comment` to add.
     pub fn trailing_comment(mut self, comment: impl Into<Comment>) -> Self {
         self.md = self.md.trailing_comment(comment.into());
         self
     }
 
     /// Adds an attribute to the enum.
+    ///
+    /// # Parameters
+    ///
+    /// - `attr`: The `Attribute` to add.
     pub fn attr(mut self, attr: impl Into<Attribute>) -> Self {
         self.md = self.md.attr(attr.into());
         self
@@ -649,6 +741,10 @@ impl StructBuilder {
     }
 
     /// Sets the visibility of the struct.
+    ///
+    /// # Parameters
+    ///
+    /// - `vis`: The `Visibility` to set.
     pub fn vis(mut self, vis: Visibility) -> Self {
         self.vis = vis;
         self
@@ -680,18 +776,30 @@ impl StructBuilder {
     }
 
     /// Adds a leading comment to the struct.
+    ///
+    /// # Parameters
+    ///
+    /// - `comment`: The `Comment` to add.
     pub fn leading_comment(mut self, comment: impl Into<Comment>) -> Self {
         self.md = self.md.leading_comment(comment.into());
         self
     }
 
     /// Adds a trailing comment to the struct.
+    ///
+    /// # Parameters
+    ///
+    /// - `comment`: The `Comment` to add.
     pub fn trailing_comment(mut self, comment: impl Into<Comment>) -> Self {
         self.md = self.md.trailing_comment(comment.into());
         self
     }
 
     /// Adds an attribute to the struct.
+    ///
+    /// # Parameters
+    ///
+    /// - `attr`: The `Attribute` to add.
     pub fn attr(mut self, attr: impl Into<Attribute>) -> Self {
         self.md = self.md.attr(attr.into());
         self
@@ -753,6 +861,10 @@ impl FnBuilder {
     }
 
     /// Sets the visibility of the function.
+    ///
+    /// # Parameters
+    ///
+    /// - `vis`: The `Visibility` to set.
     pub fn vis(mut self, vis: Visibility) -> Self {
         self.vis = vis;
         self
@@ -798,31 +910,48 @@ impl FnBuilder {
         self
     }
 
-    /// has trailing semicolon
-    pub fn has_trailing_semicolon(mut self, value: bool) -> Self {
-        self.block.has_trailing_semicolon = value;
+    /// Sets whether the function's block has a trailing semicolon.
+    /// By default, a function body does not have a trailing semicolon.
+    pub fn has_trailing_semicolon(mut self, has_trailing_semicolon: bool) -> Self {
+        self.block.has_trailing_semicolon = has_trailing_semicolon;
         self
     }
 
-    /// insert statement
+    /// Adds a statement to the function's block.
+    ///
+    /// # Parameters
+    ///
+    /// - `stmt`: The statement to add.
     pub fn statement(mut self, stmt: impl Into<Stmt>) -> Self {
         self.block.stmts.push(stmt.into());
         self
     }
 
     /// Adds an attribute to the function.
+    ///
+    /// # Parameters
+    ///
+    /// - `attr`: The `Attribute` to add.
     pub fn attr(mut self, attr: impl Into<Attribute>) -> Self {
         self.md = self.md.attr(attr.into());
         self
     }
 
     /// Adds a leading comment to the function.
+    ///
+    /// # Parameters
+    ///
+    /// - `comment`: The `Comment` to add.
     pub fn leading_comment(mut self, comment: impl Into<Comment>) -> Self {
         self.md = self.md.leading_comment(comment.into());
         self
     }
 
     /// Adds a trailing comment to the function.
+    ///
+    /// # Parameters
+    ///
+    /// - `comment`: The `Comment` to add.
     pub fn trailing_comment(mut self, comment: impl Into<Comment>) -> Self {
         self.md = self.md.trailing_comment(comment.into());
         self
@@ -863,21 +992,37 @@ pub struct StmtBuilder;
 
 impl StmtBuilder {
     /// Creates a local (`let`) binding statement.
+    ///
+    /// # Parameters
+    ///
+    /// - `pat`: The pattern for the `let` binding.
     pub fn local(self, pat: impl Into<Pat>) -> LocalBuilder {
         LocalBuilder::new(pat)
     }
 
     /// Creates an item statement.
+    ///
+    /// # Parameters
+    ///
+    /// - `item`: The `Item` to be used as a statement.
     pub fn item(self, item: impl Into<Item>) -> Stmt {
         Stmt::Item(item.into())
     }
 
     /// Creates an expression statement.
+    ///
+    /// # Parameters
+    ///
+    /// - `expr`: The `Expr` to be used as a statement.
     pub fn expr(self, expr: Expr) -> Stmt {
         Stmt::Expr(expr)
     }
 
     /// Creates a macro call statement.
+    ///
+    /// # Parameters
+    ///
+    /// - `mac`: The `ExprMacroCall` to be used as a statement.
     pub fn mac_call(self, mac: ExprMacroCall) -> Stmt {
         Stmt::MacCall(mac)
     }
@@ -892,6 +1037,10 @@ pub struct LocalBuilder {
 
 impl LocalBuilder {
     /// Creates a new `LocalBuilder` with the given pattern.
+    ///
+    /// # Parameters
+    ///
+    /// - `pat`: The pattern for the `let` binding.
     pub fn new(pat: impl Into<Pat>) -> Self {
         Self {
             pat: pat.into(),
@@ -901,18 +1050,30 @@ impl LocalBuilder {
     }
 
     /// Sets the type of the variable.
+    ///
+    /// # Parameters
+    ///
+    /// - `ty`: The `Type` of the variable.
     pub fn ty(mut self, ty: impl Into<Type>) -> Self {
         self.ty = Some(ty.into());
         self
     }
 
     /// Sets the expression to initialize the variable.
+    ///
+    /// # Parameters
+    ///
+    /// - `expr`: The initialization `Expr`.
     pub fn expr(mut self, expr: impl Into<Expr>) -> Self {
         self.expr = Some(expr.into());
         self
     }
 
     /// Builds the `Stmt::Local` AST node.
+    ///
+    /// # Returns
+    ///
+    /// A `Stmt` instance representing the `let` binding.
     pub fn build(self) -> Stmt {
         Stmt::Local(Local {
             pat: self.pat,
@@ -961,13 +1122,17 @@ impl PatBuilder {
         Pat::Wild
     }
 
-    /// set mutability of pattern
+    /// Sets the pattern to be mutable (e.g., `mut ident`).
     pub fn mutable(mut self) -> Self {
         self.mutability = true;
         self
     }
 
     /// Creates an identifier pattern.
+    ///
+    /// # Parameters
+    ///
+    /// - `name`: The name of the identifier.
     pub fn ident(self, name: impl Into<String>) -> Pat {
         Pat::Ident(PatIdent {
             ident: name.into(),
@@ -976,6 +1141,10 @@ impl PatBuilder {
     }
 
     /// Creates a tuple pattern.
+    ///
+    /// # Parameters
+    ///
+    /// - `pats`: An iterator of patterns for the tuple elements.
     pub fn tuple(self, pats: impl IntoIterator<Item = impl Into<Pat>>) -> Pat {
         Pat::Tuple(pats.into_iter().map(Into::into).collect())
     }
@@ -998,6 +1167,10 @@ pub struct PathBuilder {
 
 impl PathBuilder {
     /// Creates a new `PathBuilder` with the given segment.
+    ///
+    /// # Parameters
+    ///
+    /// - `segment`: The first segment of the path.
     pub fn new(segment: impl Into<String>) -> Self {
         Self {
             segments: thin_vec![PathSegment {
@@ -1008,6 +1181,10 @@ impl PathBuilder {
     }
 
     /// Adds a segment to the path.
+    ///
+    /// # Parameters
+    ///
+    /// - `segment`: The segment to add.
     pub fn segment(mut self, segment: impl Into<String>) -> Self {
         self.segments.push(PathSegment {
             ident: segment.into(),
@@ -1017,6 +1194,10 @@ impl PathBuilder {
     }
 
     /// Builds the `Path` AST node.
+    ///
+    /// # Returns
+    ///
+    /// A `Path` instance.
     pub fn build(self) -> Path {
         Path {
             segments: self.segments,
@@ -1024,6 +1205,10 @@ impl PathBuilder {
     }
 
     /// Adds a generic argument to the last segment.
+    ///
+    /// # Parameters
+    ///
+    /// - `arg`: The generic argument to add.
     pub fn generic(mut self, arg: impl Into<GenericArg>) -> Self {
         let segment = self.segments.last_mut().unwrap();
         let args = segment.args.get_or_insert_with(Default::default);
@@ -1032,6 +1217,10 @@ impl PathBuilder {
     }
 
     /// Builds a `Type::Path` from the `PathBuilder`.
+    ///
+    /// # Returns
+    ///
+    /// A `Type` instance representing the path.
     pub fn build_type(self) -> Type {
         Type::Path(TypePath { path: self.build() })
     }
@@ -1271,12 +1460,22 @@ impl ExprBuilder {
         Expr::Lit(lit.into())
     }
 
-    /// create int literal with suffix
+    /// Creates an integer literal expression with a specific suffix.
+    ///
+    /// # Parameters
+    ///
+    /// - `value`: The integer value.
+    /// - `suffix`: The integer suffix (e.g., `u32`, `i64`).
     pub fn int_lit_with_suffix(self, value: i32, suffix: IntSuffix) -> Expr {
         Expr::Lit(Lit::Int(LitInt::with_suffix(value as u128, suffix)))
     }
 
-    /// create float literal with suffix
+    /// Creates a float literal expression with a specific suffix.
+    ///
+    /// # Parameters
+    ///
+    /// - `value`: The float value as a string.
+    /// - `suffix`: The float suffix (e.g., `f32`, `f64`).
     pub fn float_lit_with_suffix(self, value: &str, suffix: FloatSuffix) -> Expr {
         Expr::Lit(Lit::Float(LitFloat::with_suffix(value, suffix)))
     }
@@ -1324,6 +1523,10 @@ impl ExprBuilder {
     }
 
     /// Creates a new `ArmBuilder` to construct a match arm.
+    ///
+    /// # Parameters
+    ///
+    /// - `pat`: The pattern for the arm.
     pub fn arm(self, pat: impl Into<Pat>) -> ArmBuilder {
         ArmBuilder::new(pat)
     }
@@ -1448,6 +1651,10 @@ pub struct ExprRawRefBuilder {
 
 impl ExprRawRefBuilder {
     /// Creates a new `ExprRawRefBuilder`.
+    ///
+    /// # Parameters
+    ///
+    /// - `expr`: The expression to be referenced.
     pub fn new(expr: Expr) -> Self {
         Self {
             expr,
@@ -1462,6 +1669,10 @@ impl ExprRawRefBuilder {
     }
 
     /// Builds the `Expr::RawRef`.
+    ///
+    /// # Returns
+    ///
+    /// An `Expr` instance representing the raw reference.
     pub fn build(self) -> Expr {
         Expr::RawRef(ExprRawRef {
             expr: Box::new(self.expr),
@@ -1497,6 +1708,11 @@ pub struct ItemDefBuilder {
 
 impl ItemDefBuilder {
     /// Creates a new `ItemDefBuilder`.
+    ///
+    /// # Parameters
+    ///
+    /// - `name`: The name of the item.
+    /// - `kind`: The `ItemDefKind` of the item.
     pub fn new(name: impl Into<String>, kind: impl Into<ItemDefKind>) -> Self {
         Self {
             ident: name.into(),
@@ -1507,30 +1723,50 @@ impl ItemDefBuilder {
     }
 
     /// Sets the visibility of the item.
+    ///
+    /// # Parameters
+    ///
+    /// - `vis`: The `Visibility` to set.
     pub fn vis(mut self, vis: Visibility) -> Self {
         self.vis = vis;
         self
     }
 
     /// Adds a leading comment to the item.
+    ///
+    /// # Parameters
+    ///
+    /// - `comment`: The `Comment` to add.
     pub fn leading_comment(mut self, comment: impl Into<Comment>) -> Self {
         self.md = self.md.leading_comment(comment.into());
         self
     }
 
     /// Adds a trailing comment to the item.
+    ///
+    /// # Parameters
+    ///
+    /// - `comment`: The `Comment` to add.
     pub fn trailing_comment(mut self, comment: impl Into<Comment>) -> Self {
         self.md = self.md.trailing_comment(comment.into());
         self
     }
 
     /// Adds an attribute to the item.
+    ///
+    /// # Parameters
+    ///
+    /// - `attr`: The `Attribute` to add.
     pub fn attr(mut self, attr: impl Into<Attribute>) -> Self {
         self.md = self.md.attr(attr.into());
         self
     }
 
     /// Builds the `ItemDef` AST node.
+    ///
+    /// # Returns
+    ///
+    /// An `ItemDef` instance.
     pub fn build(self) -> ItemDef {
         ItemDef {
             vis: self.vis,
@@ -1554,6 +1790,11 @@ pub struct ConstKindBuilder {
 
 impl ConstKindBuilder {
     /// Creates a new `ConstKindBuilder`.
+    ///
+    /// # Parameters
+    ///
+    /// - `ty`: The `Type` of the constant.
+    /// - `expr`: The `Expr` of the constant.
     pub fn new(ty: impl Into<Type>, expr: impl Into<Expr>) -> Self {
         Self {
             ty: ty.into(),
@@ -1562,6 +1803,10 @@ impl ConstKindBuilder {
     }
 
     /// Builds the `ItemDefKind::Const`.
+    ///
+    /// # Returns
+    ///
+    /// An `ItemDefKind` instance representing the `const` item.
     pub fn build(self) -> ItemDefKind {
         ItemDefKind::Const {
             ty: self.ty,
@@ -1589,6 +1834,11 @@ pub struct StaticKindBuilder {
 
 impl StaticKindBuilder {
     /// Creates a new `StaticKindBuilder`.
+    ///
+    /// # Parameters
+    ///
+    /// - `ty`: The `Type` of the static item.
+    /// - `expr`: The initialization `Expr` of the static item.
     pub fn new(ty: impl Into<Type>, expr: impl Into<Expr>) -> Self {
         Self {
             ty: ty.into(),
@@ -1597,6 +1847,10 @@ impl StaticKindBuilder {
     }
 
     /// Builds the `ItemDefKind::Static`.
+    ///
+    /// # Returns
+    ///
+    /// An `ItemDefKind` instance representing the `static` item.
     pub fn build(self) -> ItemDefKind {
         ItemDefKind::Static {
             ty: self.ty,
@@ -1624,6 +1878,10 @@ pub struct TypeAliasKindBuilder {
 
 impl TypeAliasKindBuilder {
     /// Creates a new `TypeAliasKindBuilder`.
+    ///
+    /// # Parameters
+    ///
+    /// - `ty`: The `Type` being aliased.
     pub fn new(ty: impl Into<Type>) -> Self {
         Self {
             generics: GenericParams::new(),
@@ -1632,12 +1890,20 @@ impl TypeAliasKindBuilder {
     }
 
     /// Adds a generic parameter to the type alias.
+    ///
+    /// # Parameters
+    ///
+    /// - `param`: The generic parameter to add.
     pub fn generic(mut self, param: impl Into<GenericParam>) -> Self {
         self.generics.params.push(param.into());
         self
     }
 
     /// Builds the `ItemDefKind::TypeAlias`.
+    ///
+    /// # Returns
+    ///
+    /// An `ItemDefKind` instance representing the type alias.
     pub fn build(self) -> ItemDefKind {
         ItemDefKind::TypeAlias {
             generics: self.generics,
@@ -1665,6 +1931,10 @@ pub struct ItemExternCrateBuilder {
 
 impl ItemExternCrateBuilder {
     /// Creates a new `ItemExternCrateBuilder`.
+    ///
+    /// # Parameters
+    ///
+    /// - `name`: The name of the crate.
     pub fn new(name: impl Into<String>) -> Self {
         Self {
             ident: name.into(),
@@ -1673,24 +1943,40 @@ impl ItemExternCrateBuilder {
     }
 
     /// Adds a leading comment to the `extern crate` item.
+    ///
+    /// # Parameters
+    ///
+    /// - `comment`: The `Comment` to add.
     pub fn leading_comment(mut self, comment: impl Into<Comment>) -> Self {
         self.md = self.md.leading_comment(comment.into());
         self
     }
 
     /// Adds a trailing comment to the `extern crate` item.
+    ///
+    /// # Parameters
+    ///
+    /// - `comment`: The `Comment` to add.
     pub fn trailing_comment(mut self, comment: impl Into<Comment>) -> Self {
         self.md = self.md.trailing_comment(comment.into());
         self
     }
 
     /// Adds an attribute to the `extern crate` item.
+    ///
+    /// # Parameters
+    ///
+    /// - `attr`: The `Attribute` to add.
     pub fn attr(mut self, attr: impl Into<Attribute>) -> Self {
         self.md = self.md.attr(attr.into());
         self
     }
 
     /// Builds the `ItemExternCrate` AST node.
+    ///
+    /// # Returns
+    ///
+    /// An `ItemExternCrate` instance.
     pub fn build(self) -> ItemExternCrate {
         ItemExternCrate {
             ident: self.ident,
@@ -1713,6 +1999,10 @@ pub struct ItemForeignModBuilder {
 
 impl ItemForeignModBuilder {
     /// Creates a new `ItemForeignModBuilder`.
+    ///
+    /// # Parameters
+    ///
+    /// - `abi`: The ABI of the foreign module (e.g., "C").
     pub fn new(abi: impl Into<String>) -> Self {
         Self {
             abi: abi.into(),
@@ -1722,30 +2012,50 @@ impl ItemForeignModBuilder {
     }
 
     /// Adds an item to the foreign module.
+    ///
+    /// # Parameters
+    ///
+    /// - `item`: The `Item` to add.
     pub fn item(mut self, item: impl Into<Item>) -> Self {
         self.items.push(item.into());
         self
     }
 
     /// Adds a leading comment to the foreign module.
+    ///
+    /// # Parameters
+    ///
+    /// - `comment`: The `Comment` to add.
     pub fn leading_comment(mut self, comment: impl Into<Comment>) -> Self {
         self.md = self.md.leading_comment(comment.into());
         self
     }
 
     /// Adds a trailing comment to the foreign module.
+    ///
+    /// # Parameters
+    ///
+    /// - `comment`: The `Comment` to add.
     pub fn trailing_comment(mut self, comment: impl Into<Comment>) -> Self {
         self.md = self.md.trailing_comment(comment.into());
         self
     }
 
     /// Adds an attribute to the foreign module.
+    ///
+    /// # Parameters
+    ///
+    /// - `attr`: The `Attribute` to add.
     pub fn attr(mut self, attr: impl Into<Attribute>) -> Self {
         self.md = self.md.attr(attr.into());
         self
     }
 
     /// Builds the `ItemForeignMod` AST node.
+    ///
+    /// # Returns
+    ///
+    /// An `ItemForeignMod` instance.
     pub fn build(self) -> ItemForeignMod {
         ItemForeignMod {
             abi: self.abi,
@@ -1768,6 +2078,10 @@ pub struct ItemMacroBuilder {
 
 impl ItemMacroBuilder {
     /// Creates a new `ItemMacroBuilder`.
+    ///
+    /// # Parameters
+    ///
+    /// - `expr`: The macro invocation `Expr`.
     pub fn new(expr: impl Into<Expr>) -> Self {
         Self {
             expr: expr.into(),
@@ -1776,24 +2090,40 @@ impl ItemMacroBuilder {
     }
 
     /// Adds a leading comment to the macro item.
+    ///
+    /// # Parameters
+    ///
+    /// - `comment`: The `Comment` to add.
     pub fn leading_comment(mut self, comment: impl Into<Comment>) -> Self {
         self.md = self.md.leading_comment(comment.into());
         self
     }
 
     /// Adds a trailing comment to the macro item.
+    ///
+    /// # Parameters
+    ///
+    /// - `comment`: The `Comment` to add.
     pub fn trailing_comment(mut self, comment: impl Into<Comment>) -> Self {
         self.md = self.md.trailing_comment(comment.into());
         self
     }
 
     /// Adds an attribute to the macro item.
+    ///
+    /// # Parameters
+    ///
+    /// - `attr`: The `Attribute` to add.
     pub fn attr(mut self, attr: impl Into<Attribute>) -> Self {
         self.md = self.md.attr(attr.into());
         self
     }
 
     /// Builds the `ItemMacro` AST node.
+    ///
+    /// # Returns
+    ///
+    /// An `ItemMacro` instance.
     pub fn build(self) -> ItemMacro {
         ItemMacro {
             expr: Box::new(self.expr),
@@ -1827,42 +2157,73 @@ impl ItemModBuilder {
     }
 
     /// Sets the visibility of the module.
+    ///
+    /// # Parameters
+    ///
+    /// - `vis`: The `Visibility` to set.
     pub fn vis(mut self, vis: Visibility) -> Self {
         self.vis = vis;
         self
     }
 
     /// Sets the content of the module.
+    ///
+    /// # Parameters
+    ///
+    /// - `content`: A `ThinVec<Item>` containing the module's content.
     pub fn content(mut self, content: ThinVec<Item>) -> Self {
         self.content = Some(content);
         self
     }
 
-    /// add new item in it
+    /// Adds an item to the module's content.
+    ///
+    /// If the module was previously defined without a block (e.g., `mod my_mod;`),
+    /// this will initialize an empty content block before adding the item.
+    ///
+    /// # Parameters
+    ///
+    /// - `item`: The item to add to the module.
     pub fn item(mut self, item: impl Into<Item>) -> Self {
         self.content.get_or_insert_default().push(item.into());
         self
     }
 
     /// Adds a leading comment to the module item.
+    ///
+    /// # Parameters
+    ///
+    /// - `comment`: The `Comment` to add.
     pub fn leading_comment(mut self, comment: impl Into<Comment>) -> Self {
         self.md = self.md.leading_comment(comment.into());
         self
     }
 
     /// Adds a trailing comment to the module item.
+    ///
+    /// # Parameters
+    ///
+    /// - `comment`: The `Comment` to add.
     pub fn trailing_comment(mut self, comment: impl Into<Comment>) -> Self {
         self.md = self.md.trailing_comment(comment.into());
         self
     }
 
     /// Adds an attribute to the module item.
+    ///
+    /// # Parameters
+    ///
+    /// - `attr`: The `Attribute` to add.
     pub fn attr(mut self, attr: impl Into<Attribute>) -> Self {
         self.md = self.md.attr(attr.into());
         self
     }
 
     /// Builds the `ItemMod` AST node.
+    ///
+    /// # Returns
+    ///
+    /// An `ItemMod` instance.
     pub fn build(self) -> ItemMod {
         ItemMod {
             vis: self.vis,
@@ -1887,6 +2248,11 @@ pub struct ItemTraitAliasBuilder {
 
 impl ItemTraitAliasBuilder {
     /// Creates a new `ItemTraitAliasBuilder`.
+    ///
+    /// # Parameters
+    ///
+    /// - `name`: The name of the trait alias.
+    /// - `bounds`: The bounds of the trait alias.
     pub fn new(name: impl Into<String>, bounds: ThinVec<String>) -> Self {
         Self {
             ident: name.into(),
@@ -1896,24 +2262,40 @@ impl ItemTraitAliasBuilder {
     }
 
     /// Adds a leading comment to the trait alias.
+    ///
+    /// # Parameters
+    ///
+    /// - `comment`: The `Comment` to add.
     pub fn leading_comment(mut self, comment: impl Into<Comment>) -> Self {
         self.md = self.md.leading_comment(comment.into());
         self
     }
 
     /// Adds a trailing comment to the trait alias.
+    ///
+    /// # Parameters
+    ///
+    /// - `comment`: The `Comment` to add.
     pub fn trailing_comment(mut self, comment: impl Into<Comment>) -> Self {
         self.md = self.md.trailing_comment(comment.into());
         self
     }
 
     /// Adds an attribute to the trait alias.
+    ///
+    /// # Parameters
+    ///
+    /// - `attr`: The `Attribute` to add.
     pub fn attr(mut self, attr: impl Into<Attribute>) -> Self {
         self.md = self.md.attr(attr.into());
         self
     }
 
     /// Builds the `ItemTraitAlias` AST node.
+    ///
+    /// # Returns
+    ///
+    /// An `ItemTraitAlias` instance.
     pub fn build(self) -> ItemTraitAlias {
         ItemTraitAlias {
             ident: self.ident,
@@ -1950,6 +2332,10 @@ impl ItemUnionBuilder {
     }
 
     /// Sets the visibility of the union.
+    ///
+    /// # Parameters
+    ///
+    /// - `vis`: The `Visibility` to set.
     pub fn vis(mut self, vis: Visibility) -> Self {
         self.vis = vis;
         self
@@ -1966,6 +2352,11 @@ impl ItemUnionBuilder {
     }
 
     /// Adds a field to the `union`.
+    ///
+    /// # Parameters
+    ///
+    /// - `name`: The name of the field.
+    /// - `ty`: The `Type` of the field.
     pub fn field(mut self, name: impl Into<String>, ty: impl Into<Type>) -> Self {
         self.fields.push(Field {
             ident: name.into(),
@@ -1976,24 +2367,40 @@ impl ItemUnionBuilder {
     }
 
     /// Adds a leading comment to the `union` item.
+    ///
+    /// # Parameters
+    ///
+    /// - `comment`: The `Comment` to add.
     pub fn leading_comment(mut self, comment: impl Into<Comment>) -> Self {
         self.md = self.md.leading_comment(comment.into());
         self
     }
 
     /// Adds a trailing comment to the `union` item.
+    ///
+    /// # Parameters
+    ///
+    /// - `comment`: The `Comment` to add.
     pub fn trailing_comment(mut self, comment: impl Into<Comment>) -> Self {
         self.md = self.md.trailing_comment(comment.into());
         self
     }
 
     /// Adds an attribute to the `union` item.
+    ///
+    /// # Parameters
+    ///
+    /// - `attr`: The `Attribute` to add.
     pub fn attr(mut self, attr: impl Into<Attribute>) -> Self {
         self.md = self.md.attr(attr.into());
         self
     }
 
     /// Builds the `ItemUnion` AST node.
+    ///
+    /// # Returns
+    ///
+    /// An `ItemUnion` instance.
     pub fn build(self) -> ItemUnion {
         ItemUnion {
             vis: self.vis,
@@ -2028,30 +2435,50 @@ impl ItemUseBuilder {
     }
 
     /// Sets the visibility of the use item.
+    ///
+    /// # Parameters
+    ///
+    /// - `vis`: The `Visibility` to set.
     pub fn vis(mut self, vis: Visibility) -> Self {
         self.vis = vis;
         self
     }
 
     /// Adds a leading comment to the `use` item.
+    ///
+    /// # Parameters
+    ///
+    /// - `comment`: The `Comment` to add.
     pub fn leading_comment(mut self, comment: impl Into<Comment>) -> Self {
         self.md = self.md.leading_comment(comment.into());
         self
     }
 
     /// Adds a trailing comment to the `use` item.
+    ///
+    /// # Parameters
+    ///
+    /// - `comment`: The `Comment` to add.
     pub fn trailing_comment(mut self, comment: impl Into<Comment>) -> Self {
         self.md = self.md.trailing_comment(comment.into());
         self
     }
 
     /// Adds an attribute to the `use` item.
+    ///
+    /// # Parameters
+    ///
+    /// - `attr`: The `Attribute` to add.
     pub fn attr(mut self, attr: impl Into<Attribute>) -> Self {
         self.md = self.md.attr(attr.into());
         self
     }
 
     /// Builds the `ItemUse` AST node.
+    ///
+    /// # Returns
+    ///
+    /// An `ItemUse` instance.
     pub fn build(self) -> ItemUse {
         ItemUse {
             vis: self.vis,
@@ -2079,13 +2506,17 @@ impl AttributeBuilder {
         Self::default()
     }
 
-    /// Sets the attribute as an inner attribute.
+    /// Sets the attribute as an inner attribute (e.g., `#![foo]`).
     pub fn inner(mut self) -> Self {
         self.is_inner = true;
         self
     }
 
     /// Sets the meta item for the attribute.
+    ///
+    /// # Parameters
+    ///
+    /// - `meta`: The `Meta` item to set.
     pub fn meta(mut self, meta: impl Into<Meta>) -> Self {
         self.meta = Some(meta.into());
         self
@@ -2122,7 +2553,12 @@ pub fn meta() -> MetaBuilder {
 pub struct MetaBuilder;
 
 impl MetaBuilder {
-    /// Creates a meta list.
+    /// Creates a meta list, e.g., `path(meta1, meta2)`.
+    ///
+    /// # Parameters
+    ///
+    /// - `path`: The path of the meta list.
+    /// - `metas`: An iterator of `Meta` items for the list.
     pub fn list(
         self,
         path: impl Into<String>,
@@ -2134,12 +2570,21 @@ impl MetaBuilder {
         })
     }
 
-    /// Creates a meta path.
+    /// Creates a meta path, e.g., `path`.
+    ///
+    /// # Parameters
+    ///
+    /// - `path`: The path of the meta item.
     pub fn path(self, path: impl Into<String>) -> Meta {
         Meta::Path(path.into())
     }
 
-    /// Creates a meta name-value pair.
+    /// Creates a meta name-value pair, e.g., `path = "value"`.
+    ///
+    /// # Parameters
+    ///
+    /// - `path`: The path of the meta item.
+    /// - `value`: The `Lit` value of the meta item.
     pub fn name_value(self, path: impl Into<String>, value: impl Into<Lit>) -> Meta {
         Meta::NameValue(MetaNameValue {
             path: path.into(),
@@ -2148,7 +2593,7 @@ impl MetaBuilder {
     }
 }
 
-/// token tree builder
+/// Creates a new `TokenTreeBuilder` to construct `TokenTree` nodes.
 pub fn tt() -> TokenTreeBuilder {
     TokenTreeBuilder {}
 }
@@ -2158,17 +2603,30 @@ pub fn tt() -> TokenTreeBuilder {
 pub struct TokenTreeBuilder;
 
 impl TokenTreeBuilder {
-    /// create TokenTree::Literal
+    /// Creates a literal token tree.
+    ///
+    /// # Parameters
+    ///
+    /// - `value`: The literal value.
     pub fn lit(self, value: impl Into<Lit>) -> TokenTree {
         TokenTree::Literal(value.into())
     }
 
-    /// create TokenTree::Ident
+    /// Creates an identifier token tree.
+    ///
+    /// # Parameters
+    ///
+    /// - `value`: The identifier string.
     pub fn ident(self, value: impl Into<String>) -> TokenTree {
         TokenTree::Ident(value.into())
     }
 
-    /// create TokenTree::Punct
+    /// Creates a punctuation token tree.
+    ///
+    /// # Parameters
+    ///
+    /// - `ch`: The punctuation character.
+    /// - `spacing`: The spacing of the punctuation.
     pub fn punct(self, ch: char, spacing: Spacing) -> TokenTree {
         TokenTree::Punct(Punct { ch, spacing })
     }
@@ -2279,6 +2737,10 @@ pub struct AsmBuilder {
 
 impl AsmBuilder {
     /// Creates a new `AsmBuilder` with the given template.
+    ///
+    /// # Parameters
+    ///
+    /// - `template`: The initial template string for the `asm!` item.
     pub fn new(template: impl Into<LitStr>) -> Self {
         Self {
             template: thin_vec![template.into()],
@@ -2288,24 +2750,40 @@ impl AsmBuilder {
     }
 
     /// Adds a template string to the `asm!` item.
+    ///
+    /// # Parameters
+    ///
+    /// - `template`: The template string to add.
     pub fn template(mut self, template: impl Into<LitStr>) -> Self {
         self.template.push(template.into());
         self
     }
 
     /// Adds an operand to the `asm!` item.
+    ///
+    /// # Parameters
+    ///
+    /// - `operand`: The `AsmOperand` to add.
     pub fn operand(mut self, operand: impl Into<AsmOperand>) -> Self {
         self.operands.push(operand.into());
         self
     }
 
     /// Sets the options for the `asm!` item.
+    ///
+    /// # Parameters
+    ///
+    /// - `options`: The `AsmOptions` to set.
     pub fn options(mut self, options: AsmOptions) -> Self {
         self.options = Some(options);
         self
     }
 
     /// Builds the `ItemAsm` AST node.
+    ///
+    /// # Returns
+    ///
+    /// An `ItemAsm` instance.
     pub fn build(self) -> ItemAsm {
         ItemAsm {
             template: self.template,
@@ -2326,21 +2804,39 @@ pub struct AsmOperandBuilder;
 
 impl AsmOperandBuilder {
     /// Creates a register operand.
+    ///
+    /// # Parameters
+    ///
+    /// - `direction`: The direction of the operand (`in`, `out`, etc.).
+    /// - `reg`: The register specifier.
+    /// - `expr`: The expression for the operand.
     pub fn reg(self, direction: AsmDirection, reg: RegSpec, expr: Expr) -> RegOperandBuilder {
         RegOperandBuilder::new(direction, reg, expr)
     }
 
     /// Creates a `sym` operand.
+    ///
+    /// # Parameters
+    ///
+    /// - `path`: The `Path` to the symbol.
     pub fn sym(self, path: Path) -> AsmOperand {
         AsmOperand::Sym(path)
     }
 
     /// Creates a `const` operand.
+    ///
+    /// # Parameters
+    ///
+    /// - `expr`: The `Expr` for the constant value.
     pub fn const_(self, expr: Expr) -> AsmOperand {
         AsmOperand::Const(expr)
     }
 
     /// Creates a `clobber_abi` operand.
+    ///
+    /// # Parameters
+    ///
+    /// - `abi`: The ABI to clobber.
     pub fn clobber_abi(self, abi: impl Into<LitStr>) -> ClobberAbiBuilder {
         ClobberAbiBuilder::new(abi)
     }
@@ -2356,6 +2852,12 @@ pub struct RegOperandBuilder {
 
 impl RegOperandBuilder {
     /// Creates a new `RegOperandBuilder`.
+    ///
+    /// # Parameters
+    ///
+    /// - `direction`: The direction of the operand.
+    /// - `reg`: The register specifier.
+    /// - `expr`: The expression for the operand.
     pub fn new(direction: AsmDirection, reg: RegSpec, expr: Expr) -> Self {
         Self {
             direction,
@@ -2366,12 +2868,20 @@ impl RegOperandBuilder {
     }
 
     /// Sets the output expression for an `inout` operand.
+    ///
+    /// # Parameters
+    ///
+    /// - `expr`: The output `Expr`.
     pub fn out_expr(mut self, expr: Expr) -> Self {
         self.out_expr = Some(expr);
         self
     }
 
     /// Builds the `RegOperand` AST node.
+    ///
+    /// # Returns
+    ///
+    /// An `AsmOperand` instance representing the register operand.
     pub fn build(self) -> AsmOperand {
         AsmOperand::Reg(RegOperand {
             direction: self.direction,
@@ -2395,6 +2905,10 @@ pub struct ClobberAbiBuilder {
 
 impl ClobberAbiBuilder {
     /// Creates a new `ClobberAbiBuilder`.
+    ///
+    /// # Parameters
+    ///
+    /// - `abi`: The initial ABI to clobber.
     pub fn new(abi: impl Into<LitStr>) -> Self {
         Self {
             abis: thin_vec![abi.into()],
@@ -2402,12 +2916,20 @@ impl ClobberAbiBuilder {
     }
 
     /// Adds an ABI to the list of clobbered ABIs.
+    ///
+    /// # Parameters
+    ///
+    /// - `abi`: The ABI to add.
     pub fn abi(mut self, abi: impl Into<LitStr>) -> Self {
         self.abis.push(abi.into());
         self
     }
 
     /// Builds the `ClobberAbi` AST node.
+    ///
+    /// # Returns
+    ///
+    /// An `AsmOperand` instance representing the `clobber_abi`.
     pub fn build(self) -> AsmOperand {
         AsmOperand::ClobberAbi(ClobberAbi { abis: self.abis })
     }
@@ -2436,13 +2958,21 @@ impl AsmOptionsBuilder {
         Self::default()
     }
 
-    /// Adds an option.
+    /// Adds an option to the `asm!` options.
+    ///
+    /// # Parameters
+    ///
+    /// - `option`: The `AsmOption` to add.
     pub fn option(mut self, option: AsmOption) -> Self {
         self.options.push(option);
         self
     }
 
     /// Builds the `AsmOptions` AST node.
+    ///
+    /// # Returns
+    ///
+    /// An `AsmOptions` instance.
     pub fn build(self) -> AsmOptions {
         AsmOptions {
             options: self.options,

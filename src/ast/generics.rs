@@ -16,6 +16,10 @@ pub struct GenericParamBuilder;
 
 impl GenericParamBuilder {
     /// Creates a new `TypeParam`.
+    ///
+    /// # Parameters
+    ///
+    /// - `ident`: The name of the type parameter.
     pub fn ty(self, ident: impl Into<String>) -> TypeParam {
         TypeParam {
             ident: ident.into(),
@@ -24,6 +28,10 @@ impl GenericParamBuilder {
     }
 
     /// Creates a new `LifetimeParam`.
+    ///
+    /// # Parameters
+    ///
+    /// - `ident`: The name of the lifetime parameter.
     pub fn lifetime(self, ident: impl Into<String>) -> LifetimeParam {
         LifetimeParam {
             ident: ident.into(),
@@ -31,6 +39,11 @@ impl GenericParamBuilder {
     }
 
     /// Creates a new `ConstParam`.
+    ///
+    /// # Parameters
+    ///
+    /// - `ident`: The name of the const parameter.
+    /// - `ty`: The `Type` of the const parameter.
     pub fn const_(self, ident: impl Into<String>, ty: impl Into<Type>) -> ConstParam {
         ConstParam {
             ident: ident.into(),

@@ -19,7 +19,7 @@ pub struct Block {
     pub stmts: ThinVec<Stmt>,
     /// Whether the last statement in the block has a trailing semicolon.
     pub has_trailing_semicolon: bool,
-    /// metadata
+    /// Inner comments and attributes for the block.
     pub md: Option<Box<Md>>,
 }
 

@@ -33,7 +33,7 @@ const LINE_WIDTH: isize = 100;
 /// A large integer value used to represent an infinitely long line.
 const INFINITY: isize = 0xffff;
 
-/// indent space size.
+/// The number of spaces to use for indentation.
 const INDENT_SIZE: usize = 4;
 
 /// The style of a break.
@@ -90,7 +90,14 @@ impl<T: PrettyPrinter + ?Sized> PrettyPrinter for Box<T> {
     }
 }
 
-/// pretty print an ast datastructure to string
+/// Pretty-prints an AST node to a string.
+///
+/// This is a convenience function that creates a new `Printer`, pretty-prints
+/// the given AST node, and returns the resulting string.
+///
+/// # Parameters
+///
+/// - `ast`: The AST node to pretty-print.
 pub fn pretty(ast: &impl PrettyPrinter) -> String {
     let mut buf = String::new();
     let mut printer = Printer::new(&mut buf);
