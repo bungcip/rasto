@@ -438,27 +438,30 @@ impl PrettyPrinter for AssociatedType {
 impl PrettyPrinter for Pat {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         match self {
-            Pat::Wild => {
-                printer.string("_");
-                Ok(())
-            }
-            Pat::Ident(pat_ident) => pat_ident.pretty_print(printer),
-            Pat::Tuple(pats) => {
-                printer.begin(BreakStyle::Consistent, "(");
-                for (i, pat) in pats.iter().enumerate() {
-                    if i > 0 {
-                        printer.string(", ");
-                    }
-                    pat.pretty_print(printer)?;
-                }
-                printer.end(")");
-                Ok(())
-            }
-            Pat::Rest => {
-                printer.string("..");
-                Ok(())
-            }
+            Pat::Const(pat) => pat.pretty_print(printer),
+            Pat::Ident(pat) => pat.pretty_print(printer),
+            Pat::Lit(pat) => pat.pretty_print(printer),
+            Pat::Macro(pat) => pat.pretty_print(printer),
+            Pat::Or(pat) => pat.pretty_print(printer),
+            Pat::Paren(pat) => pat.pretty_print(printer),
+            Pat::Path(pat) => pat.pretty_print(printer),
+            Pat::Range(pat) => pat.pretty_print(printer),
+            Pat::Reference(pat) => pat.pretty_print(printer),
+            Pat::Rest(pat) => pat.pretty_print(printer),
+            Pat::Slice(pat) => pat.pretty_print(printer),
+            Pat::Struct(pat) => pat.pretty_print(printer),
+            Pat::Tuple(pat) => pat.pretty_print(printer),
+            Pat::TupleStruct(pat) => pat.pretty_print(printer),
+            Pat::Type(pat) => pat.pretty_print(printer),
+            Pat::Wild(pat) => pat.pretty_print(printer),
         }
+    }
+}
+
+impl PrettyPrinter for PatConst {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        printer.string("const ");
+        self.expr.pretty_print(printer)
     }
 }
 
@@ -468,6 +471,169 @@ impl PrettyPrinter for PatIdent {
             printer.string("mut ");
         }
         printer.string(&self.ident);
+        Ok(())
+    }
+}
+
+impl PrettyPrinter for PatLit {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        self.lit.pretty_print(printer)
+    }
+}
+
+impl PrettyPrinter for PatMacro {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        self.mac.pretty_print(printer)
+    }
+}
+
+impl PrettyPrinter for PatOr {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        for (i, pat) in self.pats.iter().enumerate() {
+            if i > 0 {
+                printer.string(" | ");
+            }
+            pat.pretty_print(printer)?;
+        }
+        Ok(())
+    }
+}
+
+impl PrettyPrinter for PatParen {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        printer.string("(");
+        self.pat.pretty_print(printer)?;
+        printer.string(")");
+        Ok(())
+    }
+}
+
+impl PrettyPrinter for PatPath {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        self.path.pretty_print(printer)
+    }
+}
+
+impl PrettyPrinter for PatRange {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        if let Some(start) = &self.start {
+            start.pretty_print(printer)?;
+        }
+        match self.limits {
+            RangeLimits::HalfOpen => printer.string(".."),
+            RangeLimits::Closed => printer.string("..="),
+        }
+        if let Some(end) = &self.end {
+            end.pretty_print(printer)?;
+        }
+        Ok(())
+    }
+}
+
+impl PrettyPrinter for PatReference {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        printer.string("&");
+        if self.is_mut {
+            printer.string("mut ");
+        }
+        self.pat.pretty_print(printer)
+    }
+}
+
+impl PrettyPrinter for PatRest {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        printer.string("..");
+        Ok(())
+    }
+}
+
+impl PrettyPrinter for PatSlice {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        printer.begin(BreakStyle::Consistent, "[");
+        for (i, pat) in self.pats.iter().enumerate() {
+            if i > 0 {
+                printer.string(", ");
+            }
+            pat.pretty_print(printer)?;
+        }
+        printer.end("]");
+        Ok(())
+    }
+}
+
+impl PrettyPrinter for PatStruct {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        self.path.pretty_print(printer)?;
+        printer.begin(BreakStyle::Consistent, " {");
+        printer.break_();
+        for (i, field) in self.fields.iter().enumerate() {
+            if i > 0 {
+                printer.string(",");
+                printer.break_();
+            }
+            field.pretty_print(printer)?;
+        }
+        if self.has_rest {
+            if !self.fields.is_empty() {
+                printer.string(",");
+                printer.break_();
+            }
+            printer.string("..");
+        }
+        printer.break_();
+        printer.end("}");
+        Ok(())
+    }
+}
+
+impl PrettyPrinter for FieldPat {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        printer.string(&self.member);
+        printer.string(": ");
+        self.pat.pretty_print(printer)
+    }
+}
+
+impl PrettyPrinter for PatTuple {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        printer.begin(BreakStyle::Consistent, "(");
+        for (i, pat) in self.pats.iter().enumerate() {
+            if i > 0 {
+                printer.string(", ");
+            }
+            pat.pretty_print(printer)?;
+        }
+        printer.end(")");
+        Ok(())
+    }
+}
+
+impl PrettyPrinter for PatTupleStruct {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        self.path.pretty_print(printer)?;
+        printer.begin(BreakStyle::Consistent, "(");
+        for (i, pat) in self.pats.iter().enumerate() {
+            if i > 0 {
+                printer.string(", ");
+            }
+            pat.pretty_print(printer)?;
+        }
+        printer.end(")");
+        Ok(())
+    }
+}
+
+impl PrettyPrinter for PatType {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        self.pat.pretty_print(printer)?;
+        printer.string(": ");
+        self.ty.pretty_print(printer)
+    }
+}
+
+impl PrettyPrinter for PatWild {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        printer.string("_");
         Ok(())
     }
 }
@@ -887,17 +1053,19 @@ impl PrettyPrinter for ExprReturn {
 impl PrettyPrinter for ExprStruct {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string(&self.path);
-        printer.begin(BreakStyle::Consistent, " {");
-        printer.break_();
-        for (i, field) in self.fields.iter().enumerate() {
-            if i > 0 {
-                printer.string(",");
-                printer.break_();
+        if !self.fields.is_empty() {
+            printer.begin(BreakStyle::Consistent, " {");
+            printer.break_();
+            for (i, field) in self.fields.iter().enumerate() {
+                if i > 0 {
+                    printer.string(",");
+                    printer.break_();
+                }
+                field.pretty_print(printer)?;
             }
-            field.pretty_print(printer)?;
+            printer.break_();
+            printer.end("}");
         }
-        printer.break_();
-        printer.end("}");
         Ok(())
     }
 }

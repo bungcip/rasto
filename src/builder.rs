@@ -24,7 +24,8 @@
 
 use crate::ast::items::*;
 use crate::ast::*;
-use thin_vec::{ThinVec, thin_vec};
+use std::convert::Into;
+use thin_vec::{thin_vec, ThinVec};
 
 /// Creates a new `FileBuilder` to construct a `File` AST node.
 ///
@@ -1167,9 +1168,14 @@ pub struct PatBuilder {
 }
 
 impl PatBuilder {
+    /// Creates a new `PatWildBuilder`.
+    pub fn build(self) -> PatWildBuilder {
+        PatWildBuilder::new()
+    }
+
     /// Creates a wildcard pattern (`_`).
     pub fn wild(self) -> Pat {
-        Pat::Wild
+        Pat::Wild(PatWild::default())
     }
 
     /// Sets the pattern to be mutable (e.g., `mut ident`).
@@ -1196,12 +1202,674 @@ impl PatBuilder {
     ///
     /// - `pats`: An iterator of patterns for the tuple elements.
     pub fn tuple(self, pats: impl IntoIterator<Item = impl Into<Pat>>) -> Pat {
-        Pat::Tuple(pats.into_iter().map(Into::into).collect())
+        Pat::Tuple(PatTuple {
+            pats: pats.into_iter().map(Into::into).collect(),
+        })
     }
 
     /// Creates a rest pattern (`..`).
     pub fn rest(self) -> Pat {
-        Pat::Rest
+        Pat::Rest(PatRest::default())
+    }
+
+    /// Creates a literal pattern.
+    ///
+    /// # Parameters
+    ///
+    /// - `lit`: The literal value.
+    pub fn lit(self, lit: impl Into<Lit>) -> Pat {
+        Pat::Lit(PatLit {
+            lit: Box::new(lit.into()),
+        })
+    }
+
+    /// Creates a path pattern.
+    ///
+    /// # Parameters
+    ///
+    /// - `path`: The path.
+    pub fn path(self, path: impl Into<Path>) -> Pat {
+        Pat::Path(PatPath { path: path.into() })
+    }
+
+    /// Creates a struct pattern.
+    ///
+    /// # Parameters
+    ///
+    /// - `path`: The path to the struct.
+    pub fn struct_(self, path: impl Into<Path>) -> PatStructBuilder {
+        PatStructBuilder::new(path)
+    }
+
+    /// Creates a tuple struct pattern.
+    ///
+    /// # Parameters
+    ///
+    /// - `path`: The path to the tuple struct.
+    pub fn tuple_struct(self, path: impl Into<Path>) -> PatTupleStructBuilder {
+        PatTupleStructBuilder::new(path)
+    }
+
+    /// Creates a slice pattern.
+    ///
+    /// # Parameters
+    ///
+    /// - `pats`: An iterator of patterns for the slice elements.
+    pub fn slice(self, pats: impl IntoIterator<Item = impl Into<Pat>>) -> Pat {
+        Pat::Slice(PatSlice {
+            pats: pats.into_iter().map(Into::into).collect(),
+        })
+    }
+
+    /// Creates a range pattern.
+    ///
+    /// # Parameters
+    ///
+    /// - `start`: The optional start of the range.
+    /// - `limits`: The type of range (`..` or `..=`).
+    /// - `end`: The optional end of the range.
+    pub fn range(self, start: Option<Expr>, limits: RangeLimits, end: Option<Expr>) -> Pat {
+        Pat::Range(PatRange {
+            start: start.map(Box::new),
+            end: end.map(Box::new),
+            limits,
+        })
+    }
+
+    /// Creates a reference pattern.
+    ///
+    /// # Parameters
+    ///
+    /// - `pat`: The pattern to reference.
+    pub fn reference(self, pat: impl Into<Pat>) -> PatReferenceBuilder {
+        PatReferenceBuilder::new(pat)
+    }
+
+    /// Creates a parenthesized pattern.
+    ///
+    /// # Parameters
+    ///
+    /// - `pat`: The pattern to parenthesize.
+    pub fn paren(self, pat: impl Into<Pat>) -> Pat {
+        Pat::Paren(PatParen {
+            pat: Box::new(pat.into()),
+        })
+    }
+
+    /// Creates an "or" pattern.
+    ///
+    /// # Parameters
+    ///
+    /// - `pats`: An iterator of patterns for the alternatives.
+    pub fn or(self, pats: impl IntoIterator<Item = impl Into<Pat>>) -> Pat {
+        Pat::Or(PatOr {
+            pats: pats.into_iter().map(Into::into).collect(),
+        })
+    }
+
+    /// Creates a macro pattern.
+    ///
+    /// # Parameters
+    ///
+    /// - `mac`: The macro call.
+    pub fn mac(self, mac: impl Into<ExprMacroCall>) -> Pat {
+        Pat::Macro(PatMacro { mac: mac.into() })
+    }
+
+    /// Creates a type pattern.
+    ///
+    /// # Parameters
+    ///
+    /// - `pat`: The pattern.
+    /// - `ty`: The type.
+    pub fn type_(self, pat: impl Into<Pat>, ty: impl Into<Type>) -> Pat {
+        Pat::Type(PatType {
+            pat: Box::new(pat.into()),
+            ty: Box::new(ty.into()),
+        })
+    }
+
+    /// Creates a const pattern.
+    ///
+    /// # Parameters
+    ///
+    /// - `expr`: The const expression.
+    pub fn const_(self, expr: impl Into<Expr>) -> Pat {
+        Pat::Const(PatConst {
+            expr: Box::new(expr.into()),
+        })
+    }
+}
+
+/// A builder for constructing a `PatWild` AST node.
+pub struct PatWildBuilder;
+
+impl PatWildBuilder {
+    /// Creates a new `PatWildBuilder`.
+    pub fn new() -> Self {
+        Self {}
+    }
+
+    /// Builds the `PatWild` AST node.
+    pub fn build(self) -> Pat {
+        Pat::Wild(PatWild::default())
+    }
+}
+
+impl Default for PatWildBuilder {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// A builder for constructing a `PatStruct` AST node.
+pub struct PatStructBuilder {
+    path: Path,
+    fields: ThinVec<FieldPat>,
+    has_rest: bool,
+}
+
+impl PatStructBuilder {
+    /// Creates a new `PatStructBuilder`.
+    ///
+    /// # Parameters
+    ///
+    /// - `path`: The path to the struct.
+    pub fn new(path: impl Into<Path>) -> Self {
+        Self {
+            path: path.into(),
+            fields: thin_vec![],
+            has_rest: false,
+        }
+    }
+
+    /// Adds a field to the struct pattern.
+    ///
+    /// # Parameters
+    ///
+    /// - `member`: The name of the field.
+    /// - `pat`: The pattern for the field.
+    pub fn field(mut self, member: impl Into<String>, pat: impl Into<Pat>) -> Self {
+        self.fields.push(FieldPat {
+            member: member.into(),
+            pat: Box::new(pat.into()),
+        });
+        self
+    }
+
+    /// Adds a rest pattern (`..`) to the struct pattern.
+    pub fn rest(mut self) -> Self {
+        self.has_rest = true;
+        self
+    }
+
+    /// Builds the `PatStruct` AST node.
+    pub fn build(self) -> Pat {
+        Pat::Struct(PatStruct {
+            path: self.path,
+            fields: self.fields,
+            has_rest: self.has_rest,
+        })
+    }
+}
+
+/// A builder for constructing a `PatTupleStruct` AST node.
+pub struct PatTupleStructBuilder {
+    path: Path,
+    pats: ThinVec<Pat>,
+}
+
+impl PatTupleStructBuilder {
+    /// Creates a new `PatTupleStructBuilder`.
+    ///
+    /// # Parameters
+    ///
+    /// - `path`: The path to the tuple struct.
+    pub fn new(path: impl Into<Path>) -> Self {
+        Self {
+            path: path.into(),
+            pats: thin_vec![],
+        }
+    }
+
+    /// Adds a sub-pattern to the tuple struct pattern.
+    ///
+    /// # Parameters
+    ///
+    /// - `pat`: The pattern to add.
+    pub fn pat(mut self, pat: impl Into<Pat>) -> Self {
+        self.pats.push(pat.into());
+        self
+    }
+
+    /// Builds the `PatTupleStruct` AST node.
+    pub fn build(self) -> Pat {
+        Pat::TupleStruct(PatTupleStruct {
+            path: self.path,
+            pats: self.pats,
+        })
+    }
+}
+
+/// A builder for constructing a `PatReference` AST node.
+pub struct PatReferenceBuilder {
+    pat: Box<Pat>,
+    is_mut: bool,
+}
+
+impl PatReferenceBuilder {
+    /// Creates a new `PatReferenceBuilder`.
+    ///
+    /// # Parameters
+    ///
+    /// - `pat`: The pattern to reference.
+    pub fn new(pat: impl Into<Pat>) -> Self {
+        Self {
+            pat: Box::new(pat.into()),
+            is_mut: false,
+        }
+    }
+
+    /// Marks the reference as mutable.
+    pub fn mutable(mut self) -> Self {
+        self.is_mut = true;
+        self
+    }
+
+    /// Builds the `PatReference` AST node.
+    pub fn build(self) -> Pat {
+        Pat::Reference(PatReference {
+            pat: self.pat,
+            is_mut: self.is_mut,
+        })
+    }
+}
+
+/// Creates a new `TypeBuilder` to construct types.
+pub fn type_() -> TypeBuilder {
+    TypeBuilder
+}
+
+/// A builder for constructing `Type` AST nodes.
+#[derive(Clone, Copy)]
+pub struct TypeBuilder;
+
+impl TypeBuilder {
+    /// Creates an array type.
+    ///
+    /// # Parameters
+    ///
+    /// - `elem`: The element type.
+    /// - `len`: The length of the array.
+    pub fn array(self, elem: impl Into<Type>, len: impl Into<Expr>) -> Type {
+        Type::Array(TypeArray {
+            elem: Box::new(elem.into()),
+            len: Box::new(len.into()),
+        })
+    }
+
+    /// Creates a bare function type.
+    ///
+    /// # Parameters
+    ///
+    /// - `inputs`: An iterator of types for the function's input parameters.
+    /// - `output`: The optional return type.
+    pub fn bare_fn(
+        self,
+        inputs: impl IntoIterator<Item = impl Into<Type>>,
+        output: Option<impl Into<Type>>,
+    ) -> Type {
+        Type::BareFn(TypeBareFn {
+            inputs: inputs.into_iter().map(|t| t.into()).collect(),
+            output: output.map(|t| Box::new(t.into())),
+        })
+    }
+
+    /// Creates a grouped type.
+    ///
+    /// # Parameters
+    ///
+    /// - `ty`: The type to group.
+    pub fn group(self, ty: impl Into<Type>) -> Type {
+        Type::Group(Box::new(ty.into()))
+    }
+
+    /// Creates an `impl Trait` type.
+    pub fn impl_trait(self) -> Type {
+        Type::ImplTrait
+    }
+
+    /// Creates an inferred type (`_`).
+    pub fn infer(self) -> Type {
+        Type::Infer
+    }
+
+    /// Creates a macro type.
+    ///
+    /// # Parameters
+    ///
+    /// - `mac`: The macro call.
+    pub fn mac(self, mac: impl Into<ExprMacroCall>) -> Type {
+        Type::Macro(ItemMacro {
+            expr: Box::new(Expr::MacroCall(mac.into())),
+            md: None,
+        })
+    }
+
+    /// Creates a never type (`!`).
+    pub fn never(self) -> Type {
+        Type::Never
+    }
+
+    /// Creates a parenthesized type.
+    ///
+    /// # Parameters
+    ///
+    /// - `ty`: The type to parenthesize.
+    pub fn paren(self, ty: impl Into<Type>) -> Type {
+        Type::Paren(Box::new(ty.into()))
+    }
+
+    /// Creates a path type.
+    ///
+    /// # Parameters
+    ///
+    /// - `path`: The path.
+    pub fn path(self, path: impl Into<Path>) -> Type {
+        Type::Path(TypePath {
+            path: path.into(),
+        })
+    }
+
+    /// Creates a pointer type.
+    ///
+    /// # Parameters
+    ///
+    /// - `is_mut`: Whether the pointer is mutable.
+    /// - `ty`: The type being pointed to.
+    pub fn ptr(self, is_mut: bool, ty: impl Into<Type>) -> Type {
+        Type::Ptr(TypePtr {
+            mutable: is_mut,
+            elem: Box::new(ty.into()),
+        })
+    }
+
+    /// Creates a reference type.
+    ///
+    /// # Parameters
+    ///
+    /// - `is_mut`: Whether the reference is mutable.
+    /// - `ty`: The type being referenced.
+    pub fn reference(self, is_mut: bool, ty: impl Into<Type>) -> TypeReferenceBuilder {
+        TypeReferenceBuilder::new(is_mut, ty)
+    }
+
+    /// Creates a slice type.
+    ///
+    /// # Parameters
+    ///
+    /// - `ty`: The element type of the slice.
+    pub fn slice(self, ty: impl Into<Type>) -> Type {
+        Type::Slice(Box::new(ty.into()))
+    }
+
+    /// Creates a `dyn Trait` type.
+    pub fn trait_object(self) -> Type {
+        Type::TraitObject
+    }
+
+    /// Creates a tuple type.
+    ///
+    /// # Parameters
+    ///
+    /// - `tys`: An iterator of types for the tuple elements.
+    pub fn tuple(self, tys: impl IntoIterator<Item = impl Into<Type>>) -> Type {
+        Type::Tuple(tys.into_iter().map(|t| t.into()).collect())
+    }
+}
+
+/// A builder for constructing a `TypeReference` AST node.
+pub struct TypeReferenceBuilder {
+    is_mut: bool,
+    ty: Type,
+    lifetime: Option<String>,
+}
+
+impl TypeReferenceBuilder {
+    /// Creates a new `TypeReferenceBuilder`.
+    ///
+    /// # Parameters
+    ///
+    /// - `is_mut`: Whether the reference is mutable.
+    /// - `ty`: The type being referenced.
+    pub fn new(is_mut: bool, ty: impl Into<Type>) -> Self {
+        Self {
+            is_mut,
+            ty: ty.into(),
+            lifetime: None,
+        }
+    }
+
+    /// Sets the lifetime of the reference.
+    ///
+    /// # Parameters
+    ///
+    /// - `lifetime`: The lifetime to set.
+    pub fn lifetime(mut self, lifetime: impl Into<String>) -> Self {
+        self.lifetime = Some(lifetime.into());
+        self
+    }
+
+    /// Builds the `TypeReference` AST node.
+    pub fn build(self) -> Type {
+        Type::Reference(TypeReference {
+            mutable: self.is_mut,
+            elem: Box::new(self.ty),
+            lifetime: self.lifetime,
+        })
+    }
+}
+
+impl From<TypeReferenceBuilder> for Type {
+    fn from(builder: TypeReferenceBuilder) -> Self {
+        builder.build()
+    }
+}
+
+/// Creates a new `MdBuilder` to construct metadata.
+pub fn md() -> MdBuilder {
+    MdBuilder::new()
+}
+
+/// A builder for constructing `Md` (metadata) AST nodes.
+#[derive(Default)]
+pub struct MdBuilder {
+    attrs: ThinVec<Attribute>,
+    leading_comments: ThinVec<Comment>,
+    trailing_comments: ThinVec<Comment>,
+}
+
+impl MdBuilder {
+    /// Creates a new `MdBuilder`.
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Adds an attribute to the metadata.
+    ///
+    /// # Parameters
+    ///
+    /// - `attr`: The `Attribute` to add.
+    pub fn attr(mut self, attr: impl Into<Attribute>) -> Self {
+        self.attrs.push(attr.into());
+        self
+    }
+
+    /// Adds a leading comment to the metadata.
+    ///
+    /// # Parameters
+    ///
+    /// - `comment`: The `Comment` to add.
+    pub fn leading_comment(mut self, comment: impl Into<Comment>) -> Self {
+        self.leading_comments.push(comment.into());
+        self
+    }
+
+    /// Adds a trailing comment to the metadata.
+    ///
+    /// # Parameters
+    ///
+    /// - `comment`: The `Comment` to add.
+    pub fn trailing_comment(mut self, comment: impl Into<Comment>) -> Self {
+        self.trailing_comments.push(comment.into());
+        self
+    }
+
+    /// Builds the `Md` AST node.
+    pub fn build(self) -> Md {
+        Md {
+            attrs: self.attrs,
+            leading_comments: self.leading_comments,
+            trailing_comments: self.trailing_comments,
+        }
+    }
+}
+
+impl From<MdBuilder> for Md {
+    fn from(builder: MdBuilder) -> Self {
+        builder.build()
+    }
+}
+
+impl From<MdBuilder> for Option<Box<Md>> {
+    fn from(builder: MdBuilder) -> Self {
+        Some(Box::new(builder.build()))
+    }
+}
+
+impl From<ItemDefBuilder> for Item {
+    fn from(builder: ItemDefBuilder) -> Self {
+        Item::Def(builder.build())
+    }
+}
+
+impl From<ItemExternCrateBuilder> for Item {
+    fn from(builder: ItemExternCrateBuilder) -> Self {
+        Item::ExternCrate(builder.build())
+    }
+}
+
+impl From<ItemForeignModBuilder> for Item {
+    fn from(builder: ItemForeignModBuilder) -> Self {
+        Item::ForeignMod(builder.build())
+    }
+}
+
+impl From<ItemMacroBuilder> for Item {
+    fn from(builder: ItemMacroBuilder) -> Self {
+        Item::Macro(builder.build())
+    }
+}
+
+impl From<ItemModBuilder> for Item {
+    fn from(builder: ItemModBuilder) -> Self {
+        Item::Mod(builder.build())
+    }
+}
+
+impl From<ItemTraitAliasBuilder> for Item {
+    fn from(builder: ItemTraitAliasBuilder) -> Self {
+        Item::TraitAlias(builder.build())
+    }
+}
+
+impl From<ItemUnionBuilder> for Item {
+    fn from(builder: ItemUnionBuilder) -> Self {
+        Item::Union(builder.build())
+    }
+}
+
+impl From<ItemUseBuilder> for Item {
+    fn from(builder: ItemUseBuilder) -> Self {
+        Item::Use(builder.build())
+    }
+}
+
+impl From<AsmBuilder> for Item {
+    fn from(builder: AsmBuilder) -> Self {
+        Item::Asm(builder.build())
+    }
+}
+
+impl From<AssociatedConstBuilder> for ImplItem {
+    fn from(builder: AssociatedConstBuilder) -> Self {
+        ImplItem::Const(builder.build())
+    }
+}
+
+impl From<AssociatedTypeBuilder> for ImplItem {
+    fn from(builder: AssociatedTypeBuilder) -> Self {
+        ImplItem::Type(builder.build())
+    }
+}
+
+impl From<FnBuilder> for ImplItem {
+    fn from(builder: FnBuilder) -> Self {
+        ImplItem::Fn(builder.build())
+    }
+}
+
+impl From<TraitBuilder> for Item {
+    fn from(builder: TraitBuilder) -> Self {
+        Item::Trait(builder.build())
+    }
+}
+
+impl From<EnumBuilder> for Item {
+    fn from(builder: EnumBuilder) -> Self {
+        Item::Enum(builder.build())
+    }
+}
+
+impl From<StructBuilder> for Item {
+    fn from(builder: StructBuilder) -> Self {
+        Item::Struct(builder.build())
+    }
+}
+
+impl From<i32> for Expr {
+    fn from(val: i32) -> Self {
+        Expr::Lit(val.into())
+    }
+}
+
+impl From<u128> for Lit {
+    fn from(val: u128) -> Self {
+        Lit::Int(LitInt::new(val))
+    }
+}
+
+impl From<u128> for Expr {
+    fn from(val: u128) -> Self {
+        Expr::Lit(val.into())
+    }
+}
+
+impl From<bool> for Expr {
+    fn from(val: bool) -> Self {
+        Expr::Lit(val.into())
+    }
+}
+
+impl From<&str> for Expr {
+    fn from(val: &str) -> Self {
+        Expr::Lit(val.into())
+    }
+}
+
+impl From<String> for Expr {
+    fn from(val: String) -> Self {
+        Expr::Lit(val.into())
     }
 }
 
