@@ -21,8 +21,7 @@ fn test_fn_builder() {
 fn test_fn_builder_with_metadata() {
     let ast = fn_def("foo")
         .attr(attr().meta("test"))
-        .leading_comment(comment().line(" a leading comment"))
-        .trailing_comment(comment().line(" a trailing comment"))
+        .comment(comment().line(" a leading comment"))
         .input("a")
         .input("b")
         .output("bool")
@@ -36,7 +35,6 @@ fn test_fn_builder_with_metadata() {
     fn foo(a, b) -> bool {
         "Hello, world!";
     }
-    // a trailing comment
     "#);
 }
 

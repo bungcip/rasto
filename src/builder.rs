@@ -186,23 +186,13 @@ impl TraitBuilder {
         self
     }
 
-    /// Adds a leading comment to the trait.
+    /// Adds a comment to the trait.
     ///
     /// # Parameters
     ///
     /// - `comment`: The `Comment` to add.
-    pub fn leading_comment(mut self, comment: impl Into<Comment>) -> Self {
-        self.md = self.md.leading_comment(comment.into());
-        self
-    }
-
-    /// Adds a trailing comment to the trait.
-    ///
-    /// # Parameters
-    ///
-    /// - `comment`: The `Comment` to add.
-    pub fn trailing_comment(mut self, comment: impl Into<Comment>) -> Self {
-        self.md = self.md.trailing_comment(comment.into());
+    pub fn comment(mut self, comment: impl Into<Comment>) -> Self {
+        self.md = self.md.comment(comment.into());
         self
     }
 
@@ -436,7 +426,7 @@ pub fn block() -> BlockBuilder {
 pub struct BlockBuilder {
     stmts: ThinVec<Stmt>,
     has_trailing_semicolon: bool,
-    leading_comments: ThinVec<Comment>,
+    comments: ThinVec<Comment>,
     trailing_comments: ThinVec<Comment>,
 }
 
@@ -446,13 +436,13 @@ impl BlockBuilder {
         Self::default()
     }
 
-    /// Adds a leading comment to the block.
+    /// Adds a comment to the block.
     ///
     /// # Parameters
     ///
     /// - `comment`: The `Comment` to add.
-    pub fn leading_comment(mut self, comment: impl Into<Comment>) -> Self {
-        self.leading_comments.push(comment.into());
+    pub fn comment(mut self, comment: impl Into<Comment>) -> Self {
+        self.comments.push(comment.into());
         self
     }
 
@@ -492,10 +482,10 @@ impl BlockBuilder {
     ///
     /// A `Block` instance.
     pub fn build(self) -> Block {
-        let md = if !self.leading_comments.is_empty() || !self.trailing_comments.is_empty() {
+        let md = if !self.comments.is_empty() || !self.trailing_comments.is_empty() {
             let mut md_builder = MdBuilder::new();
-            for comment in self.leading_comments {
-                md_builder = md_builder.leading_comment(comment);
+            for comment in self.comments {
+                md_builder = md_builder.comment(comment);
             }
             for comment in self.trailing_comments {
                 md_builder = md_builder.trailing_comment(comment);
@@ -518,7 +508,7 @@ impl Default for BlockBuilder {
         Self {
             stmts: Default::default(),
             has_trailing_semicolon: true,
-            leading_comments: Default::default(),
+            comments: Default::default(),
             trailing_comments: Default::default(),
         }
     }
@@ -707,23 +697,13 @@ impl EnumBuilder {
         self
     }
 
-    /// Adds a leading comment to the enum.
+    /// Adds a comment to the enum.
     ///
     /// # Parameters
     ///
     /// - `comment`: The `Comment` to add.
-    pub fn leading_comment(mut self, comment: impl Into<Comment>) -> Self {
-        self.md = self.md.leading_comment(comment.into());
-        self
-    }
-
-    /// Adds a trailing comment to the enum.
-    ///
-    /// # Parameters
-    ///
-    /// - `comment`: The `Comment` to add.
-    pub fn trailing_comment(mut self, comment: impl Into<Comment>) -> Self {
-        self.md = self.md.trailing_comment(comment.into());
+    pub fn comment(mut self, comment: impl Into<Comment>) -> Self {
+        self.md = self.md.comment(comment.into());
         self
     }
 
@@ -826,23 +806,13 @@ impl StructBuilder {
         self
     }
 
-    /// Adds a leading comment to the struct.
+    /// Adds a comment to the struct.
     ///
     /// # Parameters
     ///
     /// - `comment`: The `Comment` to add.
-    pub fn leading_comment(mut self, comment: impl Into<Comment>) -> Self {
-        self.md = self.md.leading_comment(comment.into());
-        self
-    }
-
-    /// Adds a trailing comment to the struct.
-    ///
-    /// # Parameters
-    ///
-    /// - `comment`: The `Comment` to add.
-    pub fn trailing_comment(mut self, comment: impl Into<Comment>) -> Self {
-        self.md = self.md.trailing_comment(comment.into());
+    pub fn comment(mut self, comment: impl Into<Comment>) -> Self {
+        self.md = self.md.comment(comment.into());
         self
     }
 
@@ -988,23 +958,13 @@ impl FnBuilder {
         self
     }
 
-    /// Adds a leading comment to the function.
+    /// Adds a comment to the function.
     ///
     /// # Parameters
     ///
     /// - `comment`: The `Comment` to add.
-    pub fn leading_comment(mut self, comment: impl Into<Comment>) -> Self {
-        self.md = self.md.leading_comment(comment.into());
-        self
-    }
-
-    /// Adds a trailing comment to the function.
-    ///
-    /// # Parameters
-    ///
-    /// - `comment`: The `Comment` to add.
-    pub fn trailing_comment(mut self, comment: impl Into<Comment>) -> Self {
-        self.md = self.md.trailing_comment(comment.into());
+    pub fn comment(mut self, comment: impl Into<Comment>) -> Self {
+        self.md = self.md.comment(comment.into());
         self
     }
 
@@ -1685,7 +1645,7 @@ pub fn md() -> MdBuilder {
 #[derive(Default)]
 pub struct MdBuilder {
     attrs: ThinVec<Attribute>,
-    leading_comments: ThinVec<Comment>,
+    comments: ThinVec<Comment>,
     trailing_comments: ThinVec<Comment>,
 }
 
@@ -1705,13 +1665,13 @@ impl MdBuilder {
         self
     }
 
-    /// Adds a leading comment to the metadata.
+    /// Adds a comment to the metadata.
     ///
     /// # Parameters
     ///
     /// - `comment`: The `Comment` to add.
-    pub fn leading_comment(mut self, comment: impl Into<Comment>) -> Self {
-        self.leading_comments.push(comment.into());
+    pub fn comment(mut self, comment: impl Into<Comment>) -> Self {
+        self.comments.push(comment.into());
         self
     }
 
@@ -1729,7 +1689,7 @@ impl MdBuilder {
     pub fn build(self) -> Md {
         Md {
             attrs: self.attrs,
-            leading_comments: self.leading_comments,
+            comments: self.comments,
             trailing_comments: self.trailing_comments,
         }
     }
@@ -2450,23 +2410,13 @@ impl ItemDefBuilder {
         self
     }
 
-    /// Adds a leading comment to the item.
+    /// Adds a comment to the item.
     ///
     /// # Parameters
     ///
     /// - `comment`: The `Comment` to add.
-    pub fn leading_comment(mut self, comment: impl Into<Comment>) -> Self {
-        self.md = self.md.leading_comment(comment.into());
-        self
-    }
-
-    /// Adds a trailing comment to the item.
-    ///
-    /// # Parameters
-    ///
-    /// - `comment`: The `Comment` to add.
-    pub fn trailing_comment(mut self, comment: impl Into<Comment>) -> Self {
-        self.md = self.md.trailing_comment(comment.into());
+    pub fn comment(mut self, comment: impl Into<Comment>) -> Self {
+        self.md = self.md.comment(comment.into());
         self
     }
 
@@ -2660,23 +2610,13 @@ impl ItemExternCrateBuilder {
         }
     }
 
-    /// Adds a leading comment to the `extern crate` item.
+    /// Adds a comment to the `extern crate` item.
     ///
     /// # Parameters
     ///
     /// - `comment`: The `Comment` to add.
-    pub fn leading_comment(mut self, comment: impl Into<Comment>) -> Self {
-        self.md = self.md.leading_comment(comment.into());
-        self
-    }
-
-    /// Adds a trailing comment to the `extern crate` item.
-    ///
-    /// # Parameters
-    ///
-    /// - `comment`: The `Comment` to add.
-    pub fn trailing_comment(mut self, comment: impl Into<Comment>) -> Self {
-        self.md = self.md.trailing_comment(comment.into());
+    pub fn comment(mut self, comment: impl Into<Comment>) -> Self {
+        self.md = self.md.comment(comment.into());
         self
     }
 
@@ -2739,23 +2679,13 @@ impl ItemForeignModBuilder {
         self
     }
 
-    /// Adds a leading comment to the foreign module.
+    /// Adds a comment to the foreign module.
     ///
     /// # Parameters
     ///
     /// - `comment`: The `Comment` to add.
-    pub fn leading_comment(mut self, comment: impl Into<Comment>) -> Self {
-        self.md = self.md.leading_comment(comment.into());
-        self
-    }
-
-    /// Adds a trailing comment to the foreign module.
-    ///
-    /// # Parameters
-    ///
-    /// - `comment`: The `Comment` to add.
-    pub fn trailing_comment(mut self, comment: impl Into<Comment>) -> Self {
-        self.md = self.md.trailing_comment(comment.into());
+    pub fn comment(mut self, comment: impl Into<Comment>) -> Self {
+        self.md = self.md.comment(comment.into());
         self
     }
 
@@ -2807,23 +2737,13 @@ impl ItemMacroBuilder {
         }
     }
 
-    /// Adds a leading comment to the macro item.
+    /// Adds a comment to the macro item.
     ///
     /// # Parameters
     ///
     /// - `comment`: The `Comment` to add.
-    pub fn leading_comment(mut self, comment: impl Into<Comment>) -> Self {
-        self.md = self.md.leading_comment(comment.into());
-        self
-    }
-
-    /// Adds a trailing comment to the macro item.
-    ///
-    /// # Parameters
-    ///
-    /// - `comment`: The `Comment` to add.
-    pub fn trailing_comment(mut self, comment: impl Into<Comment>) -> Self {
-        self.md = self.md.trailing_comment(comment.into());
+    pub fn comment(mut self, comment: impl Into<Comment>) -> Self {
+        self.md = self.md.comment(comment.into());
         self
     }
 
@@ -2907,23 +2827,13 @@ impl ItemModBuilder {
         self
     }
 
-    /// Adds a leading comment to the module item.
+    /// Adds a comment to the module item.
     ///
     /// # Parameters
     ///
     /// - `comment`: The `Comment` to add.
-    pub fn leading_comment(mut self, comment: impl Into<Comment>) -> Self {
-        self.md = self.md.leading_comment(comment.into());
-        self
-    }
-
-    /// Adds a trailing comment to the module item.
-    ///
-    /// # Parameters
-    ///
-    /// - `comment`: The `Comment` to add.
-    pub fn trailing_comment(mut self, comment: impl Into<Comment>) -> Self {
-        self.md = self.md.trailing_comment(comment.into());
+    pub fn comment(mut self, comment: impl Into<Comment>) -> Self {
+        self.md = self.md.comment(comment.into());
         self
     }
 
@@ -2979,23 +2889,13 @@ impl ItemTraitAliasBuilder {
         }
     }
 
-    /// Adds a leading comment to the trait alias.
+    /// Adds a comment to the trait alias.
     ///
     /// # Parameters
     ///
     /// - `comment`: The `Comment` to add.
-    pub fn leading_comment(mut self, comment: impl Into<Comment>) -> Self {
-        self.md = self.md.leading_comment(comment.into());
-        self
-    }
-
-    /// Adds a trailing comment to the trait alias.
-    ///
-    /// # Parameters
-    ///
-    /// - `comment`: The `Comment` to add.
-    pub fn trailing_comment(mut self, comment: impl Into<Comment>) -> Self {
-        self.md = self.md.trailing_comment(comment.into());
+    pub fn comment(mut self, comment: impl Into<Comment>) -> Self {
+        self.md = self.md.comment(comment.into());
         self
     }
 
@@ -3084,23 +2984,13 @@ impl ItemUnionBuilder {
         self
     }
 
-    /// Adds a leading comment to the `union` item.
+    /// Adds a comment to the `union` item.
     ///
     /// # Parameters
     ///
     /// - `comment`: The `Comment` to add.
-    pub fn leading_comment(mut self, comment: impl Into<Comment>) -> Self {
-        self.md = self.md.leading_comment(comment.into());
-        self
-    }
-
-    /// Adds a trailing comment to the `union` item.
-    ///
-    /// # Parameters
-    ///
-    /// - `comment`: The `Comment` to add.
-    pub fn trailing_comment(mut self, comment: impl Into<Comment>) -> Self {
-        self.md = self.md.trailing_comment(comment.into());
+    pub fn comment(mut self, comment: impl Into<Comment>) -> Self {
+        self.md = self.md.comment(comment.into());
         self
     }
 
@@ -3162,23 +3052,13 @@ impl ItemUseBuilder {
         self
     }
 
-    /// Adds a leading comment to the `use` item.
+    /// Adds a comment to the `use` item.
     ///
     /// # Parameters
     ///
     /// - `comment`: The `Comment` to add.
-    pub fn leading_comment(mut self, comment: impl Into<Comment>) -> Self {
-        self.md = self.md.leading_comment(comment.into());
-        self
-    }
-
-    /// Adds a trailing comment to the `use` item.
-    ///
-    /// # Parameters
-    ///
-    /// - `comment`: The `Comment` to add.
-    pub fn trailing_comment(mut self, comment: impl Into<Comment>) -> Self {
-        self.md = self.md.trailing_comment(comment.into());
+    pub fn comment(mut self, comment: impl Into<Comment>) -> Self {
+        self.md = self.md.comment(comment.into());
         self
     }
 

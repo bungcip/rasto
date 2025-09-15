@@ -1905,14 +1905,14 @@ impl PrettyPrinter for ItemUse {
 
 /// Pretty-prints the leading metadata of an AST node.
 ///
-/// This includes attributes and leading comments.
+/// This includes attributes and comments.
 pub fn pp_begin<'a>(md: &'a Option<Box<Md>>, printer: &mut Printer<'a>) -> fmt::Result {
     if let Some(md) = &md {
         for attr in &md.attrs {
             attr.pretty_print(printer)?;
             printer.hard_break();
         }
-        for comment in &md.leading_comments {
+        for comment in &md.comments {
             comment.pretty_print(printer)?;
         }
     }
