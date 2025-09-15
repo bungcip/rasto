@@ -1,67 +1,129 @@
 //! Tests for patterns.
 
-use rasto::ast::*;
+use rasto::ast::{Delimiter, Pat, RangeLimits, TokenStream};
 use rasto::builder::*;
 use rasto::pretty;
 
 #[test]
-fn test_let_statement_with_ident_pattern() {
-    let let_stmt = stmt().local("x").expr(expr().lit(42)).build();
-
-    insta::assert_snapshot!(pretty(&let_stmt), @"let x = 42;");
+fn test_wild_pattern() {
+    let pat: Pat = pat().wild();
+    insta::assert_snapshot!(pretty(&pat), @"_");
 }
 
 #[test]
-fn test_let_statement_with_mut_ident_pattern() {
-    let let_stmt = stmt()
-        .local(pat().mutable().ident("x"))
-        .expr(expr().lit(42))
-        .build();
-
-    insta::assert_snapshot!(pretty(&let_stmt), @"let mut x = 42;");
+fn test_ident_pattern() {
+    let pat: Pat = pat().ident("my_var");
+    insta::assert_snapshot!(pretty(&pat), @"my_var");
 }
 
 #[test]
-fn test_for_expression_with_ident_pattern() {
-    let for_expr = expr().for_loop("x", expr().lit(10), []);
-
-    insta::assert_snapshot!(pretty(&for_expr), @"for x in 10 {}");
+fn test_mut_ident_pattern() {
+    let pat: Pat = pat().mutable().ident("my_var");
+    insta::assert_snapshot!(pretty(&pat), @"mut my_var");
 }
 
 #[test]
-fn test_match_expression_with_rest_pattern() {
-    let match_expr = expr().match_expr(
-        expr().lit(10),
-        [expr().arm(pat().rest()).body(expr().lit(42)).build()],
+fn test_lit_pattern() {
+    let pat: Pat = pat().lit(42);
+    insta::assert_snapshot!(pretty(&pat), @"42");
+}
+
+#[test]
+fn test_path_pattern() {
+    let pat: Pat = pat().path("my::path");
+    insta::assert_snapshot!(pretty(&pat), @"my::path");
+}
+
+#[test]
+fn test_tuple_pattern() {
+    let pat: Pat = pat().tuple([pat().ident("a"), pat().wild()]);
+    insta::assert_snapshot!(pretty(&pat), @"(a, _)");
+}
+
+use thin_vec::thin_vec;
+#[test]
+fn test_const_pattern() {
+    let pat: Pat = pat().const_(expr().struct_expr("MY_CONST", []));
+    insta::assert_snapshot!(pretty(&pat), @"const MY_CONST");
+}
+
+#[test]
+fn test_macro_pattern() {
+    let mac = expr().macro_call(
+        "my_macro",
+        Delimiter::Parenthesis,
+        TokenStream { tokens: thin_vec![] },
     );
-
-    insta::assert_snapshot!(pretty(&match_expr), @r"
-    match 10 {
-        .. => 42,
+    if let rasto::ast::Expr::MacroCall(mac) = mac {
+        let pat: Pat = pat().mac(mac);
+        insta::assert_snapshot!(pretty(&pat), @"my_macro!()");
     }
-    ");
 }
 
 #[test]
-fn test_let_statement_with_wildcard_pattern() {
-    let let_stmt = stmt().local(pat().wild()).build();
-
-    insta::assert_snapshot!(pretty(&let_stmt), @"let _;");
+fn test_or_pattern() {
+    let pat: Pat = pat().or([pat().ident("a"), pat().ident("b")]);
+    insta::assert_snapshot!(pretty(&pat), @"a | b");
 }
 
 #[test]
-fn test_let_statement_with_tuple_pattern() {
-    let let_stmt = stmt()
-        .local(pat().tuple(["x", "y"]))
-        .expr(expr().tuple([expr().lit(1), expr().lit(2)]))
+fn test_paren_pattern() {
+    let pat: Pat = pat().paren(pat().ident("a"));
+    insta::assert_snapshot!(pretty(&pat), @"(a)");
+}
+
+#[test]
+fn test_range_pattern() {
+    let pat: Pat = pat().range(Some(expr().lit(1)), RangeLimits::Closed, Some(expr().lit(10)));
+    insta::assert_snapshot!(pretty(&pat), @"1..=10");
+}
+
+#[test]
+fn test_reference_pattern() {
+    let pat: Pat = pat().reference(pat().ident("a")).build();
+    insta::assert_snapshot!(pretty(&pat), @"&a");
+}
+
+#[test]
+fn test_mut_reference_pattern() {
+    let pat: Pat = pat().reference(pat().ident("a")).mutable().build();
+    insta::assert_snapshot!(pretty(&pat), @"&mut a");
+}
+
+#[test]
+fn test_rest_pattern() {
+    let pat: Pat = pat().rest();
+    insta::assert_snapshot!(pretty(&pat), @"..");
+}
+
+#[test]
+fn test_slice_pattern() {
+    let pat: Pat = pat().slice([pat().ident("a"), pat().rest()]);
+    insta::assert_snapshot!(pretty(&pat), @"[a, ..]");
+}
+
+#[test]
+fn test_struct_pattern() {
+    let pat: Pat = pat()
+        .struct_("MyStruct")
+        .field("field1", pat().ident("a"))
+        .rest()
         .build();
-
-    insta::assert_snapshot!(pretty(&let_stmt), @"let (x, y) = (1, 2);");
+    insta::assert_snapshot!(pretty(&pat), @"MyStruct { field1: a, .. }");
 }
 
 #[test]
-fn test_function_with_tuple_pattern_in_arg() {
-    let fn_def = fn_def("foo").input(pat().tuple(["x", "y"])).build();
+fn test_tuple_struct_pattern() {
+    let pat: Pat = pat()
+        .tuple_struct("MyStruct")
+        .pat(pat().ident("a"))
+        .pat(pat().wild())
+        .build();
+    insta::assert_snapshot!(pretty(&pat), @"MyStruct(a, _)");
+}
 
-    insta::assert_snapshot!(pretty(&fn_def), @"fn foo((x, y)) {}");
+#[test]
+fn test_type_pattern() {
+    let pat: Pat = pat().type_(pat().ident("a"), type_().path("MyType"));
+    insta::assert_snapshot!(pretty(&pat), @"a: MyType");
 }
