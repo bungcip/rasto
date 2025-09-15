@@ -34,13 +34,13 @@ fn main() {
     let ast = fn_def("my_function")
         .vis(Visibility::Public)
         .attr(attr().meta(meta().path("test")))
-        .leading_comment(comment().doc(" This is a doc comment for my_function."))
+        .comment(comment().doc(" This is a doc comment for my_function."))
         .generic(generic_param().ty("T"))
         .input(pat().ident("arg"))
         .output("T".into())
         .block(
             block()
-                .leading_comment(comment().block(" An inner block comment. "))
+                .comment(comment().block(" An inner block comment. "))
                 .statement(
                     stmt()
                         .local(pat().ident("x"))
