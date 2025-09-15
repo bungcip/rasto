@@ -1186,15 +1186,36 @@ impl PrettyPrinter for ClobberAbi {
     }
 }
 
+fn pp_separated_with_trailing<'a, T: PrettyPrinter>(
+    items: &'a [T],
+    separator: &'a str,
+    printer: &mut Printer<'a>,
+) -> fmt::Result {
+    let num_items = items.len();
+    for (i, item) in items.iter().enumerate() {
+        item.pretty_print(printer)?;
+        printer.string(separator);
+        if i < num_items - 1 {
+            printer.hard_break();
+        }
+    }
+    Ok(())
+}
+
+fn pp_with_breaks<'a, T: PrettyPrinter>(items: &'a [T], printer: &mut Printer<'a>) -> fmt::Result {
+    let num_items = items.len();
+    for (i, item) in items.iter().enumerate() {
+        item.pretty_print(printer)?;
+        if i < num_items - 1 {
+            printer.hard_break();
+        }
+    }
+    Ok(())
+}
+
 impl PrettyPrinter for File {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
-        for (i, item) in self.items.iter().enumerate() {
-            if i > 0 {
-                printer.hard_break();
-            }
-            item.pretty_print(printer)?;
-        }
-        Ok(())
+        pp_with_breaks(&self.items, printer)
     }
 }
 
@@ -1209,14 +1230,7 @@ impl PrettyPrinter for ItemStruct {
         printer.begin(BreakStyle::Consistent, "{");
         if !self.fields.is_empty() {
             printer.hard_break();
-            let num_fields = self.fields.len();
-            for (i, field) in self.fields.iter().enumerate() {
-                field.pretty_print(printer)?;
-                printer.string(",");
-                if i < num_fields - 1 {
-                    printer.hard_break();
-                }
-            }
+            pp_separated_with_trailing(&self.fields, ",", printer)?;
         }
         printer.end("}");
         pp_end(&self.md, printer)?;
@@ -1245,14 +1259,7 @@ impl PrettyPrinter for ItemEnum {
         printer.begin(BreakStyle::Consistent, "{");
         if !self.variants.is_empty() {
             printer.hard_break();
-            let num_variants = self.variants.len();
-            for (i, variant) in self.variants.iter().enumerate() {
-                variant.pretty_print(printer)?;
-                printer.string(",");
-                if i < num_variants - 1 {
-                    printer.hard_break();
-                }
-            }
+            pp_separated_with_trailing(&self.variants, ",", printer)?;
         }
         printer.end("}");
         pp_end(&self.md, printer)?;
@@ -1299,13 +1306,7 @@ impl PrettyPrinter for ItemImpl {
         printer.begin(BreakStyle::Consistent, "{");
         if !self.items.is_empty() {
             printer.hard_break();
-            let num_items = self.items.len();
-            for (i, item) in self.items.iter().enumerate() {
-                item.pretty_print(printer)?;
-                if i < num_items - 1 {
-                    printer.hard_break();
-                }
-            }
+            pp_with_breaks(&self.items, printer)?;
         }
         printer.end("}");
         pp_end(&self.md, printer)?;
@@ -1322,26 +1323,17 @@ impl PrettyPrinter for ItemTrait {
         self.generics.pretty_print(printer)?;
         printer.string(" ");
         printer.begin(BreakStyle::Consistent, "{");
+
         if !self.associated_types.is_empty() {
             printer.hard_break();
-            let num_associated_types = self.associated_types.len();
-            for (i, associated_type) in self.associated_types.iter().enumerate() {
-                associated_type.pretty_print(printer)?;
-                if i < num_associated_types - 1 || !self.items.is_empty() {
-                    printer.hard_break();
-                }
-            }
+            pp_with_breaks(&self.associated_types, printer)?;
         }
+
         if !self.items.is_empty() {
             printer.hard_break();
-            let num_items = self.items.len();
-            for (i, item) in self.items.iter().enumerate() {
-                item.pretty_print(printer)?;
-                if i < num_items - 1 {
-                    printer.hard_break();
-                }
-            }
+            pp_with_breaks(&self.items, printer)?;
         }
+
         printer.end("}");
         pp_end(&self.md, printer)?;
         Ok(())
@@ -1644,16 +1636,11 @@ impl PrettyPrinter for ItemForeignMod {
         pp_begin(&self.md, printer)?;
         printer.string("extern ");
         printer.string(format!("\"{}\"", self.abi));
-        printer.begin(BreakStyle::Consistent, " {");
+        printer.string(" ");
+        printer.begin(BreakStyle::Consistent, "{");
         if !self.items.is_empty() {
             printer.hard_break();
-            let num_items = self.items.len();
-            for (i, item) in self.items.iter().enumerate() {
-                item.pretty_print(printer)?;
-                if i < num_items - 1 {
-                    printer.hard_break();
-                }
-            }
+            pp_with_breaks(&self.items, printer)?;
         }
         printer.end("}");
         pp_end(&self.md, printer)?;
@@ -1680,16 +1667,11 @@ impl PrettyPrinter for ItemMod {
         printer.string("mod ");
         printer.string(&self.ident);
         if let Some(content) = &self.content {
-            printer.begin(BreakStyle::Consistent, " {");
+            printer.string(" ");
+            printer.begin(BreakStyle::Consistent, "{");
             if !content.is_empty() {
                 printer.hard_break();
-                let num_items = content.len();
-                for (i, item) in content.iter().enumerate() {
-                    item.pretty_print(printer)?;
-                    if i < num_items - 1 {
-                        printer.hard_break();
-                    }
-                }
+                pp_with_breaks(content, printer)?;
             }
             printer.end("}");
         } else {
@@ -1731,14 +1713,7 @@ impl PrettyPrinter for ItemUnion {
         printer.begin(BreakStyle::Consistent, "{");
         if !self.fields.is_empty() {
             printer.hard_break();
-            let num_fields = self.fields.len();
-            for (i, field) in self.fields.iter().enumerate() {
-                field.pretty_print(printer)?;
-                printer.string(",");
-                if i < num_fields - 1 {
-                    printer.hard_break();
-                }
-            }
+            pp_separated_with_trailing(&self.fields, ",", printer)?;
         }
         printer.end("}");
 
