@@ -1172,10 +1172,6 @@ impl PrettyPrinter for Stmt {
             Stmt::Expr(expr) => {
                 expr.pretty_print(printer)?;
             }
-            Stmt::MacCall(mac) => {
-                mac.pretty_print(printer)?;
-                printer.string(";");
-            }
         }
         Ok(())
     }

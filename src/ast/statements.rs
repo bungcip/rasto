@@ -4,7 +4,7 @@
 //! They are the building blocks of function bodies and other code blocks.
 
 use crate::ast::Md;
-use crate::ast::expressions::{Expr, ExprMacroCall};
+use crate::ast::expressions::Expr;
 use crate::ast::items::Item;
 use crate::ast::patterns::Pat;
 use crate::ast::types::Type;
@@ -42,8 +42,6 @@ pub enum Stmt {
     Item(Item),
     /// An expression statement, which is an expression followed by a semicolon.
     Expr(Expr),
-    /// A macro call that is treated as a statement.
-    MacCall(ExprMacroCall),
 }
 
 /// A `let` statement, such as `let x: i32 = 1;`.
