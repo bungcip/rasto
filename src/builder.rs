@@ -25,7 +25,7 @@
 use crate::ast::items::*;
 use crate::ast::*;
 use std::convert::Into;
-use thin_vec::{thin_vec, ThinVec};
+use thin_vec::{ThinVec, thin_vec};
 
 /// Creates a new `FileBuilder` to construct a `File` AST node.
 ///
@@ -1140,7 +1140,7 @@ impl PatBuilder {
 
     /// Creates a wildcard pattern (`_`).
     pub fn wild(self) -> Pat {
-        Pat::Wild(PatWild::default())
+        Pat::Wild(PatWild)
     }
 
     /// Sets the pattern to be mutable (e.g., `mut ident`).
@@ -1174,7 +1174,7 @@ impl PatBuilder {
 
     /// Creates a rest pattern (`..`).
     pub fn rest(self) -> Pat {
-        Pat::Rest(PatRest::default())
+        Pat::Rest(PatRest)
     }
 
     /// Creates a literal pattern.
@@ -1317,7 +1317,7 @@ impl PatWildBuilder {
 
     /// Builds the `PatWild` AST node.
     pub fn build(self) -> Pat {
-        Pat::Wild(PatWild::default())
+        Pat::Wild(PatWild)
     }
 }
 
@@ -1541,9 +1541,7 @@ impl TypeBuilder {
     ///
     /// - `path`: The path.
     pub fn path(self, path: impl Into<Path>) -> Type {
-        Type::Path(TypePath {
-            path: path.into(),
-        })
+        Type::Path(TypePath { path: path.into() })
     }
 
     /// Creates a pointer type.
