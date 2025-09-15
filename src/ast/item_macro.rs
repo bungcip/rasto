@@ -1,22 +1,10 @@
 use crate::ast::expressions::Expr;
-use crate::ast::metadata::Md;
-use crate::pretty_printer::{PrettyPrinter, Printer};
-use std::fmt;
+use crate::pretty_printer::PrettyPrinter;
 
-/// A macro invocation in an items position, such as `my_macro!();`.
-#[derive(Debug, Clone, PartialEq)]
-pub struct ItemMacro {
-    /// The macro invocation expression.
-    pub expr: Box<Expr>,
-    /// Metadata about the macro invocation, including attributes and comments.
-    pub md: Option<Box<Md>>,
-}
-
-impl fmt::Display for ItemMacro {
-    /// Formats the `ItemMacro` using the pretty-printer.
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let mut printer = Printer::new(f);
-        self.pretty_print(&mut printer)?;
-        printer.finish()
+ast_item! {
+    /// A macro invocation in an items position, such as `my_macro!();`.
+    pub struct ItemMacro without vis and ident {
+        /// The macro invocation expression.
+        pub expr: Box<Expr>,
     }
 }

@@ -1,6 +1,6 @@
 use crate::ast::associated_const::AssociatedConst;
 use crate::ast::associated_type::AssociatedType;
-use crate::ast::items::ItemFn;
+use crate::ast::item_fn::ItemFn;
 
 impl From<ItemFn> for ImplItem {
     fn from(item: ItemFn) -> Self {

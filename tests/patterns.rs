@@ -52,7 +52,9 @@ fn test_macro_pattern() {
     let mac = expr().macro_call(
         "my_macro",
         Delimiter::Parenthesis,
-        TokenStream { tokens: thin_vec![] },
+        TokenStream {
+            tokens: thin_vec![],
+        },
     );
     if let rasto::ast::Expr::MacroCall(mac) = mac {
         let pat: Pat = pat().mac(mac);
@@ -74,7 +76,11 @@ fn test_paren_pattern() {
 
 #[test]
 fn test_range_pattern() {
-    let pat: Pat = pat().range(Some(expr().lit(1)), RangeLimits::Closed, Some(expr().lit(10)));
+    let pat: Pat = pat().range(
+        Some(expr().lit(1)),
+        RangeLimits::Closed,
+        Some(expr().lit(10)),
+    );
     insta::assert_snapshot!(pretty(&pat), @"1..=10");
 }
 
