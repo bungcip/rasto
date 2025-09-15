@@ -383,7 +383,7 @@ fn test_enum() {
 
 #[test]
 fn test_impl() {
-    let ast = impl_block("MyStruct").function(fn_def("new")).build();
+    let ast = impl_block("MyStruct").item(fn_def("new").build()).build();
 
     insta::assert_snapshot!(pretty(&ast));
 }
@@ -392,7 +392,7 @@ fn test_impl() {
 fn test_trait_impl() {
     let ast = impl_block("MyStruct")
         .trait_("MyTrait")
-        .function(fn_def("new"))
+        .item(fn_def("new").build())
         .build();
 
     insta::assert_snapshot!(pretty(&ast));
@@ -403,7 +403,7 @@ fn test_unsafe_trait_impl() {
     let ast = impl_block("MyStruct")
         .trait_("MyTrait")
         .unsafe_()
-        .function(fn_def("new"))
+        .item(fn_def("new").build())
         .build();
 
     insta::assert_snapshot!(pretty(&ast));

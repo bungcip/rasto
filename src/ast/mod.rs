@@ -24,6 +24,8 @@ pub mod item_def;
 pub mod item_extern_crate;
 /// Defines the AST node for a foreign module.
 pub mod item_foreign_mod;
+/// Defines the AST node for an `impl` item.
+pub mod item_impl;
 /// Defines the AST node for a macro definition.
 pub mod item_macro;
 /// Defines the AST node for a module.
@@ -65,13 +67,13 @@ pub use item_asm::*;
 pub use item_def::*;
 pub use item_extern_crate::*;
 pub use item_foreign_mod::*;
+pub use item_impl::*;
 pub use item_macro::*;
 pub use item_mod::*;
 pub use item_trait::*;
 pub use item_trait_alias::*;
 pub use item_union::*;
 pub use item_use::*;
-pub use items::*;
 pub use literals::*;
 pub use metadata::*;
 pub use patterns::*;

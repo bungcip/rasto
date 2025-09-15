@@ -50,4 +50,4 @@ pub mod pretty_printer;
 pub mod builder;
 
 /// Re-exports the main pretty-printing utilities for convenient access.
-pub use pretty_printer::{pretty, PrettyPrinter, Printer};
+pub use pretty_printer::{PrettyPrinter, Printer, pretty};

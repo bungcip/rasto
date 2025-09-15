@@ -119,6 +119,16 @@ fn test_trait_with_associated_type() {
 }
 
 #[test]
+fn test_impl_item() {
+    let item = impl_block("MyType")
+        .item(fn_def("my_func").build())
+        .item(associated_type("MyType").build())
+        .item(associated_const("MY_CONST", "u8", expr().lit(5)).build())
+        .build();
+    insta::assert_snapshot!(pretty(&item));
+}
+
+#[test]
 fn test_asm_item() {
     let template = r#""
         mov {tmp}, {x}

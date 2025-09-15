@@ -4,11 +4,11 @@
 //! impl blocks, and traits. They are the top-level declarations that make up a crate.
 
 use crate::ast::generics::GenericParams;
-use crate::ast::visibility::Visibility;
 use crate::ast::item_asm::ItemAsm;
 use crate::ast::item_def::ItemDef;
 use crate::ast::item_extern_crate::ItemExternCrate;
 use crate::ast::item_foreign_mod::ItemForeignMod;
+use crate::ast::item_impl::ImplItem;
 use crate::ast::item_macro::ItemMacro;
 use crate::ast::item_mod::ItemMod;
 use crate::ast::item_trait::ItemTrait;
@@ -19,6 +19,7 @@ use crate::ast::metadata::Md;
 use crate::ast::patterns::Pat;
 use crate::ast::statements::Block;
 use crate::ast::types::Type;
+use crate::ast::visibility::Visibility;
 use crate::pretty_printer::{PrettyPrinter, Printer};
 use std::fmt;
 use thin_vec::ThinVec;
@@ -191,8 +192,8 @@ pub struct ItemImpl {
     pub is_negative: bool,
     /// The generic parameters of the `impl` block.
     pub generics: GenericParams,
-    /// The functions within the `impl` block.
-    pub fns: ThinVec<ItemFn>,
+    /// The items within the `impl` block.
+    pub items: ThinVec<ImplItem>,
     /// Metadata about the `impl` block, including attributes and comments.
     pub md: Option<Box<Md>>,
 }
