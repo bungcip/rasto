@@ -1,8 +1,6 @@
+use crate::ast::associated_const::AssociatedConst;
 use crate::ast::associated_type::AssociatedType;
-use crate::ast::expressions::Expr;
 use crate::ast::items::ItemFn;
-use crate::ast::metadata::Md;
-use crate::ast::types::Type;
 
 impl From<ItemFn> for ImplItem {
     fn from(item: ItemFn) -> Self {
@@ -31,17 +29,4 @@ pub enum ImplItem {
     Type(AssociatedType),
     /// An associated constant within the `impl` block.
     Const(AssociatedConst),
-}
-
-/// An associated constant within an `impl` block.
-#[derive(Debug, Clone, PartialEq)]
-pub struct AssociatedConst {
-    /// The name of the constant.
-    pub ident: String,
-    /// The type of the constant.
-    pub ty: Type,
-    /// The value of the constant.
-    pub expr: Expr,
-    /// Metadata about the constant, including attributes and comments.
-    pub md: Option<Box<Md>>,
 }

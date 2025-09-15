@@ -3,6 +3,7 @@
 //! Items are the primary components of a Rust program, such as functions, structs, enums,
 //! impl blocks, and traits. They are the top-level declarations that make up a crate.
 
+use crate::ast::associated_const::AssociatedConst;
 use crate::ast::generics::GenericParams;
 use crate::ast::item_asm::ItemAsm;
 use crate::ast::item_def::ItemDef;
@@ -71,6 +72,8 @@ impl fmt::Display for Item {
 pub enum TraitItem {
     /// A function item within a trait: `fn foo();`.
     Fn(TraitItemFn),
+    /// A const item within a trait: `const FOO: usize;`.
+    Const(AssociatedConst),
 }
 
 /// A function item within a trait.
@@ -249,6 +252,12 @@ impl From<ItemStruct> for Item {
 impl From<TraitItemFn> for TraitItem {
     fn from(item: TraitItemFn) -> Self {
         TraitItem::Fn(item)
+    }
+}
+
+impl From<AssociatedConst> for TraitItem {
+    fn from(item: AssociatedConst) -> Self {
+        TraitItem::Const(item)
     }
 }
 

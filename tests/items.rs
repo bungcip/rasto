@@ -1,3 +1,5 @@
+mod associated_const;
+
 use rasto::ast::{AsmDirection, AsmOption, LitStr, RegSpec, Visibility};
 use rasto::builder::*;
 use rasto::pretty;
@@ -123,7 +125,11 @@ fn test_impl_item() {
     let item = impl_block("MyType")
         .item(fn_def("my_func").build())
         .item(associated_type("MyType").build())
-        .item(associated_const("MY_CONST", "u8", expr().lit(5)).build())
+        .item(
+            associated_const("MY_CONST", "u8")
+                .expr(expr().lit(5))
+                .build(),
+        )
         .build();
     insta::assert_snapshot!(pretty(&item));
 }

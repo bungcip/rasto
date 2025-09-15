@@ -404,8 +404,10 @@ impl PrettyPrinter for AssociatedConst {
         printer.string(&self.ident);
         printer.string(": ");
         self.ty.pretty_print(printer)?;
-        printer.string(" = ");
-        self.expr.pretty_print(printer)?;
+        if let Some(expr) = &self.expr {
+            printer.string(" = ");
+            expr.pretty_print(printer)?;
+        }
         printer.string(";");
         Ok(())
     }
@@ -1512,6 +1514,7 @@ impl PrettyPrinter for TraitItem {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         match self {
             TraitItem::Fn(item_fn) => item_fn.pretty_print(printer),
+            TraitItem::Const(associated_const) => associated_const.pretty_print(printer),
         }
     }
 }
