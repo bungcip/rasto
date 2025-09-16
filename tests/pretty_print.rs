@@ -31,6 +31,12 @@ fn test_file() {
 }
 
 #[test]
+fn test_expr_try() {
+    let ast = expr().try_block([expr().lit(1)]);
+    insta::assert_snapshot!(pretty(&ast));
+}
+
+#[test]
 fn test_macro_call_with_brackets() {
     let ast = fn_def("foo")
         .statement(expr().macro_call(

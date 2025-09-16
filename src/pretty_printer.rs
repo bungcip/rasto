@@ -90,6 +90,13 @@ impl<T: PrettyPrinter + ?Sized> PrettyPrinter for Box<T> {
     }
 }
 
+impl PrettyPrinter for ExprTry {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        printer.string("try ");
+        self.block.pretty_print(printer)
+    }
+}
+
 /// Pretty-prints an AST node to a string.
 ///
 /// This is a convenience function that creates a new `Printer`, pretty-prints
@@ -648,6 +655,7 @@ impl PrettyPrinter for Expr {
             Expr::RawRef(expr) => expr.pretty_print(printer),
             Expr::Return(expr) => expr.pretty_print(printer),
             Expr::Struct(expr) => expr.pretty_print(printer),
+            Expr::Try(expr) => expr.pretty_print(printer),
             Expr::Tuple(expr) => expr.pretty_print(printer),
             Expr::Unary(expr) => expr.pretty_print(printer),
         }
