@@ -1,5 +1,0 @@
----
-source: tests/items.rs
-expression: static_item.to_string()
----
-static COUNTER: u32 = 0;

@@ -81,11 +81,9 @@ fn test_trait_with_generics() {
 
 #[test]
 fn test_type_with_generics() {
-    let ast = def_item(
-        "MyType",
-        type_alias_kind(path("Vec").generic("T").build_type()).generic(generic_param().ty("T")),
-    )
-    .build();
+    let ast = type_alias("MyType", path("Vec").generic("T").build_type())
+        .generic(generic_param().ty("T"))
+        .build();
 
     insta::assert_snapshot!(pretty(&ast), @r###"
     type MyType<T> = Vec<T>;

@@ -23,6 +23,8 @@
 //! pretty-printed. This trait provides a `pretty_print` method that
 //! converts the AST node into a sequence of tokens for the `Printer`.
 
+use crate::ast::item_const::ItemConst;
+use crate::ast::item_type_alias::ItemTypeAlias;
 use crate::ast::items::*;
 use crate::ast::*;
 use std::borrow::Cow;
@@ -387,6 +389,38 @@ impl PrettyPrinter for Comment {
             Comment::Doc(s) => printer.string(format!("///{s}")),
         }
         printer.hard_break();
+        Ok(())
+    }
+}
+
+impl PrettyPrinter for ItemTypeAlias {
+    /// Pretty-prints the `ItemTypeAlias` to the given printer.
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        pp_begin(&self.md, printer)?;
+        self.vis.pretty_print(printer)?;
+        printer.string("type ");
+        printer.string(&self.ident);
+        self.generics.pretty_print(printer)?;
+        printer.string(" = ");
+        self.ty.pretty_print(printer)?;
+        printer.string(";");
+        pp_end(&self.md, printer)?;
+        Ok(())
+    }
+}
+
+impl PrettyPrinter for ItemConst {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        pp_begin(&self.md, printer)?;
+        self.vis.pretty_print(printer)?;
+        printer.string("const ");
+        printer.string(&self.ident);
+        printer.string(": ");
+        self.ty.pretty_print(printer)?;
+        printer.string(" = ");
+        self.expr.pretty_print(printer)?;
+        printer.string(";");
+        pp_end(&self.md, printer)?;
         Ok(())
     }
 }
@@ -1282,17 +1316,18 @@ impl PrettyPrinter for Item {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         match self {
             Item::Fn(item_fn) => item_fn.pretty_print(printer),
+            Item::Const(item_const) => item_const.pretty_print(printer),
             Item::Struct(item_struct) => item_struct.pretty_print(printer),
             Item::Static(item_static) => item_static.pretty_print(printer),
             Item::Enum(item_enum) => item_enum.pretty_print(printer),
             Item::Impl(item_impl) => item_impl.pretty_print(printer),
             Item::Trait(item_trait) => item_trait.pretty_print(printer),
-            Item::Def(item_def) => item_def.pretty_print(printer),
             Item::ExternCrate(item_extern_crate) => item_extern_crate.pretty_print(printer),
             Item::ForeignMod(item_foreign_mod) => item_foreign_mod.pretty_print(printer),
             Item::Macro(item_macro) => item_macro.pretty_print(printer),
             Item::Mod(item_mod) => item_mod.pretty_print(printer),
             Item::TraitAlias(item_trait_alias) => item_trait_alias.pretty_print(printer),
+            Item::TypeAlias(item_type_alias) => item_type_alias.pretty_print(printer),
             Item::Union(item_union) => item_union.pretty_print(printer),
             Item::Use(item_use) => item_use.pretty_print(printer),
             Item::Asm(item_asm) => item_asm.pretty_print(printer),
@@ -1830,44 +1865,6 @@ impl PrettyPrinter for GenericArg {
             GenericArg::Type(t) => t.pretty_print(printer),
             GenericArg::Const(c) => c.pretty_print(printer),
         }
-    }
-}
-
-impl PrettyPrinter for ItemDef {
-    /// Pretty-prints the `ItemDef` to the given printer.
-    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
-        pp_begin(&self.md, printer)?;
-        self.vis.pretty_print(printer)?;
-        match &self.kind {
-            ItemDefKind::Const { ty, expr } => {
-                printer.string("const ");
-                printer.string(&self.ident);
-                printer.string(": ");
-                ty.pretty_print(printer)?;
-                printer.string(" = ");
-                expr.pretty_print(printer)?;
-                printer.string(";");
-            }
-            ItemDefKind::Static { ty, expr } => {
-                printer.string("static ");
-                printer.string(&self.ident);
-                printer.string(": ");
-                ty.pretty_print(printer)?;
-                printer.string(" = ");
-                expr.pretty_print(printer)?;
-                printer.string(";");
-            }
-            ItemDefKind::TypeAlias { generics, ty } => {
-                printer.string("type ");
-                printer.string(&self.ident);
-                generics.pretty_print(printer)?;
-                printer.string(" = ");
-                ty.pretty_print(printer)?;
-                printer.string(";");
-            }
-        }
-        pp_end(&self.md, printer)?;
-        Ok(())
     }
 }
 

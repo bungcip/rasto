@@ -25,8 +25,8 @@ pub mod file;
 pub mod generics;
 /// Defines the AST node for an `asm!` expression.
 pub mod item_asm;
-/// Defines the AST node for a `const`, `static`, or `type` item.
-pub mod item_def;
+/// Defines the AST node for a `const` item.
+pub mod item_const;
 /// Defines the AST node for an enum.
 pub mod item_enum;
 /// Defines the AST node for an `extern` block.
@@ -51,6 +51,8 @@ pub mod item_struct;
 pub mod item_trait;
 /// Defines the AST node for a trait alias.
 pub mod item_trait_alias;
+/// Defines the AST node for a type alias.
+pub mod item_type_alias;
 /// Defines the AST node for a `union` item.
 pub mod item_union;
 /// Defines the AST node for a `use` item.
@@ -83,7 +85,7 @@ pub use expressions::*;
 pub use file::*;
 pub use generics::*;
 pub use item_asm::*;
-pub use item_def::*;
+pub use item_const::*;
 pub use item_enum::*;
 pub use item_extern_block::*;
 pub use item_extern_crate::*;
@@ -96,6 +98,7 @@ pub use item_static::*;
 pub use item_struct::*;
 pub use item_trait::*;
 pub use item_trait_alias::*;
+pub use item_type_alias::*;
 pub use item_union::*;
 pub use item_use::*;
 pub use literals::*;

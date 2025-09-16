@@ -1,5 +1,5 @@
 ---
 source: tests/items.rs
-expression: const_item.to_string()
+expression: pretty(&item)
 ---
 const MAX: u16 = 234342;

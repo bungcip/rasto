@@ -1,0 +1,16 @@
+//! A type alias, such as `type MyResult<T> = Result<T, MyError>`;
+
+use crate::{
+    ast::{generics::GenericParams, types::Type},
+    pretty_printer::PrettyPrinter,
+};
+
+ast_item! {
+    /// A type alias, such as `type MyResult<T> = Result<T, MyError>;`.
+    pub struct ItemTypeAlias {
+        /// The generic parameters of the type alias.
+        pub(crate) generics: GenericParams,
+        /// The type being aliased.
+        pub(crate) ty: Type,
+    }
+}
