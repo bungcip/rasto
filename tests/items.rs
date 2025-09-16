@@ -72,6 +72,18 @@ fn test_union_item() {
 }
 
 #[test]
+fn test_static_item() {
+    let item = static_item("FOO", "u32", expr().lit(42)).build();
+    insta::assert_snapshot!(pretty(&item));
+}
+
+#[test]
+fn test_mutable_static_item() {
+    let item = static_item("BAR", "u32", expr().lit(0)).mutable().build();
+    insta::assert_snapshot!(pretty(&item));
+}
+
+#[test]
 fn test_trait_with_function() {
     let item = trait_def("MyTrait").item(trait_item_fn("my_func")).build();
     insta::assert_snapshot!(pretty(&item));

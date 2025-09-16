@@ -1,0 +1,5 @@
+---
+source: tests/items.rs
+expression: pretty(&item)
+---
+static mut BAR: u32 = 0;
