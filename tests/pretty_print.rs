@@ -67,26 +67,12 @@ fn test_pretty_print_doc_comment() {
 }
 
 #[test]
-fn test_block_single_comment() {
-    let single = comment().block("Block comment with single line");
-    insta::assert_snapshot!(pretty(&single));
-}
-
-#[test]
-fn test_block_multiline_comment() {
-    let single =
-        comment().block("Block comment with multi line 1\nBlock comment with multi line 2");
-    insta::assert_snapshot!(pretty(&single));
-}
-
-#[test]
 fn test_fn() {
     let ast = fn_def("foo")
         .input("a")
         .output("i32")
         .block(
             block()
-                .comment(comment().block(" Block comment with single line "))
                 .statement(stmt().local("hello").expr(expr().lit("world")))
                 .statement(expr().lit(42))
                 .has_trailing_semicolon(false),

@@ -87,15 +87,6 @@ impl CommentBuilder {
         Comment::Line(content.into())
     }
 
-    /// Creates a block comment, e.g., `/* A block comment. */`
-    ///
-    /// # Parameters
-    ///
-    /// - `content`: The text of the comment.
-    pub fn block<S: Into<String>>(self, content: S) -> Comment {
-        Comment::Block(content.into())
-    }
-
     /// Creates a doc comment, e.g., `/// A doc comment.`
     ///
     /// # Parameters

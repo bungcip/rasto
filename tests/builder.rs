@@ -81,12 +81,6 @@ fn test_comment_builder() {
         rasto::ast::Comment::Line(" a line comment".to_string())
     );
 
-    let block_comment = comment().block(" a block comment");
-    assert_eq!(
-        block_comment,
-        rasto::ast::Comment::Block(" a block comment".to_string())
-    );
-
     let doc_comment = comment().doc(" a doc comment");
     assert_eq!(
         doc_comment,
