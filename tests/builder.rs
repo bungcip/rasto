@@ -1,5 +1,6 @@
-use rasto::ast::{Expr, ExprUnary, Lit, LitInt, PatIdent, Stmt, UnOp};
+use rasto::ast::{Block, Expr, ExprTry, ExprUnary, Lit, LitInt, PatIdent, Stmt, UnOp};
 use rasto::{builder::*, pretty};
+use thin_vec::thin_vec;
 
 #[test]
 fn test_fn_builder() {
@@ -90,5 +91,21 @@ fn test_comment_builder() {
     assert_eq!(
         doc_comment,
         rasto::ast::Comment::Doc(" a doc comment".to_string())
+    );
+}
+
+#[test]
+fn test_try_block_builder() {
+    let expr = expr().try_block([expr().lit(42)]);
+
+    assert_eq!(
+        expr,
+        Expr::Try(ExprTry {
+            block: Block {
+                stmts: thin_vec![Stmt::Expr(Expr::Lit(Lit::Int(LitInt::new(42))))],
+                has_trailing_semicolon: true,
+                md: None,
+            }
+        })
     );
 }
