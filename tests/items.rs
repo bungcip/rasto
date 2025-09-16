@@ -69,7 +69,6 @@ fn test_union_item() {
     insta::assert_snapshot!(pretty(&item));
 }
 
-
 #[test]
 fn test_use_item() {
     let item = use_item("std::collections::HashMap").build();

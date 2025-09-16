@@ -1,4 +1,4 @@
-use rasto::ast::generics::{generic_param, GenericParam, GenericArgs};
+use rasto::ast::generics::{GenericArgs, GenericParam, generic_param};
 use rasto::ast::types::Type;
 use rasto::{builder::*, pretty};
 

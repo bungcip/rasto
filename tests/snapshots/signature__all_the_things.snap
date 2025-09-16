@@ -1,0 +1,5 @@
+---
+source: tests/signature.rs
+expression: pretty(&item)
+---
+fn const async unsafe extern "C" my_fn<T>(t, ...) -> T where T: Trait {}

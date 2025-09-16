@@ -1,0 +1,5 @@
+---
+source: tests/signature.rs
+expression: pretty(&item)
+---
+fn my_fn() where T: Trait {}

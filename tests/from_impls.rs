@@ -1,4 +1,7 @@
-use rasto::ast::{*, items::{Item, TraitItem}};
+use rasto::ast::{
+    items::{Item, TraitItem},
+    *,
+};
 use rasto::builder::*;
 use thin_vec::thin_vec;
 
@@ -19,7 +22,9 @@ fn test_from_impls() {
     let item: Item = trait_def("MyTrait").build().into();
     assert!(matches!(item, Item::Trait(_)));
 
-    let item: Item = def_item("MY_CONST", const_kind("u8", expr().lit(5))).build().into();
+    let item: Item = def_item("MY_CONST", const_kind("u8", expr().lit(5)))
+        .build()
+        .into();
     assert!(matches!(item, Item::Def(_)));
 
     let item: Item = extern_crate_item("serde").build().into();
@@ -28,7 +33,9 @@ fn test_from_impls() {
     let item: Item = foreign_mod_item("C").build().into();
     assert!(matches!(item, Item::ForeignMod(_)));
 
-    let item: Item = macro_item(expr().macro_call("my_macro", Delimiter::Parenthesis, thin_vec![])).build().into();
+    let item: Item = macro_item(expr().macro_call("my_macro", Delimiter::Parenthesis, thin_vec![]))
+        .build()
+        .into();
     assert!(matches!(item, Item::Macro(_)));
 
     let item: Item = mod_item("my_module").build().into();
