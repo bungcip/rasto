@@ -4,15 +4,44 @@ use crate::ast::expressions::Expr;
 use crate::ast::metadata::Md;
 use crate::ast::types::Type;
 
-/// An associated constant in a trait or impl, such as `const MAX: u16 = 234342;`.
+/// Represents an associated constant in a trait or implementation.
+///
+/// An associated constant is a constant value that is associated with a specific
+/// type. It is defined within a trait or an `impl` block.
+///
+/// # Examples
+///
+/// In a trait definition:
+///
+/// ```rust
+/// trait MyTrait {
+///     const MAX: u16;
+/// }
+/// ```
+///
+/// In an `impl` block:
+///
+/// ```rust
+/// trait MyTrait {
+///     const MAX: u16;
+/// }
+/// struct MyType;
+///
+/// impl MyTrait for MyType {
+///     const MAX: u16 = 123;
+/// }
+/// ```
 #[derive(Debug, Clone, PartialEq)]
 pub struct AssociatedConst {
-    /// The name of the const item.
+    /// The name of the associated constant.
     pub ident: String,
-    /// The type of the const item.
+    /// The type of the associated constant.
     pub ty: Type,
-    /// The value of the const item.
+    /// The optional expression that provides the value of the constant.
+    ///
+    /// This is `None` in a trait definition where the value is not specified,
+    /// and `Some` in an `impl` block where the value is provided.
     pub expr: Option<Box<Expr>>,
-    /// Metadata about the item, including attributes and comments.
+    /// Metadata associated with the constant, such as attributes and comments.
     pub md: Option<Box<Md>>,
 }

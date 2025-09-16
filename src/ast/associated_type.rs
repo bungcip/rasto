@@ -1,29 +1,51 @@
+//! Defines the AST node for an associated type in a trait.
+
 use crate::ast::generics::GenericParams;
 use crate::ast::metadata::Md;
 use crate::ast::types::Type;
 use thin_vec::ThinVec;
 
-/// Represents an associated type in a trait definition.
+/// Represents an associated type within a trait.
 ///
-/// For example: `type Output: ?Sized;`
+/// An associated type is a placeholder type used in a trait definition, which is
+/// then specified by the implementing type.
+///
+/// # Examples
+///
+/// A simple associated type:
+///
+/// ```rust
+/// trait Iterator {
+///     type Item;
+///     // ...
+/// }
+/// ```
+///
+/// An associated type with bounds:
+///
+/// ```rust
+/// trait MyTrait {
+///     type MyType: Clone + Default;
+/// }
+/// ```
 #[derive(Debug, Clone, PartialEq)]
 pub struct AssociatedType {
-    /// The name of the associated type.
+    /// The identifier of the associated type.
     ///
-    /// In `type Output: ?Sized;`, this would be `Output`.
+    /// For `type Item;`, the ident is `Item`.
     pub ident: String,
-    /// The generic parameters of the associated type.
+    /// The generic parameters for the associated type.
     ///
-    /// For example, in `type Item<T> where T: Clone;`, this would be `<T> where T: Clone`.
+    /// For `type Item<T>;`, the generics are `<T>`.
     pub generics: GenericParams,
-    /// The bounds on the associated type.
+    /// The trait bounds that the associated type must satisfy.
     ///
-    /// In `type Output: ?Sized;`, this would be `?Sized`.
+    /// For `type Item: Clone;`, the bounds are `Clone`.
     pub bounds: ThinVec<Type>,
-    /// The default type for the associated type.
+    /// An optional default type.
     ///
-    /// In `type Output = u32;`, this would be `u32`.
+    /// For `type Item = u32;`, the default is `u32`.
     pub default: Option<Type>,
-    /// Metadata about the associated type, including attributes and comments.
+    /// Metadata, such as attributes and comments, attached to the associated type.
     pub md: Option<Box<Md>>,
 }

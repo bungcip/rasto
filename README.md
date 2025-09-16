@@ -1,5 +1,9 @@
 # Rasto - **R**ust **AST** **O**pinionated Crates
 
+[![Latest Version](https://img.shields.io/crates/v/rasto.svg)](https://crates.io/crates/rasto)
+[![Docs.rs](https://docs.rs/rasto/badge.svg)](https://docs.rs/rasto)
+[![CI](https://github.com/bungcip/rasto/actions/workflows/ci.yml/badge.svg)](https://github.com/bungcip/rasto/actions/workflows/ci.yml)
+
 `rasto` is a Rust crate for programmatic manipulation of Rust code.
 
 It provides a set of data structures for representing a Rust Abstract Syntax Tree (AST) and a pretty-printer to format the AST back into well-structured Rust code.
@@ -12,14 +16,21 @@ It provides a set of data structures for representing a Rust Abstract Syntax Tre
 
 -   **No Parser**: `rasto` does not include a parser. The focus of the library is on AST manipulation and pretty-printing. Parsing is considered a separate concern and is out of the scope of this project. For parsing Rust code, we recommend using other libraries like `syn`.
 
+## Features
+
+-   **Fluent Builder API**: A comprehensive and easy-to-use builder API for constructing Rust AST nodes.
+-   **Pretty-Printing**: A high-quality pretty-printer that formats the AST back into well-structured and readable Rust code.
+-   **Extensive AST Coverage**: Data structures for a wide range of Rust syntax, including expressions, statements, items, and more.
+-   **Snapshot Testing**: Integration with `insta` for robust snapshot testing of the pretty-printer.
+
 ## Comparison with other crates
 
-| Crate | AST Manipulation | Parsing | Pretty Printing | Focus |
-| --- | --- | --- | --- | --- |
-| `rasto` | Yes | No | Yes | Opinionated AST manipulation and pretty-printing |
-| `syn` | Yes | Yes | No | Parsing Rust code into a syntax tree |
-| `quote` | No | No | Yes | Turning a syntax tree back into Rust code |
-| `proc-macro2` | No | No | No | A wrapper around the compiler's `proc_macro` API |
+| Crate         | AST Manipulation | Parsing | Pretty Printing | Focus                                            |
+|---------------|------------------|---------|-----------------|--------------------------------------------------|
+| `rasto`       | Yes              | No      | Yes             | Opinionated AST manipulation and pretty-printing |
+| `syn`         | Yes              | Yes     | No              | Parsing Rust code into a syntax tree             |
+| `quote`       | No               | No      | Yes             | Turning a syntax tree back into Rust code        |
+| `proc-macro2` | No               | No      | No              | A wrapper around the compiler's `proc_macro` API |
 
 ## Setup
 
@@ -46,18 +57,12 @@ fn main() {
         .comment(comment().doc(" This is a doc comment for my_function."))
         .generic(generic_param().ty("T"))
         .input(pat().ident("arg"))
-        .output("T".into())
-        .block(
-            block()
-                .statement(
-                    stmt()
-                        .local(pat().ident("x"))
-                        .expr(expr().lit(42))
-                        .build(),
-                )
-                .statement(expr().field(expr().ident("arg"), "field"))
+        .output("T")
+        .statement(stmt()
+            .local(pat().ident("x"))
+            .expr(expr().lit(42))
         )
-        .trailing_comment(comment().line(" A trailing line comment."))
+        .statement(expr().field(expr().ident("arg"), "field"))
         .build();
 
     println!("{}", pretty(&ast));
@@ -73,8 +78,11 @@ pub fn my_function<T>(arg) -> T {
     let x = 42;
     arg.field;
 }
-// A trailing line comment.
 ```
+
+## Documentation
+
+The full documentation for this crate can be found on [docs.rs](https://docs.rs/rasto).
 
 ## Contributing
 
@@ -82,7 +90,15 @@ Contributions are welcome! Please open an issue or submit a pull request on GitH
 
 ### Testing
 
-To run the tests, use `cargo test`.
+To run the tests, use `cargo test`. If you make changes that affect the pretty-printer's output, you can update the snapshots with `cargo insta review`.
+
+## Code of Conduct
+
+This project adheres to the [Contributor Covenant Code of Conduct](https://www.contributor-covenant.org/version/2/1/code_of_conduct/). By participating, you are expected to uphold this code.
+
+## Changelog
+
+All notable changes to this project will be documented in the `CHANGELOG.md` file.
 
 ## License
 

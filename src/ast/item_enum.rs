@@ -1,20 +1,33 @@
+//! Defines the AST node for an enum definition.
+
 use crate::ast::metadata::Md;
 use crate::pretty_printer::PrettyPrinter;
 use thin_vec::ThinVec;
 
 ast_item! {
-    /// An enum definition.
+    /// Represents an `enum` definition, which is a type that can be one of
+    /// several variants.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// enum MyEnum {
+    ///     Variant1,
+    ///     Variant2(u32),
+    ///     Variant3 { x: i32, y: i32 },
+    /// }
+    /// ```
     pub struct ItemEnum with generics {
-        /// The variants of the enum.
+        /// The list of variants that make up the enum.
         pub variants: ThinVec<Variant>,
     }
 }
 
-/// A variant of an enum.
+/// Represents a single variant within an enum.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Variant {
     /// The name of the variant.
     pub ident: String,
-    /// Metadata about the variant, including attributes and comments.
+    /// Metadata, such as attributes and comments, attached to the variant.
     pub md: Option<Box<Md>>,
 }
