@@ -1,0 +1,5 @@
+---
+source: tests/items.rs
+expression: pretty(&default_vis)
+---
+fn my_default_fn() {}

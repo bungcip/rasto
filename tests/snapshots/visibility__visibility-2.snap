@@ -1,0 +1,7 @@
+---
+source: tests/visibility.rs
+expression: "&crate_struct"
+---
+pub(crate) struct MyCrateStruct {
+    x: i32,
+}
