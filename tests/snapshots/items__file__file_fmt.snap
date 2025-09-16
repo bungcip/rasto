@@ -1,0 +1,6 @@
+---
+source: tests/file.rs
+expression: file.to_string()
+---
+fn my_function() {}
+struct MyStruct {}

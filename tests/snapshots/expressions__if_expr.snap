@@ -1,0 +1,9 @@
+---
+source: tests/expressions.rs
+expression: pretty(&expr)
+---
+if "cond" {
+    1;
+} else {
+    2;
+}

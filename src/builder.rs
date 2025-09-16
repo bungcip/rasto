@@ -3165,7 +3165,7 @@ pub fn mod_item(name: impl Into<String>) -> ItemModBuilder {
 
 /// Create a new `EmptyItemModBuilder` to construct a module item in separated file.
 pub fn empty_mod_item(name: impl Into<String>) -> EmptyItemModBuilder {
-    EmptyItemModBuilder::new(name)    
+    EmptyItemModBuilder::new(name)
 }
 
 /// A builder for constructing an `ItemMod` AST node.
@@ -3315,7 +3315,6 @@ impl EmptyItemModBuilder {
         }
     }
 }
-
 
 /// Creates a new `ItemTraitAliasBuilder` to construct a trait alias.
 pub fn trait_alias_item(name: impl Into<String>, bounds: ThinVec<String>) -> ItemTraitAliasBuilder {
