@@ -1,0 +1,12 @@
+---
+source: tests/pretty_print.rs
+expression: pretty(&ast)
+---
+fn foo() {
+
+    /* line 1
+     * line 2
+     * line 3
+     */
+    let x = 1;
+}

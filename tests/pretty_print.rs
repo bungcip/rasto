@@ -31,6 +31,23 @@ fn test_file() {
 }
 
 #[test]
+fn test_block_multiline_comment_indentation() {
+    let ast = fn_def("foo")
+        .block(
+            block().statement(
+                stmt()
+                    .local("x")
+                    .expr(expr().lit(1))
+                    .leading_comment(comment().block(" line 1\n line 2\n line 3"))
+                    .build(),
+            ),
+        )
+        .build();
+
+    insta::assert_snapshot!(pretty(&ast));
+}
+
+#[test]
 fn test_macro_call_with_brackets() {
     let ast = fn_def("foo")
         .statement(expr().macro_call(

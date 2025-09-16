@@ -46,14 +46,15 @@ fn test_stmt_builder() {
 
     assert_eq!(
         local_stmt,
-        Stmt::Local(rasto::ast::Local {
+        rasto::ast::Local {
             pat: rasto::ast::Pat::Ident(PatIdent {
                 ident: "x".to_string(),
                 is_mut: false
             }),
             ty: Some("i32".into()),
             expr: Some(Expr::Lit(Lit::Int(LitInt::new(42)))),
-        })
+            md: Some(Box::new(Default::default())),
+        }
     );
 
     let expr_stmt = stmt().expr(expr().lit(42));

@@ -377,17 +377,20 @@ impl PrettyPrinter for Comment {
         match self {
             Comment::Line(s) => printer.string(format!("//{s}")),
             Comment::Block(s) => {
-                printer.string("/*");
-                let mut first = true;
-                for line in s.split('\n') {
-                    if first {
-                        first = false
-                    } else {
-                        printer.hard_break();
+                if s.contains('\n') {
+                    printer.string("/*");
+                    for (i, line) in s.split('\n').enumerate() {
+                        if i > 0 {
+                            printer.hard_break();
+                            printer.string(" *");
+                        }
+                        printer.string(line);
                     }
-                    printer.string(line);
+                    printer.hard_break();
+                    printer.string(" */");
+                } else {
+                    printer.string(format!("/*{s}*/"));
                 }
-                printer.string("*/");
             }
             Comment::Doc(s) => printer.string(format!("///{s}")),
         }
@@ -998,6 +1001,7 @@ impl PrettyPrinter for Stmt {
 
 impl PrettyPrinter for Local {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        pp_begin(&self.md, printer)?;
         printer.string("let ");
         self.pat.pretty_print(printer)?;
         if let Some(ty) = &self.ty {
@@ -1009,6 +1013,7 @@ impl PrettyPrinter for Local {
             expr.pretty_print(printer)?;
         }
         printer.string(";");
+        pp_end(&self.md, printer)?;
         Ok(())
     }
 }

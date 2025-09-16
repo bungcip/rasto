@@ -1,5 +1,5 @@
 ---
 source: tests/pretty_print.rs
-expression: pretty_print_comment(single)
+expression: pretty(&single)
 ---
 /*Block comment with single line*/

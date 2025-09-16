@@ -55,4 +55,12 @@ pub struct Local {
     pub ty: Option<Type>,
     /// The optional expression to initialize the variable.
     pub expr: Option<Expr>,
+    /// The metadata of the statement.
+    pub md: Option<Box<Md>>,
+}
+
+impl From<Local> for Stmt {
+    fn from(local: Local) -> Self {
+        Stmt::Local(local)
+    }
 }

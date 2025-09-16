@@ -1,6 +1,7 @@
 ---
 source: tests/pretty_print.rs
-expression: pretty_print_comment(single)
+expression: pretty(&single)
 ---
 /*Block comment with multi line 1
-Block comment with multi line 2*/
+ *Block comment with multi line 2
+ */

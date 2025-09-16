@@ -1033,6 +1033,7 @@ pub struct LocalBuilder {
     pat: Pat,
     ty: Option<Type>,
     expr: Option<Expr>,
+    md: MdBuilder,
 }
 
 impl LocalBuilder {
@@ -1046,6 +1047,7 @@ impl LocalBuilder {
             pat: pat.into(),
             ty: None,
             expr: None,
+            md: MdBuilder::new(),
         }
     }
 
@@ -1069,17 +1071,48 @@ impl LocalBuilder {
         self
     }
 
-    /// Builds the `Stmt::Local` AST node.
+    /// Adds a leading comment to the `let` statement.
+    ///
+    /// # Parameters
+    ///
+    /// - `comment`: The `Comment` to add.
+    pub fn leading_comment(mut self, comment: impl Into<Comment>) -> Self {
+        self.md = self.md.leading_comment(comment.into());
+        self
+    }
+
+    /// Adds a trailing comment to the `let` statement.
+    ///
+    /// # Parameters
+    ///
+    /// - `comment`: The `Comment` to add.
+    pub fn trailing_comment(mut self, comment: impl Into<Comment>) -> Self {
+        self.md = self.md.trailing_comment(comment.into());
+        self
+    }
+
+    /// Adds an attribute to the `let` statement.
+    ///
+    /// # Parameters
+    ///
+    /// - `attr`: The `Attribute` to add.
+    pub fn attr(mut self, attr: impl Into<Attribute>) -> Self {
+        self.md = self.md.attr(attr.into());
+        self
+    }
+
+    /// Builds the `Local` AST node.
     ///
     /// # Returns
     ///
-    /// A `Stmt` instance representing the `let` binding.
-    pub fn build(self) -> Stmt {
-        Stmt::Local(Local {
+    /// A `Local` instance representing the `let` binding.
+    pub fn build(self) -> Local {
+        Local {
             pat: self.pat,
             ty: self.ty,
             expr: self.expr,
-        })
+            md: Some(Box::new(self.md.build())),
+        }
     }
 }
 
@@ -2633,6 +2666,12 @@ impl TokenTreeBuilder {
 }
 
 impl From<LocalBuilder> for Stmt {
+    fn from(value: LocalBuilder) -> Self {
+        Stmt::Local(value.build())
+    }
+}
+
+impl From<LocalBuilder> for Local {
     fn from(value: LocalBuilder) -> Self {
         value.build()
     }
