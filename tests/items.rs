@@ -70,6 +70,50 @@ fn test_union_item() {
 }
 
 #[test]
+fn test_trait_with_function() {
+    let item = trait_def("MyTrait")
+        .item(trait_item_fn("my_func"))
+        .build();
+    insta::assert_snapshot!(pretty(&item));
+}
+
+#[test]
+fn test_visibility() {
+    let pub_fn = fn_def("my_public_fn").vis(Visibility::Public).build();
+    insta::assert_snapshot!(pretty(&pub_fn));
+
+    let crate_struct = struct_def("MyCrateStruct")
+        .vis(Visibility::Crate)
+        .field("x", "i32")
+        .build();
+    insta::assert_snapshot!(pretty(&crate_struct));
+
+    let default_enum = enum_def("MyDefaultEnum").variant("A").build();
+    insta::assert_snapshot!(pretty(&default_enum));
+
+    let pub_union = union_item("MyPublicUnion")
+        .vis(Visibility::Public)
+        .field("f1", "u32")
+        .build();
+    insta::assert_snapshot!(pretty(&pub_union));
+
+    let crate_mod = mod_item("my_crate_mod").vis(Visibility::Crate).build();
+    insta::assert_snapshot!(pretty(&crate_mod));
+
+    let pub_use = use_item("std::collections::HashMap")
+        .vis(Visibility::Public)
+        .build();
+    insta::assert_snapshot!(pretty(&pub_use));
+
+    let crate_trait = trait_def("MyCrateTrait").vis(Visibility::Crate).build();
+    insta::assert_snapshot!(pretty(&crate_trait));
+
+    let pub_const = def_item("MY_CONST", const_kind("u8", expr().lit(5)))
+        .vis(Visibility::Public)
+        .build();
+    insta::assert_snapshot!(pretty(&pub_const));
+}
+#[test]
 fn test_use_item() {
     let item = use_item("std::collections::HashMap").build();
     insta::assert_snapshot!(pretty(&item));

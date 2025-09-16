@@ -2458,6 +2458,17 @@ impl ExprBuilder {
         })
     }
 
+    /// Creates a `try` block expression.
+    ///
+    /// # Parameters
+    ///
+    /// - `block`: The block of statements inside the `try` block.
+    pub fn try_block(self, block: impl Into<Block>) -> Expr {
+        Expr::Try(ExprTry {
+            block: block.into(),
+        })
+    }
+
     /// Creates a tuple expression.
     ///
     /// # Parameters
