@@ -3,6 +3,7 @@ use crate::ast::patterns::Pat;
 use crate::ast::statements::Block;
 use crate::ast::types::Type;
 use crate::pretty_printer::PrettyPrinter;
+use compact_str::CompactString;
 use thin_vec::ThinVec;
 
 ast_item! {
@@ -20,7 +21,7 @@ ast_item! {
 pub struct Signature {
     // The `fn` token would go here.
     /// The name of the function.
-    pub ident: String,
+    pub ident: CompactString,
     /// The generic parameters of the function.
     pub generics: GenericParams,
     /// The arguments of the function.

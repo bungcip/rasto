@@ -3,6 +3,7 @@
 //! Literals are values that are written directly in the source code, such as strings,
 //! numbers, and booleans.
 
+use compact_str::CompactString;
 use std::str::FromStr;
 
 /// A literal expression.
@@ -30,7 +31,7 @@ pub enum Lit {
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct LitStr {
     /// The value of the string literal.
-    pub value: String,
+    pub value: CompactString,
 }
 
 impl LitStr {
@@ -41,7 +42,7 @@ impl LitStr {
     /// * `value` - The string value.
     pub fn new(value: &str) -> Self {
         Self {
-            value: value.to_string(),
+            value: value.into(),
         }
     }
 }
@@ -52,7 +53,7 @@ impl FromStr for LitStr {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         if s.starts_with('"') && s.ends_with('"') {
             Ok(LitStr {
-                value: s[1..s.len() - 1].to_string(),
+                value: s[1..s.len() - 1].into(),
             })
         } else {
             Err(())
@@ -62,9 +63,7 @@ impl FromStr for LitStr {
 
 impl From<&str> for LitStr {
     fn from(s: &str) -> Self {
-        Self {
-            value: s.to_string(),
-        }
+        Self { value: s.into() }
     }
 }
 
@@ -221,7 +220,7 @@ pub enum FloatSuffix {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct LitFloat {
     /// The value of the float literal.
-    pub value: String,
+    pub value: CompactString,
     /// The suffix of the float literal, e.g., `f64`.
     pub suffix: Option<FloatSuffix>,
 }
@@ -234,7 +233,7 @@ impl LitFloat {
     /// * `value` - The float value as a string.
     pub fn new(value: &str) -> Self {
         Self {
-            value: value.to_string(),
+            value: value.into(),
             suffix: None,
         }
     }
@@ -246,7 +245,7 @@ impl LitFloat {
     /// * `suffix` - The float suffix.
     pub fn with_suffix(value: &str, suffix: FloatSuffix) -> Self {
         Self {
-            value: value.to_string(),
+            value: value.into(),
             suffix: Some(suffix),
         }
     }
@@ -270,9 +269,9 @@ impl LitBool {
     }
 }
 
-impl From<String> for Lit {
-    /// Converts a `String` into a `Lit::Str` variant.
-    fn from(s: String) -> Self {
+impl From<CompactString> for Lit {
+    /// Converts a `CompactString` into a `Lit::Str` variant.
+    fn from(s: CompactString) -> Self {
         Lit::Str(LitStr { value: s })
     }
 }
@@ -280,9 +279,7 @@ impl From<String> for Lit {
 impl From<&str> for Lit {
     /// Converts a `&str` into a `Lit::Str` variant.
     fn from(s: &str) -> Self {
-        Lit::Str(LitStr {
-            value: s.to_string(),
-        })
+        Lit::Str(LitStr { value: s.into() })
     }
 }
 

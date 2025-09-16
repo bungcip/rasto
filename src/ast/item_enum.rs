@@ -1,5 +1,6 @@
 use crate::ast::metadata::Md;
 use crate::pretty_printer::PrettyPrinter;
+use compact_str::CompactString;
 use thin_vec::ThinVec;
 
 ast_item! {
@@ -14,7 +15,7 @@ ast_item! {
 #[derive(Debug, Clone, PartialEq)]
 pub struct Variant {
     /// The name of the variant.
-    pub ident: String,
+    pub ident: CompactString,
     /// Metadata about the variant, including attributes and comments.
     pub md: Option<Box<Md>>,
 }

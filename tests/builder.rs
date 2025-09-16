@@ -47,7 +47,7 @@ fn test_stmt_builder() {
         local_stmt,
         Stmt::Local(rasto::ast::Local {
             pat: rasto::ast::Pat::Ident(PatIdent {
-                ident: "x".to_string(),
+                ident: "x".into(),
                 is_mut: false
             }),
             ty: Some("i32".into()),
@@ -78,19 +78,19 @@ fn test_comment_builder() {
     let line_comment = comment().line(" a line comment");
     assert_eq!(
         line_comment,
-        rasto::ast::Comment::Line(" a line comment".to_string())
+        rasto::ast::Comment::Line(" a line comment".into())
     );
 
     let block_comment = comment().block(" a block comment");
     assert_eq!(
         block_comment,
-        rasto::ast::Comment::Block(" a block comment".to_string())
+        rasto::ast::Comment::Block(" a block comment".into())
     );
 
     let doc_comment = comment().doc(" a doc comment");
     assert_eq!(
         doc_comment,
-        rasto::ast::Comment::Doc(" a doc comment".to_string())
+        rasto::ast::Comment::Doc(" a doc comment".into())
     );
 }
 

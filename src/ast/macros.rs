@@ -21,7 +21,7 @@ macro_rules! ast_item {
             /// The visibility of the item.
             pub vis: $crate::ast::visibility::Visibility,
             /// The name of the item.
-            pub ident: String,
+            pub ident: compact_str::CompactString,
             /// Metadata about the item, including attributes and comments.
             pub md: Option<Box<$crate::ast::metadata::Md>>,
             $(
@@ -143,7 +143,7 @@ macro_rules! ast_item {
         #[derive(Debug, Clone, PartialEq)]
         $vis struct $name {
             /// The name of the item.
-            pub ident: String,
+            pub ident: compact_str::CompactString,
             /// Metadata about the item, including attributes and comments.
             pub md: Option<Box<$crate::ast::metadata::Md>>,
             $(
@@ -177,7 +177,7 @@ macro_rules! ast_item {
             /// The visibility of the item.
             pub vis: $crate::ast::visibility::Visibility,
             /// The name of the item.
-            pub ident: String,
+            pub ident: compact_str::CompactString,
             /// The generic parameters of the item.
             pub generics: $crate::ast::generics::GenericParams,
             /// Metadata about the item, including attributes and comments.

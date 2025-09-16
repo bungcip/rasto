@@ -5,6 +5,7 @@
 //! function calls, and control flow expressions like `if` and `match`.
 
 use crate::ast::{Pat, TokenStream, generics::GenericArgs, literals::Lit, statements::Block};
+use compact_str::CompactString;
 use thin_vec::ThinVec;
 
 /// Represents a Rust expression.
@@ -174,7 +175,7 @@ pub struct ExprField {
     /// The expression to access the field from.
     pub expr: Box<Expr>,
     /// The name of the field.
-    pub member: String,
+    pub member: CompactString,
 }
 
 /// An index expression, such as `arr[i]`.
@@ -212,7 +213,7 @@ pub struct ExprMethodCall {
     /// The receiver of the method call.
     pub receiver: Box<Expr>,
     /// The name of the method.
-    pub method: String,
+    pub method: CompactString,
     /// The arguments to the method.
     pub args: ThinVec<Expr>,
 }
@@ -273,7 +274,7 @@ pub struct ExprReturn {
 #[derive(Debug, Clone, PartialEq)]
 pub struct ExprStruct {
     /// The path to the struct type.
-    pub path: String,
+    pub path: CompactString,
     /// The fields to initialize.
     pub fields: ThinVec<FieldValue>,
 }
@@ -289,7 +290,7 @@ pub struct ExprTry {
 #[derive(Debug, Clone, PartialEq)]
 pub struct FieldValue {
     /// The name of the field.
-    pub member: String,
+    pub member: CompactString,
     /// The value of the field.
     pub value: Expr,
 }
@@ -397,7 +398,7 @@ pub struct Path {
 #[derive(Debug, Clone, PartialEq)]
 pub struct PathSegment {
     /// The identifier of the segment.
-    pub ident: String,
+    pub ident: CompactString,
     /// The generic arguments of the segment, such as `<T>`.
     pub args: Option<GenericArgs>,
 }

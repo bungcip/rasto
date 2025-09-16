@@ -4,6 +4,7 @@
 //! enclosed in `#[...]` for outer attributes and `#![...]` for inner attributes.
 
 use crate::ast::literals::Lit;
+use compact_str::CompactString;
 use thin_vec::ThinVec;
 
 /// An attribute, such as `#[repr(C)]` or `#![allow(dead_code)]`.
@@ -28,7 +29,7 @@ pub enum Meta {
     /// meta items in parentheses.
     List(MetaList),
     /// A meta path, such as `test`. This is a single path.
-    Path(String),
+    Path(CompactString),
     /// A meta name-value pair, such as `key = "value"`.
     NameValue(MetaNameValue),
 }
@@ -37,7 +38,7 @@ pub enum Meta {
 #[derive(Debug, Clone, PartialEq)]
 pub struct MetaList {
     /// The path of the meta list, e.g., `repr`.
-    pub path: String,
+    pub path: CompactString,
     /// The meta items within the list, e.g., `C`.
     pub metas: ThinVec<Meta>,
 }
@@ -46,7 +47,7 @@ pub struct MetaList {
 #[derive(Debug, Clone, PartialEq)]
 pub struct MetaNameValue {
     /// The path of the meta name-value pair, e.g., `key`.
-    pub path: String,
+    pub path: CompactString,
     /// The value of the meta name-value pair, e.g., `"value"`.
     pub value: Lit,
 }

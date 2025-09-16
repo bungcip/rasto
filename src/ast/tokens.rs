@@ -5,6 +5,7 @@
 //! or grouped token streams.
 
 use crate::ast::literals::Lit;
+use compact_str::CompactString;
 use thin_vec::ThinVec;
 
 /// A stream of tokens, representing the input to a macro.
@@ -26,7 +27,7 @@ pub enum TokenTree {
     /// A token stream surrounded by delimiters (e.g., `(...)`, `[...]`, `{...}`).
     Group(Group),
     /// An identifier, such as `foo` or `bar`.
-    Ident(String),
+    Ident(CompactString),
     /// A single punctuation character, such as `+`, `,`, or `$`.
     Punct(Punct),
     /// A literal, such as a character (`'a'`), a string (`"hello"`), or a number (`2.3`).

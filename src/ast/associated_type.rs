@@ -1,6 +1,7 @@
 use crate::ast::generics::GenericParams;
 use crate::ast::metadata::Md;
 use crate::ast::types::Type;
+use compact_str::CompactString;
 use thin_vec::ThinVec;
 
 /// Represents an associated type in a trait definition.
@@ -11,7 +12,7 @@ pub struct AssociatedType {
     /// The name of the associated type.
     ///
     /// In `type Output: ?Sized;`, this would be `Output`.
-    pub ident: String,
+    pub ident: CompactString,
     /// The generic parameters of the associated type.
     ///
     /// For example, in `type Item<T> where T: Clone;`, this would be `<T> where T: Clone`.

@@ -1,6 +1,6 @@
 mod associated_const;
 
-use rasto::ast::{AsmDirection, AsmOption, LitStr, RegSpec};
+use rasto::ast::{AsmDirection, AsmOption, LitStr, RegSpec, Visibility};
 use rasto::builder::*;
 use rasto::pretty;
 use thin_vec::thin_vec;
@@ -54,7 +54,7 @@ fn test_mod_item_with_content() {
 fn test_trait_alias_item() {
     let item = trait_alias_item(
         "ShareableIterator",
-        thin_vec!["Iterator".to_string(), "Sync".to_string()],
+        thin_vec!["Iterator".into(), "Sync".into()],
     )
     .build();
     insta::assert_snapshot!(pretty(&item));
@@ -71,9 +71,7 @@ fn test_union_item() {
 
 #[test]
 fn test_trait_with_function() {
-    let item = trait_def("MyTrait")
-        .item(trait_item_fn("my_func"))
-        .build();
+    let item = trait_def("MyTrait").item(trait_item_fn("my_func")).build();
     insta::assert_snapshot!(pretty(&item));
 }
 
@@ -155,12 +153,12 @@ fn test_asm_item() {
     let item = asm_item(template)
         .operand(asm_operand().reg(
             AsmDirection::InOut,
-            RegSpec::Class("reg".to_string()),
+            RegSpec::Class("reg".into()),
             expr().lit(42),
         ))
         .operand(asm_operand().reg(
             AsmDirection::Out,
-            RegSpec::Class("reg".to_string()),
+            RegSpec::Class("reg".into()),
             expr().lit(0),
         ))
         .options(

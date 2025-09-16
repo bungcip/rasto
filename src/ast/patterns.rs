@@ -4,6 +4,7 @@
 //! data. They are a powerful feature of Rust that allows for expressive and concise code.
 
 use crate::ast::*;
+use compact_str::CompactString;
 use thin_vec::ThinVec;
 
 /// Represents a pattern in a `let` binding, function parameter, or `match` arm.
@@ -54,7 +55,7 @@ pub struct PatConst {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PatIdent {
     /// The identifier.
-    pub ident: String,
+    pub ident: CompactString,
     /// Whether the pattern is mutable.
     pub is_mut: bool,
 }
@@ -140,7 +141,7 @@ pub struct PatStruct {
 #[derive(Debug, Clone, PartialEq)]
 pub struct FieldPat {
     /// The name of the field.
-    pub member: String,
+    pub member: CompactString,
     /// The pattern for the field.
     pub pat: Box<Pat>,
 }

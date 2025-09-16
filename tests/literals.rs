@@ -2,7 +2,7 @@ use rasto::ast::*;
 
 #[test]
 fn test_from_impls() {
-    let lit: Lit = "hello".to_string().into();
+    let lit: Lit = "hello".into();
     assert!(matches!(lit, Lit::Str(_)));
 
     let lit: Lit = "hello".into();

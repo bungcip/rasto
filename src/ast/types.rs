@@ -97,12 +97,14 @@ pub struct TypePtr {
 #[derive(Debug, Clone, PartialEq)]
 pub struct TypeReference {
     /// The lifetime of the reference.
-    pub lifetime: Option<String>,
+    pub lifetime: Option<CompactString>,
     /// The referenced type.
     pub elem: Box<Type>,
     /// Whether the reference is mutable.
     pub mutable: bool,
 }
+
+use compact_str::CompactString;
 
 impl From<&str> for Type {
     /// Converts a string slice into a `Type::Path`.
@@ -112,7 +114,7 @@ impl From<&str> for Type {
         Type::Path(TypePath {
             path: Path {
                 segments: thin_vec![PathSegment {
-                    ident: s.to_string(),
+                    ident: s.into(),
                     args: None,
                 }],
             },

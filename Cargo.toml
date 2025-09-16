@@ -4,6 +4,7 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+compact_str = { version = "0.7.1", features = ["serde", "proptest"] }
 insta = "1.43.2"
 thin-vec = "0.2.14"
 

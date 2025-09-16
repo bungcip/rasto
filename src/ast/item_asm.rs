@@ -2,6 +2,7 @@
 
 use crate::ast::{Expr, LitStr, Path};
 use crate::pretty_printer::PrettyPrinter;
+use compact_str::CompactString;
 use thin_vec::ThinVec;
 
 ast_item! {
@@ -61,7 +62,7 @@ pub enum AsmDirection {
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum RegSpec {
     /// A register class, e.g., `reg`.
-    Class(String),
+    Class(CompactString),
     /// An explicit register, e.g., `"eax"`.
     Explicit(LitStr),
 }

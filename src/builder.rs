@@ -24,6 +24,7 @@
 
 use crate::ast::items::*;
 use crate::ast::*;
+use compact_str::CompactString;
 use std::convert::Into;
 use thin_vec::{ThinVec, thin_vec};
 
@@ -83,7 +84,7 @@ impl CommentBuilder {
     /// # Parameters
     ///
     /// - `content`: The text of the comment.
-    pub fn line<S: Into<String>>(self, content: S) -> Comment {
+    pub fn line<S: Into<CompactString>>(self, content: S) -> Comment {
         Comment::Line(content.into())
     }
 
@@ -92,7 +93,7 @@ impl CommentBuilder {
     /// # Parameters
     ///
     /// - `content`: The text of the comment.
-    pub fn block<S: Into<String>>(self, content: S) -> Comment {
+    pub fn block<S: Into<CompactString>>(self, content: S) -> Comment {
         Comment::Block(content.into())
     }
 
@@ -101,7 +102,7 @@ impl CommentBuilder {
     /// # Parameters
     ///
     /// - `content`: The text of the comment.
-    pub fn doc<S: Into<String>>(self, content: S) -> Comment {
+    pub fn doc<S: Into<CompactString>>(self, content: S) -> Comment {
         Comment::Doc(content.into())
     }
 }
@@ -115,13 +116,13 @@ impl CommentBuilder {
 /// # Returns
 ///
 /// A `TraitBuilder` instance.
-pub fn trait_def(name: impl Into<String>) -> TraitBuilder {
+pub fn trait_def(name: impl Into<CompactString>) -> TraitBuilder {
     TraitBuilder::new(name)
 }
 
 /// A builder for constructing an `ItemTrait` (trait definition) AST node.
 pub struct TraitBuilder {
-    ident: String,
+    ident: CompactString,
     vis: Visibility,
     generics: GenericParams,
     associated_types: ThinVec<AssociatedType>,
@@ -135,7 +136,7 @@ impl TraitBuilder {
     /// # Parameters
     ///
     /// - `name`: The name of the trait.
-    pub fn new(name: impl Into<String>) -> Self {
+    pub fn new(name: impl Into<CompactString>) -> Self {
         Self {
             ident: name.into(),
             vis: Visibility::Default,
@@ -224,13 +225,16 @@ impl TraitBuilder {
 }
 
 /// Creates a new `AssociatedConstBuilder` to construct an associated constant.
-pub fn associated_const(ident: impl Into<String>, ty: impl Into<Type>) -> AssociatedConstBuilder {
+pub fn associated_const(
+    ident: impl Into<CompactString>,
+    ty: impl Into<Type>,
+) -> AssociatedConstBuilder {
     AssociatedConstBuilder::new(ident, ty)
 }
 
 /// A builder for constructing an `AssociatedConst` AST node.
 pub struct AssociatedConstBuilder {
-    ident: String,
+    ident: CompactString,
     ty: Type,
     expr: Option<Box<Expr>>,
     md: MdBuilder,
@@ -243,7 +247,7 @@ impl AssociatedConstBuilder {
     ///
     /// - `ident`: Name of the associated constant.
     /// - `ty`: Type of the associated constant.
-    pub fn new(ident: impl Into<String>, ty: impl Into<Type>) -> Self {
+    pub fn new(ident: impl Into<CompactString>, ty: impl Into<Type>) -> Self {
         Self {
             ident: ident.into(),
             ty: ty.into(),
@@ -333,13 +337,13 @@ impl ArmBuilder {
 }
 
 /// Creates a new `AssociatedTypeBuilder` to construct an associated type for traits.
-pub fn associated_type(ident: impl Into<String>) -> AssociatedTypeBuilder {
+pub fn associated_type(ident: impl Into<CompactString>) -> AssociatedTypeBuilder {
     AssociatedTypeBuilder::new(ident)
 }
 
 /// A builder for constructing an `AssociatedType` AST node.
 pub struct AssociatedTypeBuilder {
-    ident: String,
+    ident: CompactString,
     generics: GenericParams,
     bounds: ThinVec<Type>,
     default: Option<Type>,
@@ -352,7 +356,7 @@ impl AssociatedTypeBuilder {
     /// # Parameters
     ///
     /// - `ident`: Name of the associated type.
-    pub fn new(ident: impl Into<String>) -> Self {
+    pub fn new(ident: impl Into<CompactString>) -> Self {
         Self {
             ident: ident.into(),
             generics: GenericParams::new(),
@@ -640,13 +644,13 @@ impl ImplBuilder {
 /// # Returns
 ///
 /// A `EnumBuilder` instance.
-pub fn enum_def(name: impl Into<String>) -> EnumBuilder {
+pub fn enum_def(name: impl Into<CompactString>) -> EnumBuilder {
     EnumBuilder::new(name)
 }
 
 /// A builder for constructing an `ItemEnum` (enum definition) AST node.
 pub struct EnumBuilder {
-    ident: String,
+    ident: CompactString,
     vis: Visibility,
     generics: GenericParams,
     variants: ThinVec<Variant>,
@@ -659,7 +663,7 @@ impl EnumBuilder {
     /// # Parameters
     ///
     /// - `name`: The name of the enum.
-    pub fn new(name: impl Into<String>) -> Self {
+    pub fn new(name: impl Into<CompactString>) -> Self {
         Self {
             ident: name.into(),
             vis: Visibility::Default,
@@ -694,7 +698,7 @@ impl EnumBuilder {
     /// # Parameters
     ///
     /// - `name`: The name of the variant.
-    pub fn variant(mut self, name: impl Into<String>) -> Self {
+    pub fn variant(mut self, name: impl Into<CompactString>) -> Self {
         self.variants.push(Variant {
             ident: name.into(),
             md: None,
@@ -747,13 +751,13 @@ impl EnumBuilder {
 /// # Returns
 ///
 /// A `StructBuilder` instance.
-pub fn struct_def(name: impl Into<String>) -> StructBuilder {
+pub fn struct_def(name: impl Into<CompactString>) -> StructBuilder {
     StructBuilder::new(name)
 }
 
 /// A builder for constructing an `ItemStruct` (struct definition) AST node.
 pub struct StructBuilder {
-    ident: String,
+    ident: CompactString,
     vis: Visibility,
     generics: GenericParams,
     fields: ThinVec<Field>,
@@ -766,7 +770,7 @@ impl StructBuilder {
     /// # Parameters
     ///
     /// - `name`: The name of the struct.
-    pub fn new(name: impl Into<String>) -> Self {
+    pub fn new(name: impl Into<CompactString>) -> Self {
         Self {
             ident: name.into(),
             vis: Visibility::Default,
@@ -802,7 +806,7 @@ impl StructBuilder {
     ///
     /// - `name`: The name of the field.
     /// - `ty`: The type of the field.
-    pub fn field(mut self, name: impl Into<String>, ty: impl Into<Type>) -> Self {
+    pub fn field(mut self, name: impl Into<CompactString>, ty: impl Into<Type>) -> Self {
         self.fields.push(Field {
             ident: name.into(),
             ty: ty.into(),
@@ -856,14 +860,14 @@ impl StructBuilder {
 /// # Returns
 ///
 /// A `FnBuilder` instance.
-pub fn fn_def(name: impl Into<String>) -> FnBuilder {
+pub fn fn_def(name: impl Into<CompactString>) -> FnBuilder {
     FnBuilder::new(name)
 }
 
 /// A builder for constructing an `ItemFn` (function definition) AST node.
 #[derive(Default)]
 pub struct FnBuilder {
-    ident: String,
+    ident: CompactString,
     vis: Visibility,
     generics: GenericParams,
     inputs: ThinVec<Pat>,
@@ -878,7 +882,7 @@ impl FnBuilder {
     /// # Parameters
     ///
     /// - `name`: The name of the function.
-    pub fn new(name: impl Into<String>) -> Self {
+    pub fn new(name: impl Into<CompactString>) -> Self {
         Self {
             ident: name.into(),
             vis: Visibility::Default,
@@ -1100,7 +1104,7 @@ impl LocalBuilder {
 }
 
 /// Creates a new `FieldValueBuilder` to construct a field-value pair.
-pub fn field_value(member: impl Into<String>, value: impl Into<Expr>) -> FieldValue {
+pub fn field_value(member: impl Into<CompactString>, value: impl Into<Expr>) -> FieldValue {
     FieldValue {
         member: member.into(),
         value: value.into(),
@@ -1108,7 +1112,7 @@ pub fn field_value(member: impl Into<String>, value: impl Into<Expr>) -> FieldVa
 }
 
 /// Creates a new `TraitItemFnBuilder` to construct a trait item function.
-pub fn trait_item_fn(name: impl Into<String>) -> TraitItemFn {
+pub fn trait_item_fn(name: impl Into<CompactString>) -> TraitItemFn {
     TraitItemFn {
         sig: Signature {
             ident: name.into(),
@@ -1154,7 +1158,7 @@ impl PatBuilder {
     /// # Parameters
     ///
     /// - `name`: The name of the identifier.
-    pub fn ident(self, name: impl Into<String>) -> Pat {
+    pub fn ident(self, name: impl Into<CompactString>) -> Pat {
         Pat::Ident(PatIdent {
             ident: name.into(),
             is_mut: self.mutability,
@@ -1354,7 +1358,7 @@ impl PatStructBuilder {
     ///
     /// - `member`: The name of the field.
     /// - `pat`: The pattern for the field.
-    pub fn field(mut self, member: impl Into<String>, pat: impl Into<Pat>) -> Self {
+    pub fn field(mut self, member: impl Into<CompactString>, pat: impl Into<Pat>) -> Self {
         self.fields.push(FieldPat {
             member: member.into(),
             pat: Box::new(pat.into()),
@@ -1595,7 +1599,7 @@ impl TypeBuilder {
 pub struct TypeReferenceBuilder {
     is_mut: bool,
     ty: Type,
-    lifetime: Option<String>,
+    lifetime: Option<CompactString>,
 }
 
 impl TypeReferenceBuilder {
@@ -1618,7 +1622,7 @@ impl TypeReferenceBuilder {
     /// # Parameters
     ///
     /// - `lifetime`: The lifetime to set.
-    pub fn lifetime(mut self, lifetime: impl Into<String>) -> Self {
+    pub fn lifetime(mut self, lifetime: impl Into<CompactString>) -> Self {
         self.lifetime = Some(lifetime.into());
         self
     }
@@ -1830,14 +1834,14 @@ impl From<&str> for Expr {
     }
 }
 
-impl From<String> for Expr {
-    fn from(val: String) -> Self {
+impl From<CompactString> for Expr {
+    fn from(val: CompactString) -> Self {
         Expr::Lit(val.into())
     }
 }
 
 /// Creates a new `PathBuilder` to construct a path.
-pub fn path(segment: impl Into<String>) -> PathBuilder {
+pub fn path(segment: impl Into<CompactString>) -> PathBuilder {
     PathBuilder::new(segment)
 }
 
@@ -1852,7 +1856,7 @@ impl PathBuilder {
     /// # Parameters
     ///
     /// - `segment`: The first segment of the path.
-    pub fn new(segment: impl Into<String>) -> Self {
+    pub fn new(segment: impl Into<CompactString>) -> Self {
         Self {
             segments: thin_vec![PathSegment {
                 ident: segment.into(),
@@ -1866,7 +1870,7 @@ impl PathBuilder {
     /// # Parameters
     ///
     /// - `segment`: The segment to add.
-    pub fn segment(mut self, segment: impl Into<String>) -> Self {
+    pub fn segment(mut self, segment: impl Into<CompactString>) -> Self {
         self.segments.push(PathSegment {
             ident: segment.into(),
             args: None,
@@ -2077,7 +2081,7 @@ impl ExprBuilder {
     ///
     /// - `expr`: The expression to access the field from.
     /// - `member`: The name of the field.
-    pub fn field(self, expr: Expr, member: impl Into<String>) -> Expr {
+    pub fn field(self, expr: Expr, member: impl Into<CompactString>) -> Expr {
         Expr::Field(ExprField {
             expr: Box::new(expr),
             member: member.into(),
@@ -2222,7 +2226,7 @@ impl ExprBuilder {
     pub fn method_call(
         self,
         receiver: Expr,
-        method: impl Into<String>,
+        method: impl Into<CompactString>,
         args: impl IntoIterator<Item = Expr>,
     ) -> Expr {
         Expr::MethodCall(ExprMethodCall {
@@ -2290,7 +2294,7 @@ impl ExprBuilder {
     /// - `fields`: An iterator of `FieldValue`s for the struct fields.
     pub fn struct_expr(
         self,
-        path: impl Into<String>,
+        path: impl Into<CompactString>,
         fields: impl IntoIterator<Item = FieldValue>,
     ) -> Expr {
         Expr::Struct(ExprStruct {
@@ -2386,13 +2390,13 @@ impl From<Expr> for Stmt {
 }
 
 /// Creates a new `ItemDefBuilder` to construct a `const`, `static`, or `type` item.
-pub fn def_item(name: impl Into<String>, kind: impl Into<ItemDefKind>) -> ItemDefBuilder {
+pub fn def_item(name: impl Into<CompactString>, kind: impl Into<ItemDefKind>) -> ItemDefBuilder {
     ItemDefBuilder::new(name, kind)
 }
 
 /// A builder for constructing an `ItemDef` AST node.
 pub struct ItemDefBuilder {
-    ident: String,
+    ident: CompactString,
     vis: Visibility,
     kind: ItemDefKind,
     md: MdBuilder,
@@ -2405,7 +2409,7 @@ impl ItemDefBuilder {
     ///
     /// - `name`: The name of the item.
     /// - `kind`: The `ItemDefKind` of the item.
-    pub fn new(name: impl Into<String>, kind: impl Into<ItemDefKind>) -> Self {
+    pub fn new(name: impl Into<CompactString>, kind: impl Into<ItemDefKind>) -> Self {
         Self {
             ident: name.into(),
             vis: Visibility::Default,
@@ -2601,13 +2605,13 @@ impl From<TypeAliasKindBuilder> for ItemDefKind {
 }
 
 /// Creates a new `ItemExternCrateBuilder` to construct an `extern crate` item.
-pub fn extern_crate_item(name: impl Into<String>) -> ItemExternCrateBuilder {
+pub fn extern_crate_item(name: impl Into<CompactString>) -> ItemExternCrateBuilder {
     ItemExternCrateBuilder::new(name)
 }
 
 /// A builder for constructing an `ItemExternCrate` AST node.
 pub struct ItemExternCrateBuilder {
-    ident: String,
+    ident: CompactString,
     md: MdBuilder,
 }
 
@@ -2617,7 +2621,7 @@ impl ItemExternCrateBuilder {
     /// # Parameters
     ///
     /// - `name`: The name of the crate.
-    pub fn new(name: impl Into<String>) -> Self {
+    pub fn new(name: impl Into<CompactString>) -> Self {
         Self {
             ident: name.into(),
             md: MdBuilder::new(),
@@ -2658,13 +2662,13 @@ impl ItemExternCrateBuilder {
 }
 
 /// Creates a new `ItemForeignModBuilder` to construct a foreign module.
-pub fn foreign_mod_item(abi: impl Into<String>) -> ItemForeignModBuilder {
+pub fn foreign_mod_item(abi: impl Into<CompactString>) -> ItemForeignModBuilder {
     ItemForeignModBuilder::new(abi)
 }
 
 /// A builder for constructing an `ItemForeignMod` AST node.
 pub struct ItemForeignModBuilder {
-    abi: String,
+    abi: CompactString,
     items: ThinVec<Item>,
     md: MdBuilder,
 }
@@ -2675,7 +2679,7 @@ impl ItemForeignModBuilder {
     /// # Parameters
     ///
     /// - `abi`: The ABI of the foreign module (e.g., "C").
-    pub fn new(abi: impl Into<String>) -> Self {
+    pub fn new(abi: impl Into<CompactString>) -> Self {
         Self {
             abi: abi.into(),
             items: thin_vec![],
@@ -2785,13 +2789,13 @@ impl ItemMacroBuilder {
 }
 
 /// Creates a new `ItemModBuilder` to construct a module item.
-pub fn mod_item(name: impl Into<String>) -> ItemModBuilder {
+pub fn mod_item(name: impl Into<CompactString>) -> ItemModBuilder {
     ItemModBuilder::new(name)
 }
 
 /// A builder for constructing an `ItemMod` AST node.
 pub struct ItemModBuilder {
-    ident: String,
+    ident: CompactString,
     vis: Visibility,
     content: Option<ThinVec<Item>>,
     md: MdBuilder,
@@ -2799,7 +2803,7 @@ pub struct ItemModBuilder {
 
 impl ItemModBuilder {
     /// Creates a new `ItemModBuilder`.
-    pub fn new(name: impl Into<String>) -> Self {
+    pub fn new(name: impl Into<CompactString>) -> Self {
         Self {
             ident: name.into(),
             vis: Visibility::Default,
@@ -2877,14 +2881,17 @@ impl ItemModBuilder {
 }
 
 /// Creates a new `ItemTraitAliasBuilder` to construct a trait alias.
-pub fn trait_alias_item(name: impl Into<String>, bounds: ThinVec<String>) -> ItemTraitAliasBuilder {
+pub fn trait_alias_item(
+    name: impl Into<CompactString>,
+    bounds: ThinVec<CompactString>,
+) -> ItemTraitAliasBuilder {
     ItemTraitAliasBuilder::new(name, bounds)
 }
 
 /// A builder for constructing an `ItemTraitAlias` AST node.
 pub struct ItemTraitAliasBuilder {
-    ident: String,
-    bounds: ThinVec<String>,
+    ident: CompactString,
+    bounds: ThinVec<CompactString>,
     md: MdBuilder,
 }
 
@@ -2895,7 +2902,7 @@ impl ItemTraitAliasBuilder {
     ///
     /// - `name`: The name of the trait alias.
     /// - `bounds`: The bounds of the trait alias.
-    pub fn new(name: impl Into<String>, bounds: ThinVec<String>) -> Self {
+    pub fn new(name: impl Into<CompactString>, bounds: ThinVec<CompactString>) -> Self {
         Self {
             ident: name.into(),
             bounds,
@@ -2938,13 +2945,13 @@ impl ItemTraitAliasBuilder {
 }
 
 /// Creates a new `ItemUnionBuilder` to construct a `union` item.
-pub fn union_item(name: impl Into<String>) -> ItemUnionBuilder {
+pub fn union_item(name: impl Into<CompactString>) -> ItemUnionBuilder {
     ItemUnionBuilder::new(name)
 }
 
 /// A builder for constructing an `ItemUnion` AST node.
 pub struct ItemUnionBuilder {
-    ident: String,
+    ident: CompactString,
     vis: Visibility,
     fields: ThinVec<Field>,
     generics: GenericParams,
@@ -2953,7 +2960,7 @@ pub struct ItemUnionBuilder {
 
 impl ItemUnionBuilder {
     /// Creates a new `ItemUnionBuilder`.
-    pub fn new(name: impl Into<String>) -> Self {
+    pub fn new(name: impl Into<CompactString>) -> Self {
         Self {
             ident: name.into(),
             vis: Visibility::Default,
@@ -2989,7 +2996,7 @@ impl ItemUnionBuilder {
     ///
     /// - `name`: The name of the field.
     /// - `ty`: The `Type` of the field.
-    pub fn field(mut self, name: impl Into<String>, ty: impl Into<Type>) -> Self {
+    pub fn field(mut self, name: impl Into<CompactString>, ty: impl Into<Type>) -> Self {
         self.fields.push(Field {
             ident: name.into(),
             ty: ty.into(),
@@ -3035,20 +3042,20 @@ impl ItemUnionBuilder {
 }
 
 /// Creates a new `ItemUseBuilder` to construct a `use` item.
-pub fn use_item(path: impl Into<String>) -> ItemUseBuilder {
+pub fn use_item(path: impl Into<CompactString>) -> ItemUseBuilder {
     ItemUseBuilder::new(path)
 }
 
 /// A builder for constructing an `ItemUse` AST node.
 pub struct ItemUseBuilder {
-    path: String,
+    path: CompactString,
     vis: Visibility,
     md: MdBuilder,
 }
 
 impl ItemUseBuilder {
     /// Creates a new `ItemUseBuilder`.
-    pub fn new(path: impl Into<String>) -> Self {
+    pub fn new(path: impl Into<CompactString>) -> Self {
         Self {
             path: path.into(),
             vis: Visibility::Default,
@@ -3173,7 +3180,7 @@ impl MetaBuilder {
     /// - `metas`: An iterator of `Meta` items for the list.
     pub fn list(
         self,
-        path: impl Into<String>,
+        path: impl Into<CompactString>,
         metas: impl IntoIterator<Item = impl Into<Meta>>,
     ) -> Meta {
         Meta::List(MetaList {
@@ -3187,7 +3194,7 @@ impl MetaBuilder {
     /// # Parameters
     ///
     /// - `path`: The path of the meta item.
-    pub fn path(self, path: impl Into<String>) -> Meta {
+    pub fn path(self, path: impl Into<CompactString>) -> Meta {
         Meta::Path(path.into())
     }
 
@@ -3197,7 +3204,7 @@ impl MetaBuilder {
     ///
     /// - `path`: The path of the meta item.
     /// - `value`: The `Lit` value of the meta item.
-    pub fn name_value(self, path: impl Into<String>, value: impl Into<Lit>) -> Meta {
+    pub fn name_value(self, path: impl Into<CompactString>, value: impl Into<Lit>) -> Meta {
         Meta::NameValue(MetaNameValue {
             path: path.into(),
             value: value.into(),
@@ -3229,7 +3236,7 @@ impl TokenTreeBuilder {
     /// # Parameters
     ///
     /// - `value`: The identifier string.
-    pub fn ident(self, value: impl Into<String>) -> TokenTree {
+    pub fn ident(self, value: impl Into<CompactString>) -> TokenTree {
         TokenTree::Ident(value.into())
     }
 
@@ -3267,7 +3274,7 @@ impl<const N: usize> From<&[&str; N]> for Path {
         let array: ThinVec<PathSegment> = array
             .iter()
             .map(|x| PathSegment {
-                ident: x.to_string(),
+                ident: (*x).into(),
                 args: None,
             })
             .collect();

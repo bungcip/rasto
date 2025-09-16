@@ -3,6 +3,7 @@
 
 use crate::ast::types::Type;
 use crate::pretty_printer::{PrettyPrinter, Printer};
+use compact_str::CompactString;
 use std::fmt;
 
 /// Creates a new `GenericParamBuilder`.
@@ -20,7 +21,7 @@ impl GenericParamBuilder {
     /// # Parameters
     ///
     /// - `ident`: The name of the type parameter.
-    pub fn ty(self, ident: impl Into<String>) -> TypeParam {
+    pub fn ty(self, ident: impl Into<CompactString>) -> TypeParam {
         TypeParam {
             ident: ident.into(),
             bounds: vec![],
@@ -32,7 +33,7 @@ impl GenericParamBuilder {
     /// # Parameters
     ///
     /// - `ident`: The name of the lifetime parameter.
-    pub fn lifetime(self, ident: impl Into<String>) -> LifetimeParam {
+    pub fn lifetime(self, ident: impl Into<CompactString>) -> LifetimeParam {
         LifetimeParam {
             ident: ident.into(),
         }
@@ -44,7 +45,7 @@ impl GenericParamBuilder {
     ///
     /// - `ident`: The name of the const parameter.
     /// - `ty`: The `Type` of the const parameter.
-    pub fn const_(self, ident: impl Into<String>, ty: impl Into<Type>) -> ConstParam {
+    pub fn const_(self, ident: impl Into<CompactString>, ty: impl Into<Type>) -> ConstParam {
         ConstParam {
             ident: ident.into(),
             ty: ty.into(),
@@ -102,14 +103,14 @@ impl From<ConstParam> for GenericParam {
 #[derive(Debug, Clone, PartialEq)]
 pub struct LifetimeParam {
     /// The name of the lifetime, without the leading apostrophe.
-    pub ident: String,
+    pub ident: CompactString,
 }
 
 /// A type parameter, such as `T: Trait`.
 #[derive(Debug, Clone, PartialEq)]
 pub struct TypeParam {
     /// The name of the type parameter.
-    pub ident: String,
+    pub ident: CompactString,
     /// The bounds on the type parameter.
     pub bounds: Vec<Type>,
 }
@@ -118,7 +119,7 @@ pub struct TypeParam {
 #[derive(Debug, Clone, PartialEq)]
 pub struct ConstParam {
     /// The name of the const parameter.
-    pub ident: String,
+    pub ident: CompactString,
     /// The type of the const parameter.
     pub ty: Type,
 }
@@ -205,7 +206,7 @@ impl GenericArgs {
 #[derive(Debug, Clone, PartialEq)]
 pub enum GenericArg {
     /// A lifetime argument: `'a`.
-    Lifetime(String),
+    Lifetime(CompactString),
     /// A type argument: `T`.
     Type(Type),
     /// A const argument: `N`.

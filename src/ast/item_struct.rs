@@ -1,6 +1,7 @@
 use crate::ast::metadata::Md;
 use crate::ast::types::Type;
 use crate::pretty_printer::PrettyPrinter;
+use compact_str::CompactString;
 use thin_vec::ThinVec;
 
 ast_item! {
@@ -15,7 +16,7 @@ ast_item! {
 #[derive(Debug, Clone, PartialEq)]
 pub struct Field {
     /// The name of the field.
-    pub ident: String,
+    pub ident: CompactString,
     /// The type of the field.
     pub ty: Type,
     /// Metadata about the field, including attributes and comments.

@@ -1,5 +1,7 @@
 //! Defines the representation of comments in the AST.
 
+use compact_str::CompactString;
+
 /// Represents a comment in the source code.
 ///
 /// Comments can be either line comments or block comments.
@@ -14,7 +16,7 @@ pub enum Comment {
     /// ```text
     /// // This is a line comment.
     /// ```
-    Line(String),
+    Line(CompactString),
     /// A block comment, enclosed in `/* ... */`.
     ///
     /// The string contains the content of the comment, without the `/*` and `*/`.
@@ -24,7 +26,7 @@ pub enum Comment {
     /// ```text
     /// /* This is a block comment. */
     /// ```
-    Block(String),
+    Block(CompactString),
     /// A doc comment, starting with `///`.
     ///
     /// The string contains the content of the comment, without the `///`.
@@ -34,5 +36,5 @@ pub enum Comment {
     /// ```text
     /// /// This is a doc comment.
     /// ```
-    Doc(String),
+    Doc(CompactString),
 }
