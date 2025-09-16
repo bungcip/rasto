@@ -1,0 +1,7 @@
+---
+source: tests/items.rs
+expression: pretty(&item)
+---
+trait MyTrait {
+    fn my_func();
+}
