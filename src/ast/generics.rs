@@ -110,7 +110,7 @@ pub struct LifetimeParam {
 pub struct TypeParam {
     /// The name of the type parameter.
     pub ident: String,
-    /// The bounds on the type parameter.
+    /// The bounds on the type parameter, e.g., `Trait1 + Trait2`.
     pub bounds: Vec<Type>,
 }
 

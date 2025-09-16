@@ -5,13 +5,31 @@ use crate::pretty_printer::PrettyPrinter;
 use thin_vec::ThinVec;
 
 ast_item! {
-    /// An inline assembly expression: `asm!(...)`.
+    /// Represents an inline assembly block.
+    ///
+    /// This is used for embedding assembly code directly into Rust functions.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # use std::arch::asm;
+    /// unsafe {
+///     let x: u64 = 3;
+///     let y: u64;
+    ///     asm!(
+    ///         "mov {0}, {1}",
+///         out(reg) y,
+///         in(reg) x,
+    ///     );
+    /// }
+    /// ```
     pub struct ItemAsm without vis, ident, and md {
-        /// The assembly template.
+        /// A collection of string literals that make up the assembly code template.
         pub template: ThinVec<LitStr>,
-        /// The list of operands.
+        /// The list of input, output, and other operands for the assembly code.
         pub operands: ThinVec<AsmOperand>,
-        /// The options for the assembly block.
+        /// A set of options that control the behavior of the assembly block,
+        /// such as `pure`, `nomem`, or `att_syntax`.
         pub options: Option<AsmOptions>,
     }
 }

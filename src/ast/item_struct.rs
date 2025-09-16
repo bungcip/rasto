@@ -1,23 +1,35 @@
+//! Defines the AST node for a struct definition.
+
 use crate::ast::metadata::Md;
 use crate::ast::types::Type;
 use crate::pretty_printer::PrettyPrinter;
 use thin_vec::ThinVec;
 
 ast_item! {
-    /// A struct definition.
+    /// Represents a `struct` definition, which is a custom data type that
+    /// groups together related values.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// struct MyStruct {
+    ///     field1: i32,
+    ///     field2: String,
+    /// }
+    /// ```
     pub struct ItemStruct with generics {
-        /// The fields of the struct.
+        /// The list of fields that make up the struct.
         pub fields: ThinVec<Field>,
     }
 }
 
-/// A field of a struct.
+/// Represents a single field within a struct.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Field {
     /// The name of the field.
     pub ident: String,
-    /// The type of the field.
+    /// The data type of the field.
     pub ty: Type,
-    /// Metadata about the field, including attributes and comments.
+    /// Metadata, such as attributes and comments, attached to the field.
     pub md: Option<Box<Md>>,
 }

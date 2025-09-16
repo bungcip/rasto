@@ -1,3 +1,5 @@
+//! Defines the AST nodes for a function definition.
+
 use crate::ast::abi::Abi;
 use crate::ast::generics::GenericParams;
 use crate::ast::patterns::Pat;
@@ -8,37 +10,52 @@ use crate::pretty_printer::PrettyPrinter;
 use thin_vec::ThinVec;
 
 ast_item! {
-    /// A function definition.
+    /// Represents a function definition, including its signature and body.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// fn my_function(arg1: i32) -> i32 {
+    ///     arg1 + 1
+    /// }
+    /// ```
     pub struct ItemFn without ident {
-        /// The function signature.
+        /// The signature of the function, which includes its name, arguments,
+        /// return type, and other properties.
         pub sig: Signature,
-        /// The function body.
+        /// The block of code that forms the function's body.
         pub block: Block,
     }
 }
 
-/// A function signature.
+/// Represents the signature of a function, which defines its interface.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Signature {
-    /// Whether the function is `const`.
+    /// `true` if the function is a `const fn`, meaning it can be evaluated at
+    /// compile time.
     pub is_const: bool,
-    /// Whether the function is `async`.
+    /// `true` if the function is an `async fn`, meaning it returns a `Future`.
     pub is_async: bool,
-    /// Whether the function is `unsafe`.
+    /// `true` if the function is `unsafe`, requiring an `unsafe` block to be
+    /// called.
     pub is_unsafe: bool,
-    /// The ABI of the function, if any.
+    /// The Application Binary Interface (ABI) of the function, if specified.
+    /// This is typically used for FFI.
     pub abi: Option<Abi>,
-    // The `fn` token would go here.
     /// The name of the function.
     pub ident: String,
-    /// The generic parameters of the function.
+    /// The generic parameters of the function, such as `<T>`.
     pub generics: GenericParams,
-    /// The arguments of the function.
+    /// The list of input parameters (arguments) for the function.
     pub inputs: ThinVec<Pat>,
-    /// Whether the function is variadic.
+    /// `true` if the function is variadic, meaning it can accept a variable
+    /// number of arguments (e.g., `...`). This is only used in `extern`
+    /// function declarations.
     pub is_variadic: bool,
-    /// The return type of the function.
+    /// The return type of the function. If `None`, the function returns the
+    /// unit type `()`.
     pub output: Option<Type>,
-    /// The `where` clause of the function.
+    /// An optional `where` clause, which provides additional bounds on the
+    /// generic parameters.
     pub where_clause: Option<WhereClause>,
 }
