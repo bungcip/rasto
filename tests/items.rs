@@ -1,6 +1,6 @@
 mod associated_const;
 
-use rasto::ast::{AsmDirection, AsmOption, LitStr, RegSpec};
+use rasto::ast::{AsmDirection, AsmOption, LitStr, RegSpec, Visibility};
 use rasto::builder::*;
 use rasto::pretty;
 use thin_vec::thin_vec;
@@ -71,9 +71,7 @@ fn test_union_item() {
 
 #[test]
 fn test_trait_with_function() {
-    let item = trait_def("MyTrait")
-        .item(trait_item_fn("my_func"))
-        .build();
+    let item = trait_def("MyTrait").item(trait_item_fn("my_func")).build();
     insta::assert_snapshot!(pretty(&item));
 }
 

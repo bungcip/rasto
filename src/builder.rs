@@ -223,6 +223,83 @@ impl TraitBuilder {
     }
 }
 
+/// A builder for constructing an `ItemExternBlock` AST node.
+#[derive(Default)]
+pub struct ItemExternBlockBuilder {
+    is_unsafe: bool,
+    abi: Option<String>,
+    items: ThinVec<ExternalItem>,
+    md: MdBuilder,
+}
+
+impl ItemExternBlockBuilder {
+    /// Creates a new `ItemExternBlockBuilder`.
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Sets the `extern` block as `unsafe`.
+    pub fn unsafe_(mut self) -> Self {
+        self.is_unsafe = true;
+        self
+    }
+
+    /// Sets the ABI of the `extern` block.
+    ///
+    /// # Parameters
+    ///
+    /// - `abi`: The ABI string (e.g., "C").
+    pub fn abi(mut self, abi: impl Into<String>) -> Self {
+        self.abi = Some(abi.into());
+        self
+    }
+
+    /// Adds an item to the `extern` block.
+    ///
+    /// # Parameters
+    ///
+    /// - `item`: The `ExternalItem` to add.
+    pub fn item(mut self, item: impl Into<ExternalItem>) -> Self {
+        self.items.push(item.into());
+        self
+    }
+
+    /// Adds a comment to the `extern` block.
+    ///
+    /// # Parameters
+    ///
+    /// - `comment`: The `Comment` to add.
+    pub fn comment(mut self, comment: impl Into<Comment>) -> Self {
+        self.md = self.md.comment(comment.into());
+        self
+    }
+
+    /// Adds an attribute to the `extern` block.
+    ///
+    /// # Parameters
+    ///
+    /// - `attr`: The `Attribute` to add.
+    pub fn attr(mut self, attr: impl Into<Attribute>) -> Self {
+        self.md = self.md.attr(attr.into());
+        self
+    }
+
+    /// Builds the `ItemExternBlock` AST node.
+    ///
+    /// # Returns
+    ///
+    /// An `ItemExternBlock` instance.
+    pub fn build(self) -> ItemExternBlock {
+        ItemExternBlock {
+            vis: Visibility::Default,
+            is_unsafe: self.is_unsafe,
+            abi: self.abi,
+            items: self.items,
+            md: Some(Box::new(self.md.build())),
+        }
+    }
+}
+
 /// Creates a new `AssociatedConstBuilder` to construct an associated constant.
 pub fn associated_const(ident: impl Into<String>, ty: impl Into<Type>) -> AssociatedConstBuilder {
     AssociatedConstBuilder::new(ident, ty)
@@ -1881,6 +1958,12 @@ impl From<ItemExternCrateBuilder> for Item {
     }
 }
 
+impl From<ItemExternBlockBuilder> for Item {
+    fn from(builder: ItemExternBlockBuilder) -> Self {
+        Item::ExternBlock(builder.build())
+    }
+}
+
 impl From<ItemForeignModBuilder> for Item {
     fn from(builder: ItemForeignModBuilder) -> Self {
         Item::ForeignMod(builder.build())
@@ -2762,6 +2845,11 @@ impl From<TypeAliasKindBuilder> for ItemDefKind {
 /// Creates a new `ItemExternCrateBuilder` to construct an `extern crate` item.
 pub fn extern_crate_item(name: impl Into<String>) -> ItemExternCrateBuilder {
     ItemExternCrateBuilder::new(name)
+}
+
+/// Creates a new `ItemExternBlockBuilder` to construct an `extern` block item.
+pub fn extern_block_item() -> ItemExternBlockBuilder {
+    ItemExternBlockBuilder::new()
 }
 
 /// A builder for constructing an `ItemExternCrate` AST node.
