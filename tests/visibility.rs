@@ -44,7 +44,7 @@ fn test_visibility() {
     let crate_trait = trait_def("MyCrateTrait").vis(Visibility::Crate).build();
     insta::assert_snapshot!(&crate_trait, @"pub(crate) trait MyCrateTrait {}");
 
-    let pub_const = def_item("MY_CONST", const_kind("u8", expr().lit(5)))
+    let pub_const = const_def("MY_CONST", "u8", expr().lit(5))
         .vis(Visibility::Public)
         .build();
     insta::assert_snapshot!(&pub_const, @"pub const MY_CONST: u8 = 5;");

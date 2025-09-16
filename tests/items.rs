@@ -8,15 +8,15 @@ use rasto::pretty;
 use thin_vec::thin_vec;
 
 #[test]
-fn test_def_item() {
-    let const_item = def_item("MAX", const_kind("u16", expr().lit(234342))).build();
-    insta::assert_snapshot!(pretty(&const_item));
+fn test_const_item() {
+    let item = const_def("MAX", "u16", expr().lit(234342)).build();
+    insta::assert_snapshot!(pretty(&item));
+}
 
-    let static_item = def_item("COUNTER", static_kind("u32", expr().lit(0))).build();
-    insta::assert_snapshot!(pretty(&static_item));
-
-    let type_item = def_item("MyResult<T>", type_alias_kind("Result<T, MyError>")).build();
-    insta::assert_snapshot!(pretty(&type_item));
+#[test]
+fn test_type_alias_item() {
+    let item = type_alias("MyResult<T>", "Result<T, MyError>").build();
+    insta::assert_snapshot!(pretty(&item));
 }
 
 #[test]
@@ -120,7 +120,7 @@ fn test_visibility() {
     let crate_trait = trait_def("MyCrateTrait").vis(Visibility::Crate).build();
     insta::assert_snapshot!(pretty(&crate_trait));
 
-    let pub_const = def_item("MY_CONST", const_kind("u8", expr().lit(5)))
+    let pub_const = const_def("MY_CONST", "u8", expr().lit(5))
         .vis(Visibility::Public)
         .build();
     insta::assert_snapshot!(pretty(&pub_const));

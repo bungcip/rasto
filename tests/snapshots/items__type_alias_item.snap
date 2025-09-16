@@ -1,5 +1,5 @@
 ---
 source: tests/items.rs
-expression: type_item.to_string()
+expression: pretty(&item)
 ---
 type MyResult<T> = Result<T, MyError>;

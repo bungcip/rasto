@@ -22,6 +22,8 @@
 //!     .build();
 //! ```
 
+use crate::ast::item_const::ItemConst;
+use crate::ast::item_type_alias::ItemTypeAlias;
 use crate::ast::items::*;
 use crate::ast::*;
 use std::convert::Into;
@@ -65,6 +67,140 @@ impl FileBuilder {
     /// A `File` instance.
     pub fn build(self) -> File {
         File { items: self.items }
+    }
+}
+
+/// Creates a new `ItemConstBuilder` to construct a `const` item.
+pub fn const_def(
+    name: impl Into<String>,
+    ty: impl Into<Type>,
+    expr: impl Into<Expr>,
+) -> ItemConstBuilder {
+    ItemConstBuilder::new(name, ty, expr)
+}
+
+/// A builder for constructing an `ItemConst` AST node.
+pub struct ItemConstBuilder {
+    ident: String,
+    vis: Visibility,
+    ty: Type,
+    expr: Box<Expr>,
+    md: MdBuilder,
+}
+
+impl ItemConstBuilder {
+    /// Creates a new `ItemConstBuilder` with the given name, type and expression.
+    pub fn new(name: impl Into<String>, ty: impl Into<Type>, expr: impl Into<Expr>) -> Self {
+        Self {
+            ident: name.into(),
+            vis: Visibility::Default,
+            ty: ty.into(),
+            expr: Box::new(expr.into()),
+            md: MdBuilder::new(),
+        }
+    }
+
+    /// Sets the visibility of the const item.
+    pub fn vis(mut self, vis: Visibility) -> Self {
+        self.vis = vis;
+        self
+    }
+
+    /// Adds a comment to the const item.
+    pub fn comment(mut self, comment: impl Into<Comment>) -> Self {
+        self.md = self.md.comment(comment.into());
+        self
+    }
+
+    /// Adds an attribute to the const item.
+    pub fn attr(mut self, attr: impl Into<Attribute>) -> Self {
+        self.md = self.md.attr(attr.into());
+        self
+    }
+
+    /// Builds the `ItemConst` AST node.
+    pub fn build(self) -> ItemConst {
+        ItemConst {
+            vis: self.vis,
+            ident: self.ident,
+            ty: self.ty,
+            expr: self.expr,
+            md: Some(Box::new(self.md.build())),
+        }
+    }
+}
+
+impl From<ItemConstBuilder> for Item {
+    fn from(builder: ItemConstBuilder) -> Self {
+        Item::Const(builder.build())
+    }
+}
+
+/// Creates a new `ItemTypeAliasBuilder` to construct a `type` alias item.
+pub fn type_alias(name: impl Into<String>, ty: impl Into<Type>) -> ItemTypeAliasBuilder {
+    ItemTypeAliasBuilder::new(name, ty)
+}
+
+/// A builder for constructing an `ItemTypeAlias` AST node.
+pub struct ItemTypeAliasBuilder {
+    ident: String,
+    vis: Visibility,
+    generics: GenericParams,
+    ty: Type,
+    md: MdBuilder,
+}
+
+impl ItemTypeAliasBuilder {
+    /// Creates a new `ItemTypeAliasBuilder` with the given name and type.
+    pub fn new(name: impl Into<String>, ty: impl Into<Type>) -> Self {
+        Self {
+            ident: name.into(),
+            vis: Visibility::Default,
+            generics: GenericParams::new(),
+            ty: ty.into(),
+            md: MdBuilder::new(),
+        }
+    }
+
+    /// Sets the visibility of the type alias.
+    pub fn vis(mut self, vis: Visibility) -> Self {
+        self.vis = vis;
+        self
+    }
+
+    /// Adds a generic parameter to the type alias.
+    pub fn generic(mut self, param: impl Into<GenericParam>) -> Self {
+        self.generics.params.push(param.into());
+        self
+    }
+
+    /// Adds a comment to the type alias.
+    pub fn comment(mut self, comment: impl Into<Comment>) -> Self {
+        self.md = self.md.comment(comment.into());
+        self
+    }
+
+    /// Adds an attribute to the type alias.
+    pub fn attr(mut self, attr: impl Into<Attribute>) -> Self {
+        self.md = self.md.attr(attr.into());
+        self
+    }
+
+    /// Builds the `ItemTypeAlias` AST node.
+    pub fn build(self) -> ItemTypeAlias {
+        ItemTypeAlias {
+            vis: self.vis,
+            ident: self.ident,
+            generics: self.generics,
+            ty: self.ty,
+            md: Some(Box::new(self.md.build())),
+        }
+    }
+}
+
+impl From<ItemTypeAliasBuilder> for Item {
+    fn from(builder: ItemTypeAliasBuilder) -> Self {
+        Item::TypeAlias(builder.build())
     }
 }
 
@@ -2051,12 +2187,6 @@ impl From<MdBuilder> for Option<Box<Md>> {
     }
 }
 
-impl From<ItemDefBuilder> for Item {
-    fn from(builder: ItemDefBuilder) -> Self {
-        Item::Def(builder.build())
-    }
-}
-
 impl From<ItemExternCrateBuilder> for Item {
     fn from(builder: ItemExternCrateBuilder) -> Self {
         Item::ExternCrate(builder.build())
@@ -2836,221 +2966,6 @@ impl From<ExprRawRefBuilder> for Expr {
 impl From<Expr> for Stmt {
     fn from(value: Expr) -> Stmt {
         Stmt::Expr(value)
-    }
-}
-
-/// Creates a new `ItemDefBuilder` to construct a `const`, `static`, or `type` item.
-pub fn def_item(name: impl Into<String>, kind: impl Into<ItemDefKind>) -> ItemDefBuilder {
-    ItemDefBuilder::new(name, kind)
-}
-
-/// A builder for constructing an `ItemDef` AST node.
-pub struct ItemDefBuilder {
-    ident: String,
-    vis: Visibility,
-    kind: ItemDefKind,
-    md: MdBuilder,
-}
-
-impl ItemDefBuilder {
-    /// Creates a new `ItemDefBuilder`.
-    ///
-    /// # Parameters
-    ///
-    /// - `name`: The name of the item.
-    /// - `kind`: The `ItemDefKind` of the item.
-    pub fn new(name: impl Into<String>, kind: impl Into<ItemDefKind>) -> Self {
-        Self {
-            ident: name.into(),
-            vis: Visibility::Default,
-            kind: kind.into(),
-            md: MdBuilder::new(),
-        }
-    }
-
-    /// Sets the visibility of the item.
-    ///
-    /// # Parameters
-    ///
-    /// - `vis`: The `Visibility` to set.
-    pub fn vis(mut self, vis: Visibility) -> Self {
-        self.vis = vis;
-        self
-    }
-
-    /// Adds a comment to the item.
-    ///
-    /// # Parameters
-    ///
-    /// - `comment`: The `Comment` to add.
-    pub fn comment(mut self, comment: impl Into<Comment>) -> Self {
-        self.md = self.md.comment(comment.into());
-        self
-    }
-
-    /// Adds an attribute to the item.
-    ///
-    /// # Parameters
-    ///
-    /// - `attr`: The `Attribute` to add.
-    pub fn attr(mut self, attr: impl Into<Attribute>) -> Self {
-        self.md = self.md.attr(attr.into());
-        self
-    }
-
-    /// Builds the `ItemDef` AST node.
-    ///
-    /// # Returns
-    ///
-    /// An `ItemDef` instance.
-    pub fn build(self) -> ItemDef {
-        ItemDef {
-            vis: self.vis,
-            ident: self.ident,
-            kind: self.kind,
-            md: Some(Box::new(self.md.build())),
-        }
-    }
-}
-
-/// Creates a new `ConstKindBuilder` to construct an `ItemDefKind::Const`.
-pub fn const_kind(ty: impl Into<Type>, expr: impl Into<Expr>) -> ConstKindBuilder {
-    ConstKindBuilder::new(ty, expr)
-}
-
-/// A builder for `ItemDefKind::Const`.
-pub struct ConstKindBuilder {
-    ty: Type,
-    expr: Box<Expr>,
-}
-
-impl ConstKindBuilder {
-    /// Creates a new `ConstKindBuilder`.
-    ///
-    /// # Parameters
-    ///
-    /// - `ty`: The `Type` of the constant.
-    /// - `expr`: The `Expr` of the constant.
-    pub fn new(ty: impl Into<Type>, expr: impl Into<Expr>) -> Self {
-        Self {
-            ty: ty.into(),
-            expr: Box::new(expr.into()),
-        }
-    }
-
-    /// Builds the `ItemDefKind::Const`.
-    ///
-    /// # Returns
-    ///
-    /// An `ItemDefKind` instance representing the `const` item.
-    pub fn build(self) -> ItemDefKind {
-        ItemDefKind::Const {
-            ty: self.ty,
-            expr: self.expr,
-        }
-    }
-}
-
-impl From<ConstKindBuilder> for ItemDefKind {
-    fn from(builder: ConstKindBuilder) -> Self {
-        builder.build()
-    }
-}
-
-/// Creates a new `StaticKindBuilder` to construct an `ItemDefKind::Static`.
-pub fn static_kind(ty: impl Into<Type>, expr: impl Into<Expr>) -> StaticKindBuilder {
-    StaticKindBuilder::new(ty, expr)
-}
-
-/// A builder for `ItemDefKind::Static`.
-pub struct StaticKindBuilder {
-    ty: Type,
-    expr: Box<Expr>,
-}
-
-impl StaticKindBuilder {
-    /// Creates a new `StaticKindBuilder`.
-    ///
-    /// # Parameters
-    ///
-    /// - `ty`: The `Type` of the static item.
-    /// - `expr`: The initialization `Expr` of the static item.
-    pub fn new(ty: impl Into<Type>, expr: impl Into<Expr>) -> Self {
-        Self {
-            ty: ty.into(),
-            expr: Box::new(expr.into()),
-        }
-    }
-
-    /// Builds the `ItemDefKind::Static`.
-    ///
-    /// # Returns
-    ///
-    /// An `ItemDefKind` instance representing the `static` item.
-    pub fn build(self) -> ItemDefKind {
-        ItemDefKind::Static {
-            ty: self.ty,
-            expr: self.expr,
-        }
-    }
-}
-
-impl From<StaticKindBuilder> for ItemDefKind {
-    fn from(builder: StaticKindBuilder) -> Self {
-        builder.build()
-    }
-}
-
-/// Creates a new `TypeAliasKindBuilder` to construct an `ItemDefKind::TypeAlias`.
-pub fn type_alias_kind(ty: impl Into<Type>) -> TypeAliasKindBuilder {
-    TypeAliasKindBuilder::new(ty)
-}
-
-/// A builder for `ItemDefKind::TypeAlias`.
-pub struct TypeAliasKindBuilder {
-    generics: GenericParams,
-    ty: Type,
-}
-
-impl TypeAliasKindBuilder {
-    /// Creates a new `TypeAliasKindBuilder`.
-    ///
-    /// # Parameters
-    ///
-    /// - `ty`: The `Type` being aliased.
-    pub fn new(ty: impl Into<Type>) -> Self {
-        Self {
-            generics: GenericParams::new(),
-            ty: ty.into(),
-        }
-    }
-
-    /// Adds a generic parameter to the type alias.
-    ///
-    /// # Parameters
-    ///
-    /// - `param`: The generic parameter to add.
-    pub fn generic(mut self, param: impl Into<GenericParam>) -> Self {
-        self.generics.params.push(param.into());
-        self
-    }
-
-    /// Builds the `ItemDefKind::TypeAlias`.
-    ///
-    /// # Returns
-    ///
-    /// An `ItemDefKind` instance representing the type alias.
-    pub fn build(self) -> ItemDefKind {
-        ItemDefKind::TypeAlias {
-            generics: self.generics,
-            ty: self.ty,
-        }
-    }
-}
-
-impl From<TypeAliasKindBuilder> for ItemDefKind {
-    fn from(builder: TypeAliasKindBuilder) -> Self {
-        builder.build()
     }
 }
 

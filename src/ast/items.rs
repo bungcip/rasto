@@ -6,7 +6,7 @@
 use crate::ast::associated_const::AssociatedConst;
 use crate::ast::generics::GenericParams;
 use crate::ast::item_asm::ItemAsm;
-use crate::ast::item_def::ItemDef;
+use crate::ast::item_const::ItemConst;
 use crate::ast::item_enum::ItemEnum;
 use crate::ast::item_extern_block::ItemExternBlock;
 use crate::ast::item_extern_crate::ItemExternCrate;
@@ -19,6 +19,7 @@ use crate::ast::item_static::ItemStatic;
 use crate::ast::item_struct::ItemStruct;
 use crate::ast::item_trait::ItemTrait;
 use crate::ast::item_trait_alias::ItemTraitAlias;
+use crate::ast::item_type_alias::ItemTypeAlias;
 use crate::ast::item_union::ItemUnion;
 use crate::ast::item_use::ItemUse;
 use crate::ast::metadata::Md;
@@ -33,6 +34,8 @@ use thin_vec::ThinVec;
 pub enum Item {
     /// An `asm!` block.
     Asm(ItemAsm),
+    /// A `const` item: `const FOO: u32 = 42;`.
+    Const(ItemConst),
     /// A function item: `fn foo() { ... }`.
     Fn(ItemFn),
     /// A struct item: `struct Foo { ... }`.
@@ -45,8 +48,6 @@ pub enum Item {
     Impl(ItemImpl),
     /// A trait item: `trait Foo { ... }`.
     Trait(ItemTrait),
-    /// A `const`, `static`, or `type` item.
-    Def(ItemDef),
     /// An `extern crate` item: `extern crate semver;`.
     ExternCrate(ItemExternCrate),
     /// A foreign module: `extern "C" { ... }`.
@@ -59,6 +60,8 @@ pub enum Item {
     Mod(ItemMod),
     /// A trait alias: `trait Foo = Bar;`.
     TraitAlias(ItemTraitAlias),
+    /// A type alias: `type Foo = Bar;`.
+    TypeAlias(ItemTypeAlias),
     /// A `union` item: `union Foo { ... }`.
     Union(ItemUnion),
     /// A `use` item: `use std::collections::HashMap;`.
@@ -129,6 +132,13 @@ impl From<ItemAsm> for Item {
     }
 }
 
+impl From<ItemConst> for Item {
+    /// Converts an `ItemConst` into an `Item::Const` variant.
+    fn from(item: ItemConst) -> Self {
+        Item::Const(item)
+    }
+}
+
 impl From<ItemFn> for Item {
     /// Converts an `ItemFn` into an `Item::Fn` variant.
     fn from(item: ItemFn) -> Self {
@@ -183,13 +193,6 @@ impl From<ItemTrait> for Item {
     }
 }
 
-impl From<ItemDef> for Item {
-    /// Converts an `ItemDef` into an `Item::Def` variant.
-    fn from(item: ItemDef) -> Self {
-        Item::Def(item)
-    }
-}
-
 impl From<ItemExternCrate> for Item {
     /// Converts an `ItemExternCrate` into an `Item::ExternCrate` variant.
     fn from(item: ItemExternCrate) -> Self {
@@ -229,6 +232,13 @@ impl From<ItemTraitAlias> for Item {
     /// Converts an `ItemTraitAlias` into an `Item::TraitAlias` variant.
     fn from(item: ItemTraitAlias) -> Self {
         Item::TraitAlias(item)
+    }
+}
+
+impl From<ItemTypeAlias> for Item {
+    /// Converts an `ItemTypeAlias` into an `Item::TypeAlias` variant.
+    fn from(item: ItemTypeAlias) -> Self {
+        Item::TypeAlias(item)
     }
 }
 
