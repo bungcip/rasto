@@ -16,6 +16,7 @@ use crate::pretty_printer::{PrettyPrinter, Printer};
 use std::fmt;
 
 impl PrettyPrinter for Visibility {
+    /// Pretty-prints the `Visibility` to the given printer.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         match self {
             Visibility::Public => {

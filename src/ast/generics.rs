@@ -213,6 +213,9 @@ pub enum GenericArg {
 }
 
 impl From<&str> for GenericArg {
+    /// Converts a string slice into a `GenericArg::Type`.
+    ///
+    /// This is a convenience function for creating simple type-based generic arguments.
     fn from(s: &str) -> Self {
         GenericArg::Type(Type::from(s))
     }

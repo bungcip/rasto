@@ -1,3 +1,5 @@
+//! Defines the AST node for an `extern crate` item.
+
 use crate::pretty_printer::PrettyPrinter;
 
 ast_item! {

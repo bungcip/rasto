@@ -1,6 +1,6 @@
 mod associated_const;
 
-use rasto::ast::{AsmDirection, AsmOption, LitStr, RegSpec};
+use rasto::ast::{AsmDirection, AsmOption, LitStr, RegSpec, Visibility};
 use rasto::builder::*;
 use rasto::pretty;
 use thin_vec::thin_vec;

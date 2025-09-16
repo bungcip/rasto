@@ -1,3 +1,5 @@
+//! Defines the AST node for a trait alias.
+
 use crate::pretty_printer::PrettyPrinter;
 use thin_vec::ThinVec;
 

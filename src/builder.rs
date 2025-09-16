@@ -39,7 +39,8 @@ pub fn file() -> FileBuilder {
 /// A builder for constructing a `File` AST node.
 #[derive(Default)]
 pub struct FileBuilder {
-    items: ThinVec<Item>,
+    /// The items in the file.
+    pub items: ThinVec<Item>,
 }
 
 impl FileBuilder {
@@ -121,12 +122,18 @@ pub fn trait_def(name: impl Into<String>) -> TraitBuilder {
 
 /// A builder for constructing an `ItemTrait` (trait definition) AST node.
 pub struct TraitBuilder {
-    ident: String,
-    vis: Visibility,
-    generics: GenericParams,
-    associated_types: ThinVec<AssociatedType>,
-    items: ThinVec<TraitItem>,
-    md: MdBuilder,
+    /// The name of the trait.
+    pub ident: String,
+    /// The visibility of the trait.
+    pub vis: Visibility,
+    /// The generic parameters of the trait.
+    pub generics: GenericParams,
+    /// The associated types of the trait.
+    pub associated_types: ThinVec<AssociatedType>,
+    /// The items within the trait.
+    pub items: ThinVec<TraitItem>,
+    /// The metadata of the trait.
+    pub md: MdBuilder,
 }
 
 impl TraitBuilder {
@@ -230,10 +237,14 @@ pub fn associated_const(ident: impl Into<String>, ty: impl Into<Type>) -> Associ
 
 /// A builder for constructing an `AssociatedConst` AST node.
 pub struct AssociatedConstBuilder {
-    ident: String,
-    ty: Type,
-    expr: Option<Box<Expr>>,
-    md: MdBuilder,
+    /// The name of the associated const.
+    pub ident: String,
+    /// The type of the associated const.
+    pub ty: Type,
+    /// The expression of the associated const.
+    pub expr: Option<Box<Expr>>,
+    /// The metadata of the associated const.
+    pub md: MdBuilder,
 }
 
 impl AssociatedConstBuilder {
@@ -279,9 +290,12 @@ impl AssociatedConstBuilder {
 
 /// A builder for constructing an `Arm` AST node.
 pub struct ArmBuilder {
-    pat: Pat,
-    guard: Option<Expr>,
-    body: Expr,
+    /// The pattern of the arm.
+    pub pat: Pat,
+    /// The guard of the arm.
+    pub guard: Option<Expr>,
+    /// The body of the arm.
+    pub body: Expr,
 }
 
 impl ArmBuilder {
@@ -339,11 +353,16 @@ pub fn associated_type(ident: impl Into<String>) -> AssociatedTypeBuilder {
 
 /// A builder for constructing an `AssociatedType` AST node.
 pub struct AssociatedTypeBuilder {
-    ident: String,
-    generics: GenericParams,
-    bounds: ThinVec<Type>,
-    default: Option<Type>,
-    md: Option<Box<Md>>,
+    /// The name of the associated type.
+    pub ident: String,
+    /// The generic parameters of the associated type.
+    pub generics: GenericParams,
+    /// The bounds of the associated type.
+    pub bounds: ThinVec<Type>,
+    /// The default type of the associated type.
+    pub default: Option<Type>,
+    /// The metadata of the associated type.
+    pub md: Option<Box<Md>>,
 }
 
 impl AssociatedTypeBuilder {
@@ -429,10 +448,14 @@ pub fn block() -> BlockBuilder {
 
 /// A builder for constructing a `Block` AST node.
 pub struct BlockBuilder {
-    stmts: ThinVec<Stmt>,
-    has_trailing_semicolon: bool,
-    comments: ThinVec<Comment>,
-    trailing_comments: ThinVec<Comment>,
+    /// The statements in the block.
+    pub stmts: ThinVec<Stmt>,
+    /// Whether the block has a trailing semicolon.
+    pub has_trailing_semicolon: bool,
+    /// The comments in the block.
+    pub comments: ThinVec<Comment>,
+    /// The trailing comments in the block.
+    pub trailing_comments: ThinVec<Comment>,
 }
 
 impl BlockBuilder {
@@ -534,12 +557,20 @@ pub fn impl_block(ty: impl Into<Type>) -> ImplBuilder {
 
 /// A builder for constructing an `ItemImpl` (impl block) AST node.
 pub struct ImplBuilder {
-    generics: GenericParams,
-    ty: Type,
-    trait_: Option<Type>,
-    is_unsafe: bool,
-    is_negative: bool,
-    items: ThinVec<ImplItem>,
+    /// The generic parameters of the impl block.
+    pub generics: GenericParams,
+    /// The type the impl block is for.
+    pub ty: Type,
+    /// The trait the impl block is for.
+    pub trait_: Option<Type>,
+    /// Whether the impl block is unsafe.
+    pub is_unsafe: bool,
+    /// Whether the impl block is negative.
+    pub is_negative: bool,
+    /// The items in the impl block.
+    pub items: ThinVec<ImplItem>,
+    /// The metadata of the impl block.
+    pub md: MdBuilder,
 }
 
 impl ImplBuilder {
@@ -556,6 +587,7 @@ impl ImplBuilder {
             is_unsafe: false,
             is_negative: false,
             items: thin_vec![],
+            md: MdBuilder::new(),
         }
     }
 
@@ -613,6 +645,36 @@ impl ImplBuilder {
         self
     }
 
+    /// Adds a comment to the impl block.
+    ///
+    /// # Parameters
+    ///
+    /// - `comment`: The comment to add.
+    pub fn comment(mut self, comment: impl Into<Comment>) -> Self {
+        self.md = self.md.comment(comment.into());
+        self
+    }
+
+    /// Adds a trailing comment to the impl block.
+    ///
+    /// # Parameters
+    ///
+    /// - `comment`: The comment to add.
+    pub fn trailing_comment(mut self, comment: impl Into<Comment>) -> Self {
+        self.md = self.md.trailing_comment(comment.into());
+        self
+    }
+
+    /// Adds an attribute to the impl block.
+    ///
+    /// # Parameters
+    ///
+    /// - `attr`: The attribute to add.
+    pub fn attr(mut self, attr: impl Into<Attribute>) -> Self {
+        self.md = self.md.attr(attr.into());
+        self
+    }
+
     /// Builds the `ItemImpl` AST node.
     ///
     /// # Returns
@@ -626,7 +688,7 @@ impl ImplBuilder {
             is_unsafe: self.is_unsafe,
             is_negative: self.is_negative,
             items: self.items,
-            md: None,
+            md: Some(Box::new(self.md.build())),
         }
     }
 }
@@ -646,11 +708,16 @@ pub fn enum_def(name: impl Into<String>) -> EnumBuilder {
 
 /// A builder for constructing an `ItemEnum` (enum definition) AST node.
 pub struct EnumBuilder {
-    ident: String,
-    vis: Visibility,
-    generics: GenericParams,
-    variants: ThinVec<Variant>,
-    md: MdBuilder,
+    /// The name of the enum.
+    pub ident: String,
+    /// The visibility of the enum.
+    pub vis: Visibility,
+    /// The generic parameters of the enum.
+    pub generics: GenericParams,
+    /// The variants of the enum.
+    pub variants: ThinVec<Variant>,
+    /// The metadata of the enum.
+    pub md: MdBuilder,
 }
 
 impl EnumBuilder {
@@ -753,11 +820,16 @@ pub fn struct_def(name: impl Into<String>) -> StructBuilder {
 
 /// A builder for constructing an `ItemStruct` (struct definition) AST node.
 pub struct StructBuilder {
-    ident: String,
-    vis: Visibility,
-    generics: GenericParams,
-    fields: ThinVec<Field>,
-    md: MdBuilder,
+    /// The name of the struct.
+    pub ident: String,
+    /// The visibility of the struct.
+    pub vis: Visibility,
+    /// The generic parameters of the struct.
+    pub generics: GenericParams,
+    /// The fields of the struct.
+    pub fields: ThinVec<Field>,
+    /// The metadata of the struct.
+    pub md: MdBuilder,
 }
 
 impl StructBuilder {
@@ -863,13 +935,20 @@ pub fn fn_def(name: impl Into<String>) -> FnBuilder {
 /// A builder for constructing an `ItemFn` (function definition) AST node.
 #[derive(Default)]
 pub struct FnBuilder {
-    ident: String,
-    vis: Visibility,
-    generics: GenericParams,
-    inputs: ThinVec<Pat>,
-    output: Option<Type>,
-    block: Block,
-    md: MdBuilder,
+    /// The name of the function.
+    pub ident: String,
+    /// The visibility of the function.
+    pub vis: Visibility,
+    /// The generic parameters of the function.
+    pub generics: GenericParams,
+    /// The inputs of the function.
+    pub inputs: ThinVec<Pat>,
+    /// The output of the function.
+    pub output: Option<Type>,
+    /// The block of the function.
+    pub block: Block,
+    /// The metadata of the function.
+    pub md: MdBuilder,
 }
 
 impl FnBuilder {
@@ -953,16 +1032,6 @@ impl FnBuilder {
         self
     }
 
-    /// Adds an attribute to the function.
-    ///
-    /// # Parameters
-    ///
-    /// - `attr`: The `Attribute` to add.
-    pub fn attr(mut self, attr: impl Into<Attribute>) -> Self {
-        self.md = self.md.attr(attr.into());
-        self
-    }
-
     /// Adds a comment to the function.
     ///
     /// # Parameters
@@ -970,6 +1039,26 @@ impl FnBuilder {
     /// - `comment`: The `Comment` to add.
     pub fn comment(mut self, comment: impl Into<Comment>) -> Self {
         self.md = self.md.comment(comment.into());
+        self
+    }
+
+    /// Adds a trailing comment to the function.
+    ///
+    /// # Parameters
+    ///
+    /// - `comment`: The comment to add.
+    pub fn trailing_comment(mut self, comment: impl Into<Comment>) -> Self {
+        self.md = self.md.trailing_comment(comment.into());
+        self
+    }
+
+    /// Adds an attribute to the function.
+    ///
+    /// # Parameters
+    ///
+    /// - `attr`: The attribute to add.
+    pub fn attr(mut self, attr: impl Into<Attribute>) -> Self {
+        self.md = self.md.attr(attr.into());
         self
     }
 
@@ -1046,9 +1135,12 @@ impl StmtBuilder {
 
 /// A builder for constructing a `Local` (let) AST node.
 pub struct LocalBuilder {
-    pat: Pat,
-    ty: Option<Type>,
-    expr: Option<Expr>,
+    /// The pattern of the local.
+    pub pat: Pat,
+    /// The type of the local.
+    pub ty: Option<Type>,
+    /// The expression of the local.
+    pub expr: Option<Expr>,
 }
 
 impl LocalBuilder {
@@ -1129,7 +1221,8 @@ pub fn pat() -> PatBuilder {
 /// A builder for constructing `Pat` AST nodes.
 #[derive(Clone, Copy, Default)]
 pub struct PatBuilder {
-    mutability: bool,
+    /// Whether the pattern is mutable.
+    pub mutability: bool,
 }
 
 impl PatBuilder {
@@ -1329,9 +1422,12 @@ impl Default for PatWildBuilder {
 
 /// A builder for constructing a `PatStruct` AST node.
 pub struct PatStructBuilder {
-    path: Path,
-    fields: ThinVec<FieldPat>,
-    has_rest: bool,
+    /// The path to the struct.
+    pub path: Path,
+    /// The fields of the struct pattern.
+    pub fields: ThinVec<FieldPat>,
+    /// Whether the struct pattern has a rest pattern.
+    pub has_rest: bool,
 }
 
 impl PatStructBuilder {
@@ -1380,8 +1476,10 @@ impl PatStructBuilder {
 
 /// A builder for constructing a `PatTupleStruct` AST node.
 pub struct PatTupleStructBuilder {
-    path: Path,
-    pats: ThinVec<Pat>,
+    /// The path to the tuple struct.
+    pub path: Path,
+    /// The patterns of the tuple struct.
+    pub pats: ThinVec<Pat>,
 }
 
 impl PatTupleStructBuilder {
@@ -1418,8 +1516,10 @@ impl PatTupleStructBuilder {
 
 /// A builder for constructing a `PatReference` AST node.
 pub struct PatReferenceBuilder {
-    pat: Box<Pat>,
-    is_mut: bool,
+    /// The pattern being referenced.
+    pub pat: Box<Pat>,
+    /// Whether the reference is mutable.
+    pub is_mut: bool,
 }
 
 impl PatReferenceBuilder {
@@ -1593,9 +1693,12 @@ impl TypeBuilder {
 
 /// A builder for constructing a `TypeReference` AST node.
 pub struct TypeReferenceBuilder {
-    is_mut: bool,
-    ty: Type,
-    lifetime: Option<String>,
+    /// Whether the reference is mutable.
+    pub is_mut: bool,
+    /// The type being referenced.
+    pub ty: Type,
+    /// The lifetime of the reference.
+    pub lifetime: Option<String>,
 }
 
 impl TypeReferenceBuilder {
@@ -1647,9 +1750,12 @@ pub fn md() -> MdBuilder {
 /// A builder for constructing `Md` (metadata) AST nodes.
 #[derive(Default)]
 pub struct MdBuilder {
-    attrs: ThinVec<Attribute>,
-    comments: ThinVec<Comment>,
-    trailing_comments: ThinVec<Comment>,
+    /// The attributes of the metadata.
+    pub attrs: ThinVec<Attribute>,
+    /// The comments of the metadata.
+    pub comments: ThinVec<Comment>,
+    /// The trailing comments of the metadata.
+    pub trailing_comments: ThinVec<Comment>,
 }
 
 impl MdBuilder {

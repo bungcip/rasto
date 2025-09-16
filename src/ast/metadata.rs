@@ -15,39 +15,54 @@ pub struct Md {
     pub trailing_comments: ThinVec<Comment>,
 }
 
-/// Builder for `Md`.
+/// A builder for creating `Md` instances.
 #[derive(Debug, Clone, Default)]
 pub struct MdBuilder {
-    attrs: ThinVec<Attribute>,
-    comments: ThinVec<Comment>,
-    trailing_comments: ThinVec<Comment>,
+    /// The attributes of the metadata.
+    pub attrs: ThinVec<Attribute>,
+    /// The comments of the metadata.
+    pub comments: ThinVec<Comment>,
+    /// The trailing comments of the metadata.
+    pub trailing_comments: ThinVec<Comment>,
 }
 
 impl MdBuilder {
-    /// Creates a new `MdBuilder`.
+    /// Creates a new, empty `MdBuilder`.
     pub fn new() -> Self {
         Self::default()
     }
 
-    /// Adds an attribute.
+    /// Adds an attribute to the metadata.
+    ///
+    /// # Parameters
+    ///
+    /// * `attr` - The attribute to add.
     pub fn attr(mut self, attr: Attribute) -> Self {
         self.attrs.push(attr);
         self
     }
 
-    /// Adds a comment.
+    /// Adds a comment to the metadata.
+    ///
+    /// # Parameters
+    ///
+    /// * `comment` - The comment to add.
     pub fn comment(mut self, comment: Comment) -> Self {
         self.comments.push(comment);
         self
     }
 
-    /// Adds a trailing comment.
+    /// Adds a trailing comment to the metadata.
+    ///
+    /// # Parameters
+    ///
+    /// * `comment` - The trailing comment to add.
     pub fn trailing_comment(mut self, comment: Comment) -> Self {
         self.trailing_comments.push(comment);
         self
     }
 
-    /// Builds the `Md`.
+    /// Builds the `Md` instance.
     pub fn build(self) -> Md {
         Md {
             attrs: self.attrs,

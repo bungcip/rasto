@@ -1,3 +1,5 @@
+//! Defines the AST node for a `union` definition.
+
 use crate::ast::item_struct::Field;
 use crate::pretty_printer::PrettyPrinter;
 use thin_vec::ThinVec;

@@ -1,3 +1,5 @@
+//! Defines the AST node for a trait definition.
+
 use crate::ast::associated_type::AssociatedType;
 use crate::ast::items::TraitItem;
 use crate::pretty_printer::PrettyPrinter;

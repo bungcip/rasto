@@ -86,12 +86,14 @@ pub trait PrettyPrinter {
 }
 
 impl<T: PrettyPrinter + ?Sized> PrettyPrinter for Box<T> {
+    /// Pretty-prints the boxed value.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         (**self).pretty_print(printer)
     }
 }
 
 impl PrettyPrinter for ExprTry {
+    /// Pretty-prints the `try` expression.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string("try ");
         self.block.pretty_print(printer)
@@ -380,6 +382,7 @@ impl<'a> Printer<'a> {
 }
 
 impl PrettyPrinter for Comment {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.hard_break();
         match self {
@@ -405,6 +408,7 @@ impl PrettyPrinter for Comment {
 }
 
 impl PrettyPrinter for AssociatedConst {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         pp_begin(&self.md, printer)?;
         printer.string("const ");
@@ -421,6 +425,7 @@ impl PrettyPrinter for AssociatedConst {
 }
 
 impl PrettyPrinter for AssociatedType {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         pp_begin(&self.md, printer)?;
         printer.string("type ");
@@ -445,6 +450,7 @@ impl PrettyPrinter for AssociatedType {
 }
 
 impl PrettyPrinter for Pat {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         match self {
             Pat::Const(pat) => pat.pretty_print(printer),
@@ -468,6 +474,7 @@ impl PrettyPrinter for Pat {
 }
 
 impl PrettyPrinter for PatConst {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string("const ");
         self.expr.pretty_print(printer)
@@ -475,6 +482,7 @@ impl PrettyPrinter for PatConst {
 }
 
 impl PrettyPrinter for PatIdent {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         if self.is_mut {
             printer.string("mut ");
@@ -485,18 +493,21 @@ impl PrettyPrinter for PatIdent {
 }
 
 impl PrettyPrinter for PatLit {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         self.lit.pretty_print(printer)
     }
 }
 
 impl PrettyPrinter for PatMacro {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         self.mac.pretty_print(printer)
     }
 }
 
 impl PrettyPrinter for PatOr {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         for (i, pat) in self.pats.iter().enumerate() {
             if i > 0 {
@@ -509,6 +520,7 @@ impl PrettyPrinter for PatOr {
 }
 
 impl PrettyPrinter for PatParen {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string("(");
         self.pat.pretty_print(printer)?;
@@ -518,12 +530,14 @@ impl PrettyPrinter for PatParen {
 }
 
 impl PrettyPrinter for PatPath {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         self.path.pretty_print(printer)
     }
 }
 
 impl PrettyPrinter for PatRange {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         if let Some(start) = &self.start {
             start.pretty_print(printer)?;
@@ -540,6 +554,7 @@ impl PrettyPrinter for PatRange {
 }
 
 impl PrettyPrinter for PatReference {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string("&");
         if self.is_mut {
@@ -550,6 +565,7 @@ impl PrettyPrinter for PatReference {
 }
 
 impl PrettyPrinter for PatRest {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string("..");
         Ok(())
@@ -557,6 +573,7 @@ impl PrettyPrinter for PatRest {
 }
 
 impl PrettyPrinter for PatSlice {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.begin(BreakStyle::Consistent, "[");
         for (i, pat) in self.pats.iter().enumerate() {
@@ -571,6 +588,7 @@ impl PrettyPrinter for PatSlice {
 }
 
 impl PrettyPrinter for PatStruct {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         self.path.pretty_print(printer)?;
         printer.begin(BreakStyle::Consistent, " {");
@@ -596,6 +614,7 @@ impl PrettyPrinter for PatStruct {
 }
 
 impl PrettyPrinter for FieldPat {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string(&self.member);
         printer.string(": ");
@@ -604,6 +623,7 @@ impl PrettyPrinter for FieldPat {
 }
 
 impl PrettyPrinter for PatTuple {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.begin(BreakStyle::Consistent, "(");
         for (i, pat) in self.pats.iter().enumerate() {
@@ -618,6 +638,7 @@ impl PrettyPrinter for PatTuple {
 }
 
 impl PrettyPrinter for PatTupleStruct {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         self.path.pretty_print(printer)?;
         printer.begin(BreakStyle::Consistent, "(");
@@ -633,6 +654,7 @@ impl PrettyPrinter for PatTupleStruct {
 }
 
 impl PrettyPrinter for PatType {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         self.pat.pretty_print(printer)?;
         printer.string(": ");
@@ -641,6 +663,7 @@ impl PrettyPrinter for PatType {
 }
 
 impl PrettyPrinter for PatWild {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string("_");
         Ok(())
@@ -648,6 +671,7 @@ impl PrettyPrinter for PatWild {
 }
 
 impl PrettyPrinter for UnOp {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         match self {
             UnOp::Not => printer.string("!"),
@@ -658,6 +682,7 @@ impl PrettyPrinter for UnOp {
 }
 
 impl PrettyPrinter for Path {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         for (i, segment) in self.segments.iter().enumerate() {
             if i > 0 {
@@ -670,6 +695,7 @@ impl PrettyPrinter for Path {
 }
 
 impl PrettyPrinter for PathSegment {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string(&self.ident);
         if let Some(args) = &self.args {
@@ -680,6 +706,7 @@ impl PrettyPrinter for PathSegment {
 }
 
 impl PrettyPrinter for Lit {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         match self {
             Lit::Str(lit) => lit.pretty_print(printer),
@@ -695,6 +722,7 @@ impl PrettyPrinter for Lit {
 }
 
 impl PrettyPrinter for LitStr {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string(format!("\"{}\"", self.value));
         Ok(())
@@ -702,6 +730,7 @@ impl PrettyPrinter for LitStr {
 }
 
 impl PrettyPrinter for LitByteStr {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string(format!("b\"{}\"", String::from_utf8_lossy(&self.value)));
         Ok(())
@@ -709,6 +738,7 @@ impl PrettyPrinter for LitByteStr {
 }
 
 impl PrettyPrinter for LitCStr {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string(format!("c\"{}\"", String::from_utf8_lossy(&self.value)));
         Ok(())
@@ -716,6 +746,7 @@ impl PrettyPrinter for LitCStr {
 }
 
 impl PrettyPrinter for LitByte {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string(format!("b'{}'", self.value as char));
         Ok(())
@@ -723,6 +754,7 @@ impl PrettyPrinter for LitByte {
 }
 
 impl PrettyPrinter for LitChar {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string(format!("'{}'", self.value));
         Ok(())
@@ -730,6 +762,7 @@ impl PrettyPrinter for LitChar {
 }
 
 impl PrettyPrinter for LitInt {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string(self.value.to_string());
         if let Some(suffix) = &self.suffix {
@@ -754,6 +787,7 @@ impl PrettyPrinter for LitInt {
 }
 
 impl PrettyPrinter for LitFloat {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string(&self.value);
         if let Some(suffix) = &self.suffix {
@@ -768,6 +802,7 @@ impl PrettyPrinter for LitFloat {
 }
 
 impl PrettyPrinter for LitBool {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string(self.value.to_string());
         Ok(())
@@ -775,6 +810,7 @@ impl PrettyPrinter for LitBool {
 }
 
 impl PrettyPrinter for BinOp {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         match self {
             BinOp::Add => printer.string("+"),
@@ -787,6 +823,7 @@ impl PrettyPrinter for BinOp {
 }
 
 impl PrettyPrinter for ExprBinary {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.begin(BreakStyle::Inconsistent, "");
         self.left.pretty_print(printer)?;
@@ -800,6 +837,7 @@ impl PrettyPrinter for ExprBinary {
 }
 
 impl PrettyPrinter for ExprUnary {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         self.op.pretty_print(printer)?;
         self.expr.pretty_print(printer)?;
@@ -808,6 +846,7 @@ impl PrettyPrinter for ExprUnary {
 }
 
 impl PrettyPrinter for Expr {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         match self {
             Expr::Lit(lit) => lit.pretty_print(printer),
@@ -846,6 +885,7 @@ impl PrettyPrinter for Expr {
 }
 
 impl PrettyPrinter for ExprArray {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.begin(BreakStyle::Consistent, "[");
         printer.break_();
@@ -862,6 +902,7 @@ impl PrettyPrinter for ExprArray {
 }
 
 impl PrettyPrinter for ExprAsync {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string("async ");
         self.block.pretty_print(printer)
@@ -869,6 +910,7 @@ impl PrettyPrinter for ExprAsync {
 }
 
 impl PrettyPrinter for ExprAwait {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         self.expr.pretty_print(printer)?;
         printer.string(".await");
@@ -877,6 +919,7 @@ impl PrettyPrinter for ExprAwait {
 }
 
 impl PrettyPrinter for ExprBreak {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string("break");
         Ok(())
@@ -884,6 +927,7 @@ impl PrettyPrinter for ExprBreak {
 }
 
 impl PrettyPrinter for ExprCall {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         self.func.pretty_print(printer)?;
         printer.begin(BreakStyle::Consistent, "(");
@@ -899,6 +943,7 @@ impl PrettyPrinter for ExprCall {
 }
 
 impl PrettyPrinter for ExprCast {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         self.expr.pretty_print(printer)?;
         printer.string(" as ");
@@ -908,6 +953,7 @@ impl PrettyPrinter for ExprCast {
 }
 
 impl PrettyPrinter for ExprClosure {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string("|");
         for (i, input) in self.inputs.iter().enumerate() {
@@ -922,6 +968,7 @@ impl PrettyPrinter for ExprClosure {
 }
 
 impl PrettyPrinter for ExprConst {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string("const ");
         self.block.pretty_print(printer)
@@ -929,6 +976,7 @@ impl PrettyPrinter for ExprConst {
 }
 
 impl PrettyPrinter for ExprContinue {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string("continue");
         Ok(())
@@ -936,6 +984,7 @@ impl PrettyPrinter for ExprContinue {
 }
 
 impl PrettyPrinter for ExprField {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         self.expr.pretty_print(printer)?;
         printer.string(".");
@@ -945,6 +994,7 @@ impl PrettyPrinter for ExprField {
 }
 
 impl PrettyPrinter for ExprIndex {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         self.expr.pretty_print(printer)?;
         printer.string("[");
@@ -955,6 +1005,7 @@ impl PrettyPrinter for ExprIndex {
 }
 
 impl PrettyPrinter for ExprMatch {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string("match ");
         self.expr.pretty_print(printer)?;
@@ -974,6 +1025,7 @@ impl PrettyPrinter for ExprMatch {
 }
 
 impl PrettyPrinter for Arm {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         self.pat.pretty_print(printer)?;
         if let Some(guard) = &self.guard {
@@ -986,6 +1038,7 @@ impl PrettyPrinter for Arm {
 }
 
 impl PrettyPrinter for ExprMethodCall {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         self.receiver.pretty_print(printer)?;
         printer.string(".");
@@ -1003,6 +1056,7 @@ impl PrettyPrinter for ExprMethodCall {
 }
 
 impl PrettyPrinter for ExprParen {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string("(");
         self.expr.pretty_print(printer)?;
@@ -1012,6 +1066,7 @@ impl PrettyPrinter for ExprParen {
 }
 
 impl PrettyPrinter for ExprRange {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         if let Some(start) = &self.start {
             start.pretty_print(printer)?;
@@ -1028,6 +1083,7 @@ impl PrettyPrinter for ExprRange {
 }
 
 impl PrettyPrinter for ExprRef {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string("&");
         if self.is_mut {
@@ -1038,6 +1094,7 @@ impl PrettyPrinter for ExprRef {
 }
 
 impl PrettyPrinter for ExprRawRef {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string("&raw ");
         if self.is_mut {
@@ -1050,6 +1107,7 @@ impl PrettyPrinter for ExprRawRef {
 }
 
 impl PrettyPrinter for ExprReturn {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string("return");
         if let Some(expr) = &self.expr {
@@ -1061,6 +1119,7 @@ impl PrettyPrinter for ExprReturn {
 }
 
 impl PrettyPrinter for ExprStruct {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string(&self.path);
         if !self.fields.is_empty() {
@@ -1081,6 +1140,7 @@ impl PrettyPrinter for ExprStruct {
 }
 
 impl PrettyPrinter for FieldValue {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string(&self.member);
         printer.string(": ");
@@ -1089,6 +1149,7 @@ impl PrettyPrinter for FieldValue {
 }
 
 impl PrettyPrinter for ExprTuple {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.begin(BreakStyle::Consistent, "(");
         for (i, elem) in self.elems.iter().enumerate() {
@@ -1103,6 +1164,7 @@ impl PrettyPrinter for ExprTuple {
 }
 
 impl PrettyPrinter for ItemFn {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         pp_begin(&self.md, printer)?;
         self.vis.pretty_print(printer)?;
@@ -1116,6 +1178,7 @@ impl PrettyPrinter for ItemFn {
 }
 
 impl PrettyPrinter for Signature {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string(&self.ident);
         self.generics.pretty_print(printer)?;
@@ -1136,6 +1199,7 @@ impl PrettyPrinter for Signature {
 }
 
 impl PrettyPrinter for Block {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.begin(BreakStyle::Consistent, "{");
 
@@ -1169,6 +1233,7 @@ impl PrettyPrinter for Block {
 }
 
 impl PrettyPrinter for Stmt {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         match self {
             Stmt::Local(local) => {
@@ -1186,6 +1251,7 @@ impl PrettyPrinter for Stmt {
 }
 
 impl PrettyPrinter for Local {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string("let ");
         self.pat.pretty_print(printer)?;
@@ -1203,6 +1269,7 @@ impl PrettyPrinter for Local {
 }
 
 impl PrettyPrinter for Item {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         match self {
             Item::Fn(item_fn) => item_fn.pretty_print(printer),
@@ -1224,6 +1291,7 @@ impl PrettyPrinter for Item {
 }
 
 impl PrettyPrinter for ItemAsm {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string("asm!(");
         printer.begin(BreakStyle::Consistent, "");
@@ -1262,6 +1330,7 @@ impl PrettyPrinter for ItemAsm {
 }
 
 impl PrettyPrinter for AsmOperand {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         match self {
             AsmOperand::Reg(reg) => reg.pretty_print(printer),
@@ -1279,6 +1348,7 @@ impl PrettyPrinter for AsmOperand {
 }
 
 impl PrettyPrinter for RegOperand {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         self.direction.pretty_print(printer)?;
         printer.string("(");
@@ -1294,6 +1364,7 @@ impl PrettyPrinter for RegOperand {
 }
 
 impl PrettyPrinter for AsmDirection {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         match self {
             AsmDirection::In => printer.string("in"),
@@ -1307,6 +1378,7 @@ impl PrettyPrinter for AsmDirection {
 }
 
 impl PrettyPrinter for RegSpec {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         match self {
             RegSpec::Class(class) => printer.string(class),
@@ -1317,6 +1389,7 @@ impl PrettyPrinter for RegSpec {
 }
 
 impl PrettyPrinter for AsmOptions {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string("options(");
         for (i, option) in self.options.iter().enumerate() {
@@ -1331,6 +1404,7 @@ impl PrettyPrinter for AsmOptions {
 }
 
 impl PrettyPrinter for AsmOption {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         match self {
             AsmOption::Pure => printer.string("pure"),
@@ -1347,6 +1421,7 @@ impl PrettyPrinter for AsmOption {
 }
 
 impl PrettyPrinter for ClobberAbi {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string("clobber_abi(");
         for (i, abi) in self.abis.iter().enumerate() {
@@ -1388,12 +1463,14 @@ fn pp_with_breaks<'a, T: PrettyPrinter>(items: &'a [T], printer: &mut Printer<'a
 }
 
 impl PrettyPrinter for File {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         pp_with_breaks(&self.items, printer)
     }
 }
 
 impl PrettyPrinter for ItemStruct {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         pp_begin(&self.md, printer)?;
         self.vis.pretty_print(printer)?;
@@ -1413,6 +1490,7 @@ impl PrettyPrinter for ItemStruct {
 }
 
 impl PrettyPrinter for Field {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         pp_begin(&self.md, printer)?;
         printer.string(&self.ident);
@@ -1423,6 +1501,7 @@ impl PrettyPrinter for Field {
 }
 
 impl PrettyPrinter for ItemEnum {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         pp_begin(&self.md, printer)?;
         self.vis.pretty_print(printer)?;
@@ -1442,6 +1521,7 @@ impl PrettyPrinter for ItemEnum {
 }
 
 impl PrettyPrinter for Variant {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         pp_begin(&self.md, printer)?;
         printer.string(&self.ident);
@@ -1450,6 +1530,7 @@ impl PrettyPrinter for Variant {
 }
 
 impl PrettyPrinter for ImplItem {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         match self {
             ImplItem::Fn(item_fn) => item_fn.pretty_print(printer),
@@ -1460,6 +1541,7 @@ impl PrettyPrinter for ImplItem {
 }
 
 impl PrettyPrinter for ItemImpl {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         pp_begin(&self.md, printer)?;
         if self.is_unsafe {
@@ -1489,6 +1571,7 @@ impl PrettyPrinter for ItemImpl {
 }
 
 impl PrettyPrinter for ItemTrait {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         pp_begin(&self.md, printer)?;
         self.vis.pretty_print(printer)?;
@@ -1515,6 +1598,7 @@ impl PrettyPrinter for ItemTrait {
 }
 
 impl PrettyPrinter for TraitItem {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         match self {
             TraitItem::Fn(item_fn) => item_fn.pretty_print(printer),
@@ -1524,6 +1608,7 @@ impl PrettyPrinter for TraitItem {
 }
 
 impl PrettyPrinter for TraitItemFn {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         pp_begin(&self.md, printer)?;
         printer.string("fn ");
@@ -1540,6 +1625,7 @@ impl PrettyPrinter for TraitItemFn {
 }
 
 impl PrettyPrinter for ExprIf {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string("if ");
         self.cond.pretty_print(printer)?;
@@ -1554,12 +1640,14 @@ impl PrettyPrinter for ExprIf {
 }
 
 impl PrettyPrinter for ExprBlock {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         self.block.pretty_print(printer)
     }
 }
 
 impl PrettyPrinter for ExprLoop {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string("loop ");
         self.body.pretty_print(printer)
@@ -1567,6 +1655,7 @@ impl PrettyPrinter for ExprLoop {
 }
 
 impl PrettyPrinter for ExprWhile {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string("while ");
         self.cond.pretty_print(printer)?;
@@ -1576,6 +1665,7 @@ impl PrettyPrinter for ExprWhile {
 }
 
 impl PrettyPrinter for ExprFor {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string("for ");
         self.pat.pretty_print(printer)?;
@@ -1587,6 +1677,7 @@ impl PrettyPrinter for ExprFor {
 }
 
 impl PrettyPrinter for ExprAssign {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         self.left.pretty_print(printer)?;
         printer.string(" = ");
@@ -1595,6 +1686,7 @@ impl PrettyPrinter for ExprAssign {
 }
 
 impl PrettyPrinter for ExprMacroCall {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         self.path.pretty_print(printer)?;
         printer.string("!");
@@ -1615,6 +1707,7 @@ impl PrettyPrinter for ExprMacroCall {
 }
 
 impl PrettyPrinter for TokenStream {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         for (i, token) in self.tokens.iter().enumerate() {
             if i > 0 {
@@ -1627,6 +1720,7 @@ impl PrettyPrinter for TokenStream {
 }
 
 impl PrettyPrinter for TokenTree {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         match self {
             TokenTree::Group(group) => group.pretty_print(printer),
@@ -1641,6 +1735,7 @@ impl PrettyPrinter for TokenTree {
 }
 
 impl PrettyPrinter for Group {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         let (open, close) = match self.delimiter {
             Delimiter::Parenthesis => ("(", ")"),
@@ -1656,6 +1751,7 @@ impl PrettyPrinter for Group {
 }
 
 impl PrettyPrinter for Punct {
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string(self.ch.to_string());
         if self.spacing == Spacing::Alone {
@@ -1666,7 +1762,7 @@ impl PrettyPrinter for Punct {
 }
 
 impl PrettyPrinter for Attribute {
-    /// Pretty-prints the `Attribute` to the given printer.
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         match self {
             Attribute::Inner(meta) => {
@@ -1685,7 +1781,7 @@ impl PrettyPrinter for Attribute {
 }
 
 impl PrettyPrinter for Meta {
-    /// Pretty-prints the `Meta` to the given printer.
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         match self {
             Meta::List(list) => list.pretty_print(printer),
@@ -1699,7 +1795,7 @@ impl PrettyPrinter for Meta {
 }
 
 impl PrettyPrinter for MetaList {
-    /// Pretty-prints the `MetaList` to the given printer.
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string(&self.path);
         printer.string("(");
@@ -1715,7 +1811,7 @@ impl PrettyPrinter for MetaList {
 }
 
 impl PrettyPrinter for MetaNameValue {
-    /// Pretty-prints the `MetaNameValue` to the given printer.
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string(&self.path);
         printer.string(" = ");
@@ -1724,7 +1820,7 @@ impl PrettyPrinter for MetaNameValue {
 }
 
 impl PrettyPrinter for GenericArgs {
-    /// Pretty-prints the `GenericArgs` to the given printer.
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         if !self.args.is_empty() {
             printer.string("<");
@@ -1741,7 +1837,7 @@ impl PrettyPrinter for GenericArgs {
 }
 
 impl PrettyPrinter for GenericArg {
-    /// Pretty-prints the `GenericArg` to the given printer.
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         match self {
             GenericArg::Lifetime(lt) => {
@@ -1756,7 +1852,7 @@ impl PrettyPrinter for GenericArg {
 }
 
 impl PrettyPrinter for ItemDef {
-    /// Pretty-prints the `ItemDef` to the given printer.
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         pp_begin(&self.md, printer)?;
         self.vis.pretty_print(printer)?;
@@ -1794,7 +1890,7 @@ impl PrettyPrinter for ItemDef {
 }
 
 impl PrettyPrinter for ItemExternCrate {
-    /// Pretty-prints the `ItemExternCrate` to the given printer.
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         pp_begin(&self.md, printer)?;
         printer.string("extern crate ");
@@ -1806,7 +1902,7 @@ impl PrettyPrinter for ItemExternCrate {
 }
 
 impl PrettyPrinter for ItemForeignMod {
-    /// Pretty-prints the `ItemForeignMod` to the given printer.
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         pp_begin(&self.md, printer)?;
         printer.string("extern ");
@@ -1824,7 +1920,7 @@ impl PrettyPrinter for ItemForeignMod {
 }
 
 impl PrettyPrinter for ItemMacro {
-    /// Pretty-prints the `ItemMacro` to the given printer.
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         pp_begin(&self.md, printer)?;
         self.expr.pretty_print(printer)?;
@@ -1835,7 +1931,7 @@ impl PrettyPrinter for ItemMacro {
 }
 
 impl PrettyPrinter for ItemMod {
-    /// Pretty-prints the `ItemMod` to the given printer.
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         pp_begin(&self.md, printer)?;
         self.vis.pretty_print(printer)?;
@@ -1858,7 +1954,7 @@ impl PrettyPrinter for ItemMod {
 }
 
 impl PrettyPrinter for ItemTraitAlias {
-    /// Pretty-prints the `ItemTraitAlias` to the given printer.
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         pp_begin(&self.md, printer)?;
         printer.string("trait ");
@@ -1877,7 +1973,7 @@ impl PrettyPrinter for ItemTraitAlias {
 }
 
 impl PrettyPrinter for ItemUnion {
-    /// Pretty-prints the `ItemUnion` to the given printer.
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         pp_begin(&self.md, printer)?;
         self.vis.pretty_print(printer)?;
@@ -1898,7 +1994,7 @@ impl PrettyPrinter for ItemUnion {
 }
 
 impl PrettyPrinter for ItemUse {
-    /// Pretty-prints the `ItemUse` to the given printer.
+    /// Pretty-prints the AST node.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         pp_begin(&self.md, printer)?;
         self.vis.pretty_print(printer)?;

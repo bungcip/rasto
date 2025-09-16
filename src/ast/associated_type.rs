@@ -1,3 +1,5 @@
+//! An associated type in a trait.
+
 use crate::ast::generics::GenericParams;
 use crate::ast::metadata::Md;
 use crate::ast::types::Type;

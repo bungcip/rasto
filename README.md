@@ -1,16 +1,21 @@
-# rasto
+# `rasto`
 
-`rasto` is a Rust crate for programmatic manipulation of Rust code.
-
-It provides a set of data structures for representing a Rust Abstract Syntax Tree (AST) and a pretty-printer to format the AST back into well-structured Rust code.
+`rasto` is a Rust crate for programmatic manipulation of Rust code. It provides a set of data structures for representing a Rust Abstract Syntax Tree (AST) and a pretty-printer to format the AST back into well-structured Rust code.
 
 ## Philosophy
 
 `rasto` is an opinionated library with a specific focus on AST manipulation and code generation. It is designed with the following principles in mind:
 
+-   **Ergonomic Builder API**: `rasto` provides a fluent builder API for constructing AST nodes programmatically. This allows for a more readable and maintainable way of creating complex AST structures.
 -   **Opinionated Comment Placement**: `rasto` enforces a specific style of comment placement. Not all AST nodes can have comments attached to them. This is a deliberate design choice to ensure that the generated code is always well-formatted and readable.
-
 -   **No Parser**: `rasto` does not include a parser. The focus of the library is on AST manipulation and pretty-printing. Parsing is considered a separate concern and is out of the scope of this project. For parsing Rust code, we recommend using other libraries like `syn`.
+
+## Features
+
+-   **Comprehensive AST**: `rasto` provides a comprehensive set of data structures for representing a Rust AST, including expressions, statements, items, patterns, types, and more.
+-   **Fluent Builder API**: A rich builder API for constructing AST nodes programmatically.
+-   **Pretty-Printer**: A flexible and efficient pretty-printer for formatting the AST back into well-formatted Rust code. The pretty-printer is based on Philip Wadler's "A Prettier Printer".
+-   **Extensive Documentation**: All public items are fully documented with examples.
 
 ## Comparison with other crates
 
@@ -31,6 +36,36 @@ rasto = "0.1.0"
 ```
 
 ## Usage
+
+### Simple Example
+
+Here's a simple example of how to build a function and pretty-print it:
+
+```rust
+use rasto::builder::*;
+use rasto::pretty;
+
+fn main() {
+    let ast = fn_def("my_function")
+        .vis(Visibility::Public)
+        .input(pat().ident("arg"))
+        .output("T".into())
+        .statement(expr().lit(42))
+        .build();
+
+    println!("{}", pretty(&ast));
+}
+```
+
+This will produce the following output:
+
+```rust
+pub fn my_function(arg) -> T {
+    42;
+}
+```
+
+### Detailed Example
 
 Here's a more detailed example of how to build a function with comments and attributes, and then pretty-print it:
 
@@ -76,6 +111,14 @@ pub fn my_function<T>(arg) -> T {
     arg.field;
 }
 // A trailing line comment.
+```
+
+## Documentation
+
+The documentation for this crate can be generated and viewed locally using `cargo doc`:
+
+```bash
+cargo doc --open
 ```
 
 ## Contributing

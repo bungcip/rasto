@@ -49,6 +49,9 @@ impl LitStr {
 impl FromStr for LitStr {
     type Err = ();
 
+    /// Creates a new `LitStr` from a string slice.
+    ///
+    /// The string slice must be enclosed in double quotes.
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         if s.starts_with('"') && s.ends_with('"') {
             Ok(LitStr {
@@ -61,6 +64,7 @@ impl FromStr for LitStr {
 }
 
 impl From<&str> for LitStr {
+    /// Creates a new `LitStr` from a string slice.
     fn from(s: &str) -> Self {
         Self {
             value: s.to_string(),
@@ -314,36 +318,42 @@ impl From<bool> for Lit {
 }
 
 impl From<f64> for Lit {
+    /// Converts a `f64` into a `Lit::Float` variant.
     fn from(f: f64) -> Self {
         Lit::Float(LitFloat::new(&f.to_string()))
     }
 }
 
 impl From<char> for Lit {
+    /// Converts a `char` into a `Lit::Char` variant.
     fn from(c: char) -> Self {
         Lit::Char(LitChar::new(c))
     }
 }
 
 impl From<u8> for Lit {
+    /// Converts a `u8` into a `Lit::Byte` variant.
     fn from(b: u8) -> Self {
         Lit::Byte(LitByte::new(b))
     }
 }
 
 impl From<&[u8]> for Lit {
+    /// Converts a `&[u8]` into a `Lit::ByteStr` variant.
     fn from(s: &[u8]) -> Self {
         Lit::ByteStr(LitByteStr::new(s))
     }
 }
 
 impl<const N: usize> From<&[u8; N]> for Lit {
+    /// Converts a `&[u8; N]` into a `Lit::ByteStr` variant.
     fn from(array: &[u8; N]) -> Self {
         Lit::ByteStr(LitByteStr::new(array.as_slice()))
     }
 }
 
 impl<'a> From<&'a std::ffi::CStr> for Lit {
+    /// Converts a `&CStr` into a `Lit::CStr` variant.
     fn from(s: &'a std::ffi::CStr) -> Self {
         Lit::CStr(LitCStr::new(s.to_str().unwrap()))
     }

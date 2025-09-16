@@ -1,3 +1,5 @@
+//! Defines the AST nodes for a function definition.
+
 use crate::ast::generics::GenericParams;
 use crate::ast::patterns::Pat;
 use crate::ast::statements::Block;

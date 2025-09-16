@@ -1,3 +1,5 @@
+//! Defines the AST node for a `use` item.
+
 use crate::pretty_printer::PrettyPrinter;
 
 ast_item! {

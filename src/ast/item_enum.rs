@@ -1,3 +1,5 @@
+//! Defines the AST node for an enum definition.
+
 use crate::ast::metadata::Md;
 use crate::pretty_printer::PrettyPrinter;
 use thin_vec::ThinVec;

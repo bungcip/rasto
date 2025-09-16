@@ -1,3 +1,5 @@
+//! Defines the AST nodes for a struct definition.
+
 use crate::ast::metadata::Md;
 use crate::ast::types::Type;
 use crate::pretty_printer::PrettyPrinter;

@@ -1,3 +1,5 @@
+//! Defines macros for generating AST item structs.
+
 /// A macro for generating AST item structs.
 ///
 /// This macro reduces boilerplate by generating the struct definition with

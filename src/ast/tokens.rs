@@ -15,6 +15,7 @@ pub struct TokenStream {
 }
 
 impl From<ThinVec<TokenTree>> for TokenStream {
+    /// Converts a `ThinVec<TokenTree>` into a `TokenStream`.
     fn from(tokens: ThinVec<TokenTree>) -> Self {
         Self { tokens }
     }

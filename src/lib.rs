@@ -17,7 +17,12 @@
 //!
 //! let ast = fn_def("foo")
 //!     .comment(comment().line(" A simple function."))
-//!     .statement(expr().lit(42))
+//!     .block(
+//!         block()
+//!             .comment(comment().block(" An inner comment "))
+//!             .statement(expr().lit(42))
+//!     )
+//!     .trailing_comment(comment().line(" Trailing comment."))
 //!     .build();
 //!
 //! let mut buf = String::new();

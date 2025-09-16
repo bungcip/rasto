@@ -369,6 +369,7 @@ pub struct ExprAssign {
 }
 
 impl From<ExprTry> for Expr {
+    /// Converts an `ExprTry` into an `Expr::Try`.
     fn from(expr: ExprTry) -> Self {
         Expr::Try(expr)
     }

@@ -1,3 +1,5 @@
+//! Defines the AST node for a `const`, `static`, or `type` item.
+
 use crate::ast::expressions::Expr;
 use crate::ast::generics::GenericParams;
 use crate::ast::types::Type;

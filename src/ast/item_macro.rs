@@ -1,3 +1,5 @@
+//! Defines the AST node for a macro invocation in an item position.
+
 use crate::ast::expressions::Expr;
 use crate::pretty_printer::PrettyPrinter;
 

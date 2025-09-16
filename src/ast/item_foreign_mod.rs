@@ -1,3 +1,5 @@
+//! Defines the AST node for a foreign module.
+
 use crate::ast::items::Item;
 use crate::pretty_printer::PrettyPrinter;
 use thin_vec::ThinVec;
