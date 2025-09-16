@@ -65,6 +65,8 @@ pub enum Expr {
     Return(ExprReturn),
     /// A struct instantiation expression: `Foo { a: 1, b: 2 }`.
     Struct(ExprStruct),
+    /// A `try` block: `try { ... }`.
+    Try(ExprTry),
     /// A tuple expression: `(a, b, c)`.
     Tuple(ExprTuple),
     /// A unary operation: `!x` or `-x`.
@@ -276,6 +278,13 @@ pub struct ExprStruct {
     pub fields: ThinVec<FieldValue>,
 }
 
+/// A `try` block, such as `try { ... }`.
+#[derive(Debug, Clone, PartialEq)]
+pub struct ExprTry {
+    /// The block of statements inside the `try` block.
+    pub block: Block,
+}
+
 /// A field-value pair in a struct expression.
 #[derive(Debug, Clone, PartialEq)]
 pub struct FieldValue {
@@ -357,6 +366,12 @@ pub struct ExprAssign {
     pub left: Box<Expr>,
     /// The right-hand side of the assignment.
     pub right: Box<Expr>,
+}
+
+impl From<ExprTry> for Expr {
+    fn from(expr: ExprTry) -> Self {
+        Expr::Try(expr)
+    }
 }
 
 use crate::ast::tokens::Delimiter;

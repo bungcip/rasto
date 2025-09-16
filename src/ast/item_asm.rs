@@ -1,27 +1,18 @@
 //! Defines the AST node for an `asm!` expression.
 
 use crate::ast::{Expr, LitStr, Path};
-use crate::pretty_printer::{PrettyPrinter, Printer};
-use std::fmt;
+use crate::pretty_printer::PrettyPrinter;
 use thin_vec::ThinVec;
 
-/// An inline assembly expression: `asm!(...)`.
-#[derive(Debug, Clone, PartialEq)]
-pub struct ItemAsm {
-    /// The assembly template.
-    pub template: ThinVec<LitStr>,
-    /// The list of operands.
-    pub operands: ThinVec<AsmOperand>,
-    /// The options for the assembly block.
-    pub options: Option<AsmOptions>,
-}
-
-impl fmt::Display for ItemAsm {
-    /// Formats the `ItemAsm` using the pretty-printer.
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let mut printer = Printer::new(f);
-        self.pretty_print(&mut printer)?;
-        printer.finish()
+ast_item! {
+    /// An inline assembly expression: `asm!(...)`.
+    pub struct ItemAsm without vis, ident, and md {
+        /// The assembly template.
+        pub template: ThinVec<LitStr>,
+        /// The list of operands.
+        pub operands: ThinVec<AsmOperand>,
+        /// The options for the assembly block.
+        pub options: Option<AsmOptions>,
     }
 }
 

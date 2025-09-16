@@ -13,7 +13,7 @@ fn test_file() {
     let ast = file()
         .item(
             struct_def("Foo")
-                .leading_comment(comment().line(" A simple struct."))
+                .comment(comment().line(" A simple struct."))
                 .field("field1", "i32")
                 .field("field2", "String")
                 .build(),
@@ -27,6 +27,12 @@ fn test_file() {
         )
         .build();
 
+    insta::assert_snapshot!(pretty(&ast));
+}
+
+#[test]
+fn test_expr_try() {
+    let ast = expr().try_block([expr().lit(1)]);
     insta::assert_snapshot!(pretty(&ast));
 }
 
@@ -48,7 +54,7 @@ fn test_pretty_print_doc_comment() {
     let a = file()
         .item(
             fn_def("foo")
-                .leading_comment(comment().doc(" This is a doc comment."))
+                .comment(comment().doc(" This is a doc comment."))
                 .build(),
         )
         .build();
@@ -79,7 +85,7 @@ fn test_fn() {
         .output("i32")
         .block(
             block()
-                .leading_comment(comment().block(" Block comment with single line "))
+                .comment(comment().block(" Block comment with single line "))
                 .statement(stmt().local("hello").expr(expr().lit("world")))
                 .statement(expr().lit(42))
                 .has_trailing_semicolon(false),
@@ -92,7 +98,7 @@ fn test_fn() {
 #[test]
 fn test_block_with_comments() {
     let ast = block()
-        .leading_comment(comment().line(" leading comment"))
+        .comment(comment().line(" leading comment"))
         .statement(expr().lit(42))
         .trailing_comment(comment().line(" trailing comment"))
         .build();
@@ -301,7 +307,7 @@ fn test_long_binary_expression() {
 #[test]
 fn test_trait() {
     let ast = trait_def("MyTrait")
-        .leading_comment(comment().line(" A simple trait."))
+        .comment(comment().line(" A simple trait."))
         .item(trait_item_fn("my_func"))
         .build();
 
@@ -373,7 +379,7 @@ fn test_macro_call_expression_with_path() {
 #[test]
 fn test_enum() {
     let ast = enum_def("MyEnum")
-        .leading_comment(comment().line(" A simple enum."))
+        .comment(comment().line(" A simple enum."))
         .variant("Variant1")
         .variant("Variant2")
         .build();
@@ -383,7 +389,7 @@ fn test_enum() {
 
 #[test]
 fn test_impl() {
-    let ast = impl_block("MyStruct").function(fn_def("new")).build();
+    let ast = impl_block("MyStruct").item(fn_def("new").build()).build();
 
     insta::assert_snapshot!(pretty(&ast));
 }
@@ -392,7 +398,7 @@ fn test_impl() {
 fn test_trait_impl() {
     let ast = impl_block("MyStruct")
         .trait_("MyTrait")
-        .function(fn_def("new"))
+        .item(fn_def("new").build())
         .build();
 
     insta::assert_snapshot!(pretty(&ast));
@@ -403,7 +409,7 @@ fn test_unsafe_trait_impl() {
     let ast = impl_block("MyStruct")
         .trait_("MyTrait")
         .unsafe_()
-        .function(fn_def("new"))
+        .item(fn_def("new").build())
         .build();
 
     insta::assert_snapshot!(pretty(&ast));
@@ -514,7 +520,7 @@ fn test_all_literals() {
 #[test]
 fn test_struct() {
     let ast = struct_def("Foo")
-        .leading_comment(comment().line(" A simple struct."))
+        .comment(comment().line(" A simple struct."))
         .field("field1", "i32")
         .field("field2", "String")
         .build();

@@ -3,20 +3,23 @@
 //! Items are the primary components of a Rust program, such as functions, structs, enums,
 //! impl blocks, and traits. They are the top-level declarations that make up a crate.
 
+use crate::ast::associated_const::AssociatedConst;
 use crate::ast::generics::GenericParams;
-use crate::ast::visibility::Visibility;
 use crate::ast::item_asm::ItemAsm;
 use crate::ast::item_def::ItemDef;
+use crate::ast::item_enum::ItemEnum;
 use crate::ast::item_extern_crate::ItemExternCrate;
+use crate::ast::item_fn::{ItemFn, Signature};
 use crate::ast::item_foreign_mod::ItemForeignMod;
+use crate::ast::item_impl::ImplItem;
 use crate::ast::item_macro::ItemMacro;
 use crate::ast::item_mod::ItemMod;
+use crate::ast::item_struct::ItemStruct;
 use crate::ast::item_trait::ItemTrait;
 use crate::ast::item_trait_alias::ItemTraitAlias;
 use crate::ast::item_union::ItemUnion;
 use crate::ast::item_use::ItemUse;
 use crate::ast::metadata::Md;
-use crate::ast::patterns::Pat;
 use crate::ast::statements::Block;
 use crate::ast::types::Type;
 use crate::pretty_printer::{PrettyPrinter, Printer};
@@ -70,6 +73,8 @@ impl fmt::Display for Item {
 pub enum TraitItem {
     /// A function item within a trait: `fn foo();`.
     Fn(TraitItemFn),
+    /// A const item within a trait: `const FOO: usize;`.
+    Const(AssociatedConst),
 }
 
 /// A function item within a trait.
@@ -83,33 +88,6 @@ pub struct TraitItemFn {
     pub md: Option<Box<Md>>,
 }
 
-impl fmt::Display for ItemFn {
-    /// Formats the `ItemFn` using the pretty-printer.
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let mut printer = Printer::new(f);
-        self.pretty_print(&mut printer)?;
-        printer.finish()
-    }
-}
-
-impl fmt::Display for ItemStruct {
-    /// Formats the `ItemStruct` using the pretty-printer.
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let mut printer = Printer::new(f);
-        self.pretty_print(&mut printer)?;
-        printer.finish()
-    }
-}
-
-impl fmt::Display for ItemEnum {
-    /// Formats the `ItemEnum` using the pretty-printer.
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let mut printer = Printer::new(f);
-        self.pretty_print(&mut printer)?;
-        printer.finish()
-    }
-}
-
 impl fmt::Display for ItemImpl {
     /// Formats the `ItemImpl` using the pretty-printer.
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -117,65 +95,6 @@ impl fmt::Display for ItemImpl {
         self.pretty_print(&mut printer)?;
         printer.finish()
     }
-}
-
-impl fmt::Display for ItemTrait {
-    /// Formats the `ItemTrait` using the pretty-printer.
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let mut printer = Printer::new(f);
-        self.pretty_print(&mut printer)?;
-        printer.finish()
-    }
-}
-
-/// A struct definition.
-#[derive(Debug, Clone, PartialEq)]
-pub struct ItemStruct {
-    /// The visibility of the struct.
-    pub vis: Visibility,
-    /// The name of the struct.
-    pub ident: String,
-    /// The generic parameters of the struct.
-    pub generics: GenericParams,
-    /// The fields of the struct.
-    pub fields: ThinVec<Field>,
-    /// Metadata about the struct, including attributes and comments.
-    pub md: Option<Box<Md>>,
-}
-
-/// A field of a struct.
-#[derive(Debug, Clone, PartialEq)]
-pub struct Field {
-    /// The name of the field.
-    pub ident: String,
-    /// The type of the field.
-    pub ty: Type,
-    /// Metadata about the field, including attributes and comments.
-    pub md: Option<Box<Md>>,
-}
-
-/// An enum definition.
-#[derive(Debug, Clone, PartialEq)]
-pub struct ItemEnum {
-    /// The visibility of the enum.
-    pub vis: Visibility,
-    /// The name of the enum.
-    pub ident: String,
-    /// The generic parameters of the enum.
-    pub generics: GenericParams,
-    /// The variants of the enum.
-    pub variants: ThinVec<Variant>,
-    /// Metadata about the enum, including attributes and comments.
-    pub md: Option<Box<Md>>,
-}
-
-/// A variant of an enum.
-#[derive(Debug, Clone, PartialEq)]
-pub struct Variant {
-    /// The name of the variant.
-    pub ident: String,
-    /// Metadata about the variant, including attributes and comments.
-    pub md: Option<Box<Md>>,
 }
 
 /// An `impl` block.
@@ -191,37 +110,10 @@ pub struct ItemImpl {
     pub is_negative: bool,
     /// The generic parameters of the `impl` block.
     pub generics: GenericParams,
-    /// The functions within the `impl` block.
-    pub fns: ThinVec<ItemFn>,
+    /// The items within the `impl` block.
+    pub items: ThinVec<ImplItem>,
     /// Metadata about the `impl` block, including attributes and comments.
     pub md: Option<Box<Md>>,
-}
-
-/// A function definition.
-#[derive(Debug, Clone, PartialEq)]
-pub struct ItemFn {
-    /// The visibility of the function.
-    pub vis: Visibility,
-    /// The function signature.
-    pub sig: Signature,
-    /// The function body.
-    pub block: Block,
-    /// Metadata about the function, including attributes and comments.
-    pub md: Option<Box<Md>>,
-}
-
-/// A function signature.
-#[derive(Debug, Clone, PartialEq)]
-pub struct Signature {
-    // The `fn` token would go here.
-    /// The name of the function.
-    pub ident: String,
-    /// The generic parameters of the function.
-    pub generics: GenericParams,
-    /// The arguments of the function.
-    pub inputs: ThinVec<Pat>,
-    /// The return type of the function.
-    pub output: Option<Type>,
 }
 
 impl From<ItemAsm> for Item {
@@ -248,6 +140,12 @@ impl From<ItemStruct> for Item {
 impl From<TraitItemFn> for TraitItem {
     fn from(item: TraitItemFn) -> Self {
         TraitItem::Fn(item)
+    }
+}
+
+impl From<AssociatedConst> for TraitItem {
+    fn from(item: AssociatedConst) -> Self {
+        TraitItem::Const(item)
     }
 }
 

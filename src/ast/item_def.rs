@@ -1,22 +1,14 @@
 use crate::ast::expressions::Expr;
 use crate::ast::generics::GenericParams;
-use crate::ast::metadata::Md;
 use crate::ast::types::Type;
-use crate::ast::visibility::Visibility;
-use crate::pretty_printer::{PrettyPrinter, Printer};
-use std::fmt;
+use crate::pretty_printer::PrettyPrinter;
 
-/// An item, such as a `const`, `static`, or `type` definition.
-#[derive(Debug, Clone, PartialEq)]
-pub struct ItemDef {
-    /// The visibility of the item.
-    pub vis: Visibility,
-    /// The name of the item.
-    pub ident: String,
-    /// Metadata about the item, including attributes and comments.
-    pub md: Option<Box<Md>>,
-    /// The kind of the item.
-    pub kind: ItemDefKind,
+ast_item! {
+    /// An item, such as a `const`, `static`, or `type` definition.
+    pub struct ItemDef {
+        /// The kind of the item.
+        pub kind: ItemDefKind,
+    }
 }
 
 /// The kind of an item.
@@ -43,13 +35,4 @@ pub enum ItemDefKind {
         /// The type being aliased.
         ty: Type,
     },
-}
-
-impl fmt::Display for ItemDef {
-    /// Formats the `ItemDef` using the pretty-printer.
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let mut printer = Printer::new(f);
-        self.pretty_print(&mut printer)?;
-        printer.finish()
-    }
 }

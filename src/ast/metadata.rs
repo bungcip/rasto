@@ -10,7 +10,7 @@ pub struct Md {
     /// Attributes that appear before the node.
     pub attrs: ThinVec<Attribute>,
     /// Comments that appear before the node.
-    pub leading_comments: ThinVec<Comment>,
+    pub comments: ThinVec<Comment>,
     /// Comments that appear after the node.
     pub trailing_comments: ThinVec<Comment>,
 }
@@ -19,7 +19,7 @@ pub struct Md {
 #[derive(Debug, Clone, Default)]
 pub struct MdBuilder {
     attrs: ThinVec<Attribute>,
-    leading_comments: ThinVec<Comment>,
+    comments: ThinVec<Comment>,
     trailing_comments: ThinVec<Comment>,
 }
 
@@ -35,9 +35,9 @@ impl MdBuilder {
         self
     }
 
-    /// Adds a leading comment.
-    pub fn leading_comment(mut self, comment: Comment) -> Self {
-        self.leading_comments.push(comment);
+    /// Adds a comment.
+    pub fn comment(mut self, comment: Comment) -> Self {
+        self.comments.push(comment);
         self
     }
 
@@ -51,7 +51,7 @@ impl MdBuilder {
     pub fn build(self) -> Md {
         Md {
             attrs: self.attrs,
-            leading_comments: self.leading_comments,
+            comments: self.comments,
             trailing_comments: self.trailing_comments,
         }
     }

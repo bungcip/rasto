@@ -1,4 +1,6 @@
-use rasto::ast::{AsmDirection, AsmOption, LitStr, RegSpec, Visibility};
+mod associated_const;
+
+use rasto::ast::{AsmDirection, AsmOption, LitStr, RegSpec};
 use rasto::builder::*;
 use rasto::pretty;
 use thin_vec::thin_vec;
@@ -122,6 +124,20 @@ fn test_use_item() {
 fn test_trait_with_associated_type() {
     let item = trait_def("MyTrait")
         .associated_type(associated_type("MyType"))
+        .build();
+    insta::assert_snapshot!(pretty(&item));
+}
+
+#[test]
+fn test_impl_item() {
+    let item = impl_block("MyType")
+        .item(fn_def("my_func").build())
+        .item(associated_type("MyType").build())
+        .item(
+            associated_const("MY_CONST", "u8")
+                .expr(expr().lit(5))
+                .build(),
+        )
         .build();
     insta::assert_snapshot!(pretty(&item));
 }

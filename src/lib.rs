@@ -16,8 +16,7 @@
 //! use rasto::builder::*;
 //!
 //! let ast = fn_def("foo")
-//!     .leading_comment(comment().line(" A simple function."))
-//!     .trailing_comment(comment().line(" Trailing comment."))
+//!     .comment(comment().line(" A simple function."))
 //!     .statement(expr().lit(42))
 //!     .build();
 //!
@@ -50,4 +49,4 @@ pub mod pretty_printer;
 pub mod builder;
 
 /// Re-exports the main pretty-printing utilities for convenient access.
-pub use pretty_printer::{pretty, PrettyPrinter, Printer};
+pub use pretty_printer::{PrettyPrinter, Printer, pretty};
