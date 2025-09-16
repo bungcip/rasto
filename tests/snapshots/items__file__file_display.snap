@@ -1,0 +1,6 @@
+---
+source: tests/file.rs
+expression: pretty(&file)
+---
+fn my_function() {}
+struct MyStruct {}
