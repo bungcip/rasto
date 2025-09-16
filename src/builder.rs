@@ -223,6 +223,83 @@ impl TraitBuilder {
     }
 }
 
+/// A builder for constructing an `ItemExternBlock` AST node.
+#[derive(Default)]
+pub struct ItemExternBlockBuilder {
+    is_unsafe: bool,
+    abi: Option<String>,
+    items: ThinVec<ExternalItem>,
+    md: MdBuilder,
+}
+
+impl ItemExternBlockBuilder {
+    /// Creates a new `ItemExternBlockBuilder`.
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Sets the `extern` block as `unsafe`.
+    pub fn unsafe_(mut self) -> Self {
+        self.is_unsafe = true;
+        self
+    }
+
+    /// Sets the ABI of the `extern` block.
+    ///
+    /// # Parameters
+    ///
+    /// - `abi`: The ABI string (e.g., "C").
+    pub fn abi(mut self, abi: impl Into<String>) -> Self {
+        self.abi = Some(abi.into());
+        self
+    }
+
+    /// Adds an item to the `extern` block.
+    ///
+    /// # Parameters
+    ///
+    /// - `item`: The `ExternalItem` to add.
+    pub fn item(mut self, item: impl Into<ExternalItem>) -> Self {
+        self.items.push(item.into());
+        self
+    }
+
+    /// Adds a comment to the `extern` block.
+    ///
+    /// # Parameters
+    ///
+    /// - `comment`: The `Comment` to add.
+    pub fn comment(mut self, comment: impl Into<Comment>) -> Self {
+        self.md = self.md.comment(comment.into());
+        self
+    }
+
+    /// Adds an attribute to the `extern` block.
+    ///
+    /// # Parameters
+    ///
+    /// - `attr`: The `Attribute` to add.
+    pub fn attr(mut self, attr: impl Into<Attribute>) -> Self {
+        self.md = self.md.attr(attr.into());
+        self
+    }
+
+    /// Builds the `ItemExternBlock` AST node.
+    ///
+    /// # Returns
+    ///
+    /// An `ItemExternBlock` instance.
+    pub fn build(self) -> ItemExternBlock {
+        ItemExternBlock {
+            vis: Visibility::Default,
+            is_unsafe: self.is_unsafe,
+            abi: self.abi,
+            items: self.items,
+            md: Some(Box::new(self.md.build())),
+        }
+    }
+}
+
 /// Creates a new `AssociatedConstBuilder` to construct an associated constant.
 pub fn associated_const(ident: impl Into<String>, ty: impl Into<Type>) -> AssociatedConstBuilder {
     AssociatedConstBuilder::new(ident, ty)
@@ -865,9 +942,15 @@ pub fn fn_def(name: impl Into<String>) -> FnBuilder {
 pub struct FnBuilder {
     ident: String,
     vis: Visibility,
+    is_const: bool,
+    is_async: bool,
+    is_unsafe: bool,
+    abi: Option<Abi>,
     generics: GenericParams,
     inputs: ThinVec<Pat>,
+    is_variadic: bool,
     output: Option<Type>,
+    where_clause: Option<WhereClause>,
     block: Block,
     md: MdBuilder,
 }
@@ -896,6 +979,30 @@ impl FnBuilder {
         self
     }
 
+    /// Sets the function as `const`.
+    pub fn const_(mut self) -> Self {
+        self.is_const = true;
+        self
+    }
+
+    /// Sets the function as `async`.
+    pub fn async_(mut self) -> Self {
+        self.is_async = true;
+        self
+    }
+
+    /// Sets the function as `unsafe`.
+    pub fn unsafe_(mut self) -> Self {
+        self.is_unsafe = true;
+        self
+    }
+
+    /// Sets the ABI of the function.
+    pub fn abi(mut self, abi: Abi) -> Self {
+        self.abi = Some(abi);
+        self
+    }
+
     /// Adds a generic parameter to the function.
     ///
     /// # Parameters
@@ -916,6 +1023,25 @@ impl FnBuilder {
         self
     }
 
+    /// Adds a typed input parameter to the function.
+    ///
+    /// This is a convenience method for creating a `Pat::Type` pattern.
+    ///
+    /// # Parameters
+    ///
+    /// - `name`: The name of the input parameter.
+    /// - `ty`: The type of the input parameter.
+    pub fn input_typed(mut self, name: impl Into<String>, ty: impl Into<Type>) -> Self {
+        self.inputs.push(pat().type_(pat().ident(name), ty));
+        self
+    }
+
+    /// Sets whether the function is variadic.
+    pub fn variadic(mut self, is_variadic: bool) -> Self {
+        self.is_variadic = is_variadic;
+        self
+    }
+
     /// Sets the return type of the function.
     ///
     /// # Parameters
@@ -923,6 +1049,12 @@ impl FnBuilder {
     /// - `ty`: The return type.
     pub fn output(mut self, ty: impl Into<Type>) -> Self {
         self.output = Some(ty.into());
+        self
+    }
+
+    /// Sets the `where` clause of the function.
+    pub fn where_clause(mut self, where_clause: WhereClause) -> Self {
+        self.where_clause = Some(where_clause);
         self
     }
 
@@ -986,10 +1118,16 @@ impl FnBuilder {
         ItemFn {
             vis: self.vis,
             sig: Signature {
+                is_const: self.is_const,
+                is_async: self.is_async,
+                is_unsafe: self.is_unsafe,
+                abi: self.abi,
                 ident: self.ident,
                 generics: self.generics,
                 inputs: self.inputs,
+                is_variadic: self.is_variadic,
                 output: self.output,
+                where_clause: self.where_clause,
             },
             block: self.block,
             md: Some(Box::new(self.md.build())),
@@ -1108,16 +1246,114 @@ pub fn field_value(member: impl Into<String>, value: impl Into<Expr>) -> FieldVa
 }
 
 /// Creates a new `TraitItemFnBuilder` to construct a trait item function.
-pub fn trait_item_fn(name: impl Into<String>) -> TraitItemFn {
-    TraitItemFn {
-        sig: Signature {
+pub fn trait_item_fn(name: impl Into<String>) -> TraitItemFnBuilder {
+    TraitItemFnBuilder::new(name)
+}
+
+/// A builder for constructing a `TraitItemFn` AST node.
+#[derive(Default)]
+pub struct TraitItemFnBuilder {
+    ident: String,
+    is_const: bool,
+    is_async: bool,
+    is_unsafe: bool,
+    abi: Option<Abi>,
+    generics: GenericParams,
+    inputs: ThinVec<Pat>,
+    is_variadic: bool,
+    output: Option<Type>,
+    where_clause: Option<WhereClause>,
+    block: Option<Block>,
+    md: MdBuilder,
+}
+
+impl TraitItemFnBuilder {
+    /// Creates a new `TraitItemFnBuilder` with the given function name.
+    pub fn new(name: impl Into<String>) -> Self {
+        Self {
             ident: name.into(),
-            generics: Default::default(),
-            inputs: thin_vec![],
-            output: None,
-        },
-        block: None,
-        md: None,
+            ..Default::default()
+        }
+    }
+
+    /// Sets the function as `const`.
+    pub fn const_(mut self) -> Self {
+        self.is_const = true;
+        self
+    }
+
+    /// Sets the function as `async`.
+    pub fn async_(mut self) -> Self {
+        self.is_async = true;
+        self
+    }
+
+    /// Sets the function as `unsafe`.
+    pub fn unsafe_(mut self) -> Self {
+        self.is_unsafe = true;
+        self
+    }
+
+    /// Sets the ABI of the function.
+    pub fn abi(mut self, abi: Abi) -> Self {
+        self.abi = Some(abi);
+        self
+    }
+
+    /// Adds a generic parameter to the function.
+    pub fn generic(mut self, param: impl Into<GenericParam>) -> Self {
+        self.generics.params.push(param.into());
+        self
+    }
+
+    /// Adds an input parameter to the function.
+    pub fn input(mut self, pat: impl Into<Pat>) -> Self {
+        self.inputs.push(pat.into());
+        self
+    }
+
+    /// Sets whether the function is variadic.
+    pub fn variadic(mut self, is_variadic: bool) -> Self {
+        self.is_variadic = is_variadic;
+        self
+    }
+
+    /// Sets the return type of the function.
+    pub fn output(mut self, ty: impl Into<Type>) -> Self {
+        self.output = Some(ty.into());
+        self
+    }
+
+    /// Sets the `where` clause of the function.
+    pub fn where_clause(mut self, where_clause: WhereClause) -> Self {
+        self.where_clause = Some(where_clause);
+        self
+    }
+
+    /// Sets the block of statements for the function.
+    pub fn block(mut self, block: BlockBuilder) -> Self {
+        self.block = Some(block.build());
+        self
+    }
+
+    /// Builds the `TraitItemFn` AST node.
+    pub fn build(self) -> TraitItemFn {
+        TraitItemFn {
+            sig: Signature {
+                is_const: self.is_const,
+                is_async: self.is_async,
+                is_unsafe: self.is_unsafe,
+                abi: self.abi,
+                ident: self.ident,
+                generics: self.generics,
+                inputs: self.inputs,
+                is_variadic: self.is_variadic,
+                output: self.output,
+                where_clause: self.where_clause,
+            },
+            block: self.block,
+            md: Some(Box::new(self.md.build())),
+        }
     }
 }
 
@@ -1719,6 +1955,12 @@ impl From<ItemDefBuilder> for Item {
 impl From<ItemExternCrateBuilder> for Item {
     fn from(builder: ItemExternCrateBuilder) -> Self {
         Item::ExternCrate(builder.build())
+    }
+}
+
+impl From<ItemExternBlockBuilder> for Item {
+    fn from(builder: ItemExternBlockBuilder) -> Self {
+        Item::ExternBlock(builder.build())
     }
 }
 
@@ -2605,6 +2847,11 @@ pub fn extern_crate_item(name: impl Into<String>) -> ItemExternCrateBuilder {
     ItemExternCrateBuilder::new(name)
 }
 
+/// Creates a new `ItemExternBlockBuilder` to construct an `extern` block item.
+pub fn extern_block_item() -> ItemExternBlockBuilder {
+    ItemExternBlockBuilder::new()
+}
+
 /// A builder for constructing an `ItemExternCrate` AST node.
 pub struct ItemExternCrateBuilder {
     ident: String,
@@ -3299,6 +3546,12 @@ impl From<FnBuilder> for ItemFn {
 impl From<FnBuilder> for Item {
     fn from(val: FnBuilder) -> Self {
         Item::Fn(val.into())
+    }
+}
+
+impl From<TraitItemFnBuilder> for TraitItem {
+    fn from(val: TraitItemFnBuilder) -> Self {
+        TraitItem::Fn(val.build())
     }
 }
 

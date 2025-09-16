@@ -1,6 +1,7 @@
 mod associated_const;
 mod file;
 mod macros;
+
 use rasto::ast::{AsmDirection, AsmOption, LitStr, RegSpec, Visibility};
 use rasto::builder::*;
 use rasto::pretty;
@@ -72,9 +73,7 @@ fn test_union_item() {
 
 #[test]
 fn test_trait_with_function() {
-    let item = trait_def("MyTrait")
-        .item(trait_item_fn("my_func"))
-        .build();
+    let item = trait_def("MyTrait").item(trait_item_fn("my_func")).build();
     insta::assert_snapshot!(pretty(&item));
 }
 
@@ -114,7 +113,6 @@ fn test_visibility() {
         .build();
     insta::assert_snapshot!(pretty(&pub_const));
 }
-
 #[test]
 fn test_use_item() {
     let item = use_item("std::collections::HashMap").build();

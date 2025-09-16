@@ -8,6 +8,7 @@ use crate::ast::generics::GenericParams;
 use crate::ast::item_asm::ItemAsm;
 use crate::ast::item_def::ItemDef;
 use crate::ast::item_enum::ItemEnum;
+use crate::ast::item_extern_block::ItemExternBlock;
 use crate::ast::item_extern_crate::ItemExternCrate;
 use crate::ast::item_fn::{ItemFn, Signature};
 use crate::ast::item_foreign_mod::ItemForeignMod;
@@ -47,6 +48,8 @@ pub enum Item {
     ExternCrate(ItemExternCrate),
     /// A foreign module: `extern "C" { ... }`.
     ForeignMod(ItemForeignMod),
+    /// An `extern` block: `extern "C" { ... }`.
+    ExternBlock(ItemExternBlock),
     /// A macro definition: `macro_rules! ...`.
     Macro(ItemMacro),
     /// A module: `mod foo { ... }`.
@@ -181,6 +184,13 @@ impl From<ItemExternCrate> for Item {
     /// Converts an `ItemExternCrate` into an `Item::ExternCrate` variant.
     fn from(item: ItemExternCrate) -> Self {
         Item::ExternCrate(item)
+    }
+}
+
+impl From<ItemExternBlock> for Item {
+    /// Converts an `ItemExternBlock` into an `Item::ExternBlock` variant.
+    fn from(item: ItemExternBlock) -> Self {
+        Item::ExternBlock(item)
     }
 }
 

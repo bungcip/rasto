@@ -7,6 +7,8 @@
 #[macro_use]
 mod macros;
 
+/// Defines the AST node for an `extern` block.
+pub mod abi;
 /// Defines the AST node for an associated const in a trait.
 pub mod associated_const;
 /// Defines the AST node for an associated type in a trait.
@@ -27,6 +29,8 @@ pub mod item_asm;
 pub mod item_def;
 /// Defines the AST node for an enum.
 pub mod item_enum;
+/// Defines the AST node for an `extern` block.
+pub mod item_extern_block;
 /// Defines the AST node for an `extern crate` item.
 pub mod item_extern_crate;
 /// Defines the AST node for a function.
@@ -67,7 +71,10 @@ pub mod tokens;
 pub mod types;
 /// Defines the AST nodes for visibility.
 pub mod visibility;
+/// Defines the AST nodes for `where` clauses.
+pub mod where_clause;
 
+pub use abi::*;
 pub use associated_const::*;
 pub use associated_type::*;
 pub use attributes::*;
@@ -78,6 +85,7 @@ pub use generics::*;
 pub use item_asm::*;
 pub use item_def::*;
 pub use item_enum::*;
+pub use item_extern_block::*;
 pub use item_extern_crate::*;
 pub use item_fn::*;
 pub use item_foreign_mod::*;
@@ -96,3 +104,4 @@ pub use statements::*;
 pub use tokens::*;
 pub use types::*;
 pub use visibility::*;
+pub use where_clause::*;
