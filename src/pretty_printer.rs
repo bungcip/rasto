@@ -1117,6 +1117,20 @@ impl PrettyPrinter for ItemFn {
 
 impl PrettyPrinter for Signature {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        if self.is_const {
+            printer.string("const ");
+        }
+        if self.is_async {
+            printer.string("async ");
+        }
+        if self.is_unsafe {
+            printer.string("unsafe ");
+        }
+        if let Some(abi) = &self.abi {
+            printer.string("extern ");
+            abi.pretty_print(printer)?;
+            printer.string(" ");
+        }
         printer.string(&self.ident);
         self.generics.pretty_print(printer)?;
         printer.begin(BreakStyle::Consistent, "(");
@@ -1126,10 +1140,19 @@ impl PrettyPrinter for Signature {
             }
             input.pretty_print(printer)?;
         }
+        if self.is_variadic {
+            if !self.inputs.is_empty() {
+                printer.string(", ");
+            }
+            printer.string("...");
+        }
         printer.end(")");
         if let Some(output) = &self.output {
             printer.string(" -> ");
             output.pretty_print(printer)?;
+        }
+        if let Some(where_clause) = &self.where_clause {
+            where_clause.pretty_print(printer)?;
         }
         Ok(())
     }

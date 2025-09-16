@@ -113,7 +113,6 @@ fn test_visibility() {
         .build();
     insta::assert_snapshot!(pretty(&pub_const));
 }
-
 #[test]
 fn test_use_item() {
     let item = use_item("std::collections::HashMap").build();
