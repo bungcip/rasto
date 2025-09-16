@@ -2,7 +2,7 @@
 
 [![Latest Version](https://img.shields.io/crates/v/rasto.svg)](https://crates.io/crates/rasto)
 [![Docs.rs](https://docs.rs/rasto/badge.svg)](https://docs.rs/rasto)
-[![CI](https://github.com/your-username/rasto/actions/workflows/ci.yml/badge.svg)](https://github.com/your-username/rasto/actions/workflows/ci.yml)
+[![CI](https://github.com/bungcip/rasto/actions/workflows/ci.yml/badge.svg)](https://github.com/bungcip/rasto/actions/workflows/ci.yml)
 
 `rasto` is a Rust crate for programmatic manipulation of Rust code.
 
@@ -57,18 +57,12 @@ fn main() {
         .comment(comment().doc(" This is a doc comment for my_function."))
         .generic(generic_param().ty("T"))
         .input(pat().ident("arg"))
-        .output("T".into())
-        .block(
-            block()
-                .statement(
-                    stmt()
-                        .local(pat().ident("x"))
-                        .expr(expr().lit(42))
-                        .build(),
-                )
-                .statement(expr().field(expr().ident("arg"), "field"))
+        .output("T")
+        .statement(stmt()
+            .local(pat().ident("x"))
+            .expr(expr().lit(42))
         )
-        .trailing_comment(comment().line(" A trailing line comment."))
+        .statement(expr().field(expr().ident("arg"), "field"))
         .build();
 
     println!("{}", pretty(&ast));
@@ -84,7 +78,6 @@ pub fn my_function<T>(arg) -> T {
     let x = 42;
     arg.field;
 }
-// A trailing line comment.
 ```
 
 ## Documentation
