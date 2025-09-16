@@ -1,4 +1,4 @@
-use rasto::ast::generics::generic_param;
+use rasto::ast::generics::{generic_param, GenericParam, GenericArgs};
 use rasto::ast::types::Type;
 use rasto::{builder::*, pretty};
 
@@ -26,6 +26,21 @@ fn test_struct_with_generics() {
         my_field: T,
     }
     ");
+}
+
+#[test]
+fn test_from_impls() {
+    let param: GenericParam = generic_param().lifetime("a").into();
+    assert!(matches!(param, GenericParam::Lifetime(_)));
+
+    let param: GenericParam = generic_param().ty("T").into();
+    assert!(matches!(param, GenericParam::Type(_)));
+
+    let param: GenericParam = generic_param().const_("N", "usize").into();
+    assert!(matches!(param, GenericParam::Const(_)));
+
+    let args: GenericArgs = GenericArgs::new();
+    assert!(args.args.is_empty());
 }
 
 #[test]

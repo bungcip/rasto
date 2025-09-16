@@ -1,0 +1,5 @@
+---
+source: tests/visibility.rs
+expression: "&pub_fn"
+---
+pub fn my_public_fn() {}
