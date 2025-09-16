@@ -57,8 +57,6 @@ pub mod item_union;
 pub mod item_use;
 /// Defines the AST nodes for items.
 pub mod items;
-/// Defines the AST nodes for keywords.
-pub mod keyword;
 /// Defines the AST nodes for literals.
 pub mod literals;
 /// Defines the AST nodes for metadata.
