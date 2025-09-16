@@ -26,3 +26,21 @@ fn test_metadata() {
         Comment::Line("A trailing comment.".to_string())
     );
 }
+
+#[test]
+fn test_md_builder() {
+    let md = rasto::ast::MdBuilder::new()
+        .attr(Attribute::Outer(Meta::Path("foo".into())))
+        .comment(Comment::Line(" a comment".into()))
+        .trailing_comment(Comment::Line(" a trailing comment".into()))
+        .build();
+
+    assert_eq!(
+        md,
+        Md {
+            attrs: thin_vec![Attribute::Outer(Meta::Path("foo".into()))],
+            comments: thin_vec![Comment::Line(" a comment".into())],
+            trailing_comments: thin_vec![Comment::Line(" a trailing comment".into())],
+        }
+    );
+}

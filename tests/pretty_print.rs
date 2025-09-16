@@ -7,6 +7,7 @@ use rasto::pretty;
 use thin_vec::thin_vec;
 
 mod patterns;
+mod expressions;
 
 #[test]
 fn test_file() {

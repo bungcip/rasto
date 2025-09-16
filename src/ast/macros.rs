@@ -4,6 +4,7 @@
 /// common fields, as well as a `Display` implementation.
 ///
 /// It supports two forms: one for items with generics and one for items without.
+#[macro_export]
 macro_rules! ast_item {
     (
         $(#[$outer:meta])*
