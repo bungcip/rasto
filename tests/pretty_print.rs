@@ -6,8 +6,8 @@ use rasto::builder::{
 use rasto::pretty;
 use thin_vec::thin_vec;
 
-mod patterns;
 mod expressions;
+mod patterns;
 
 #[test]
 fn test_file() {

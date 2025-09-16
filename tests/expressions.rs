@@ -1,6 +1,6 @@
+use rasto::ast::BinOp;
 use rasto::builder::*;
 use rasto::pretty;
-use rasto::ast::BinOp;
 
 #[test]
 fn test_assign_expr() {

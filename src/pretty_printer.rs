@@ -404,6 +404,25 @@ impl PrettyPrinter for Comment {
     }
 }
 
+impl PrettyPrinter for ItemStatic {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        pp_begin(&self.md, printer)?;
+        self.vis.pretty_print(printer)?;
+        printer.string("static ");
+        if self.is_mut {
+            printer.string("mut ");
+        }
+        printer.string(&self.ident);
+        printer.string(": ");
+        self.ty.pretty_print(printer)?;
+        printer.string(" = ");
+        self.expr.pretty_print(printer)?;
+        printer.string(";");
+        pp_end(&self.md, printer)?;
+        Ok(())
+    }
+}
+
 impl PrettyPrinter for ItemExternBlock {
     /// Pretty-prints the `ItemExternBlock` to the given printer.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
@@ -1277,6 +1296,7 @@ impl PrettyPrinter for Item {
         match self {
             Item::Fn(item_fn) => item_fn.pretty_print(printer),
             Item::Struct(item_struct) => item_struct.pretty_print(printer),
+            Item::Static(item_static) => item_static.pretty_print(printer),
             Item::Enum(item_enum) => item_enum.pretty_print(printer),
             Item::Impl(item_impl) => item_impl.pretty_print(printer),
             Item::Trait(item_trait) => item_trait.pretty_print(printer),

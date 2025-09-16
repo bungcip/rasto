@@ -15,6 +15,7 @@ use crate::ast::item_foreign_mod::ItemForeignMod;
 use crate::ast::item_impl::ImplItem;
 use crate::ast::item_macro::ItemMacro;
 use crate::ast::item_mod::ItemMod;
+use crate::ast::item_static::ItemStatic;
 use crate::ast::item_struct::ItemStruct;
 use crate::ast::item_trait::ItemTrait;
 use crate::ast::item_trait_alias::ItemTraitAlias;
@@ -36,6 +37,8 @@ pub enum Item {
     Fn(ItemFn),
     /// A struct item: `struct Foo { ... }`.
     Struct(ItemStruct),
+    /// A static item: `static FOO: u32 = 42;`.
+    Static(ItemStatic),
     /// An enum item: `enum Foo { ... }`.
     Enum(ItemEnum),
     /// An `impl` block: `impl Foo { ... }`.
@@ -137,6 +140,13 @@ impl From<ItemStruct> for Item {
     /// Converts an `ItemStruct` into an `Item::Struct` variant.
     fn from(item: ItemStruct) -> Self {
         Item::Struct(item)
+    }
+}
+
+impl From<ItemStatic> for Item {
+    /// Converts an `ItemStatic` into an `Item::Static` variant.
+    fn from(item: ItemStatic) -> Self {
+        Item::Static(item)
     }
 }
 

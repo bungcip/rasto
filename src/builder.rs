@@ -2042,6 +2042,113 @@ impl From<StructBuilder> for Item {
     }
 }
 
+/// Creates a new `StaticItemBuilder` to construct a static item.
+///
+/// # Parameters
+///
+/// - `name`: The name of the static item.
+/// - `ty`: The type of the static item.
+/// - `expr`: The expression of the static item.
+///
+/// # Returns
+///
+/// A `StaticItemBuilder` instance.
+pub fn static_item(
+    name: impl Into<String>,
+    ty: impl Into<Type>,
+    expr: impl Into<Expr>,
+) -> StaticItemBuilder {
+    StaticItemBuilder::new(name, ty, expr)
+}
+
+/// A builder for constructing an `ItemStatic` (static item) AST node.
+pub struct StaticItemBuilder {
+    ident: String,
+    vis: Visibility,
+    is_mut: bool,
+    ty: Type,
+    expr: Box<Expr>,
+    md: MdBuilder,
+}
+
+impl StaticItemBuilder {
+    /// Creates a new `StaticItemBuilder` with the given name, type and expression.
+    ///
+    /// # Parameters
+    ///
+    /// - `name`: The name of the static item.
+    /// - `ty`: The type of the static item.
+    /// - `expr`: The expression of the static item.
+    pub fn new(name: impl Into<String>, ty: impl Into<Type>, expr: impl Into<Expr>) -> Self {
+        Self {
+            ident: name.into(),
+            vis: Visibility::Default,
+            is_mut: false,
+            ty: ty.into(),
+            expr: Box::new(expr.into()),
+            md: MdBuilder::new(),
+        }
+    }
+
+    /// Sets the visibility of the static item.
+    ///
+    /// # Parameters
+    ///
+    /// - `vis`: The `Visibility` to set.
+    pub fn vis(mut self, vis: Visibility) -> Self {
+        self.vis = vis;
+        self
+    }
+
+    /// Sets the static item as mutable.
+    pub fn mutable(mut self) -> Self {
+        self.is_mut = true;
+        self
+    }
+
+    /// Adds a comment to the static item.
+    ///
+    /// # Parameters
+    ///
+    /// - `comment`: The `Comment` to add.
+    pub fn comment(mut self, comment: impl Into<Comment>) -> Self {
+        self.md = self.md.comment(comment.into());
+        self
+    }
+
+    /// Adds an attribute to the static item.
+    ///
+    /// # Parameters
+    ///
+    /// - `attr`: The `Attribute` to add.
+    pub fn attr(mut self, attr: impl Into<Attribute>) -> Self {
+        self.md = self.md.attr(attr.into());
+        self
+    }
+
+    /// Builds the `ItemStatic` AST node.
+    ///
+    /// # Returns
+    ///
+    /// An `ItemStatic` instance.
+    pub fn build(self) -> ItemStatic {
+        ItemStatic {
+            vis: self.vis,
+            ident: self.ident,
+            is_mut: self.is_mut,
+            ty: self.ty,
+            expr: self.expr,
+            md: Some(Box::new(self.md.build())),
+        }
+    }
+}
+
+impl From<StaticItemBuilder> for Item {
+    fn from(builder: StaticItemBuilder) -> Self {
+        Item::Static(builder.build())
+    }
+}
+
 impl From<i32> for Expr {
     fn from(val: i32) -> Self {
         Expr::Lit(val.into())

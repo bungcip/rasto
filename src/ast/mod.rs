@@ -43,6 +43,8 @@ pub mod item_impl;
 pub mod item_macro;
 /// Defines the AST node for a module.
 pub mod item_mod;
+/// Defines the AST node for a static item.
+pub mod item_static;
 /// Defines the AST node for a struct.
 pub mod item_struct;
 /// Defines the AST node for a trait.
@@ -92,6 +94,7 @@ pub use item_foreign_mod::*;
 pub use item_impl::*;
 pub use item_macro::*;
 pub use item_mod::*;
+pub use item_static::*;
 pub use item_struct::*;
 pub use item_trait::*;
 pub use item_trait_alias::*;
