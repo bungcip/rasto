@@ -49,7 +49,6 @@ fn main() {
         .output("T".into())
         .block(
             block()
-                .comment(comment().block(" An inner block comment. "))
                 .statement(
                     stmt()
                         .local(pat().ident("x"))
@@ -71,7 +70,6 @@ This will produce the following output:
 /// This is a doc comment for my_function.
 #[test]
 pub fn my_function<T>(arg) -> T {
-    /* An inner block comment. */
     let x = 42;
     arg.field;
 }

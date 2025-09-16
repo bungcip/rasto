@@ -384,19 +384,6 @@ impl PrettyPrinter for Comment {
         printer.hard_break();
         match self {
             Comment::Line(s) => printer.string(format!("//{s}")),
-            Comment::Block(s) => {
-                printer.string("/*");
-                let mut first = true;
-                for line in s.split('\n') {
-                    if first {
-                        first = false
-                    } else {
-                        printer.hard_break();
-                    }
-                    printer.string(line);
-                }
-                printer.string("*/");
-            }
             Comment::Doc(s) => printer.string(format!("///{s}")),
         }
         printer.hard_break();
