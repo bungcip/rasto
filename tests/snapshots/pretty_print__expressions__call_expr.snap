@@ -1,0 +1,5 @@
+---
+source: tests/expressions.rs
+expression: pretty(&expr)
+---
+"my_func"(1, "b")

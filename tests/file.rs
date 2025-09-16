@@ -9,3 +9,12 @@ fn test_file_display() {
         .build();
     insta::assert_snapshot!(pretty(&file));
 }
+
+#[test]
+fn test_file_fmt() {
+    let file = file()
+        .item(fn_def("my_function").build())
+        .item(struct_def("MyStruct").build())
+        .build();
+    insta::assert_snapshot!(file.to_string());
+}

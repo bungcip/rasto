@@ -1,0 +1,5 @@
+---
+source: tests/expressions.rs
+expression: pretty(&expr)
+---
+MyStruct { my_field: 42 }
