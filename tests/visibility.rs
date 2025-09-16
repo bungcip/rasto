@@ -33,7 +33,7 @@ fn test_visibility() {
     }
     ");
 
-    let crate_mod = mod_item("my_crate_mod").vis(Visibility::Crate).build();
+    let crate_mod = empty_mod_item("my_crate_mod").vis(Visibility::Crate).build();
     insta::assert_snapshot!(&crate_mod, @"pub(crate) mod my_crate_mod;");
 
     let pub_use = use_item("std::collections::HashMap")

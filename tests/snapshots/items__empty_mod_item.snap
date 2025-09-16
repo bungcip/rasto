@@ -2,4 +2,4 @@
 source: tests/items.rs
 expression: pretty(&item)
 ---
-mod my_module {}
+mod empty_module;

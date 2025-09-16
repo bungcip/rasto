@@ -41,6 +41,12 @@ fn test_macro_item() {
 }
 
 #[test]
+fn test_empty_mod_item() {
+    let item = empty_mod_item("empty_module").build();
+    insta::assert_snapshot!(pretty(&item));
+}
+
+#[test]
 fn test_mod_item() {
     let item = mod_item("my_module").build();
     insta::assert_snapshot!(pretty(&item));

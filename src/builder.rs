@@ -3163,11 +3163,17 @@ pub fn mod_item(name: impl Into<String>) -> ItemModBuilder {
     ItemModBuilder::new(name)
 }
 
+/// Create a new `EmptyItemModBuilder` to construct a module item in separated file.
+pub fn empty_mod_item(name: impl Into<String>) -> EmptyItemModBuilder {
+    EmptyItemModBuilder::new(name)    
+}
+
 /// A builder for constructing an `ItemMod` AST node.
+#[derive(Default)]
 pub struct ItemModBuilder {
     ident: String,
     vis: Visibility,
-    content: Option<ThinVec<Item>>,
+    content: ThinVec<Item>,
     md: MdBuilder,
 }
 
@@ -3176,9 +3182,7 @@ impl ItemModBuilder {
     pub fn new(name: impl Into<String>) -> Self {
         Self {
             ident: name.into(),
-            vis: Visibility::Default,
-            content: None,
-            md: MdBuilder::new(),
+            ..Default::default()
         }
     }
 
@@ -3198,7 +3202,7 @@ impl ItemModBuilder {
     ///
     /// - `content`: A `ThinVec<Item>` containing the module's content.
     pub fn content(mut self, content: ThinVec<Item>) -> Self {
-        self.content = Some(content);
+        self.content = content;
         self
     }
 
@@ -3211,7 +3215,7 @@ impl ItemModBuilder {
     ///
     /// - `item`: The item to add to the module.
     pub fn item(mut self, item: impl Into<Item>) -> Self {
-        self.content.get_or_insert_default().push(item.into());
+        self.content.push(item.into());
         self
     }
 
@@ -3244,11 +3248,74 @@ impl ItemModBuilder {
         ItemMod {
             vis: self.vis,
             ident: self.ident,
-            content: self.content,
+            content: Some(self.content),
             md: Some(Box::new(self.md.build())),
         }
     }
 }
+
+/// A builder for constructing an `ItemMod` AST node.
+#[derive(Default)]
+pub struct EmptyItemModBuilder {
+    ident: String,
+    vis: Visibility,
+    md: MdBuilder,
+}
+
+impl EmptyItemModBuilder {
+    /// Creates a new `EmptyItemModBuilder`.
+    pub fn new(name: impl Into<String>) -> Self {
+        Self {
+            ident: name.into(),
+            ..Default::default()
+        }
+    }
+
+    /// Sets the visibility of the module.
+    ///
+    /// # Parameters
+    ///
+    /// - `vis`: The `Visibility` to set.
+    pub fn vis(mut self, vis: Visibility) -> Self {
+        self.vis = vis;
+        self
+    }
+
+    /// Adds a comment to the module item.
+    ///
+    /// # Parameters
+    ///
+    /// - `comment`: The `Comment` to add.
+    pub fn comment(mut self, comment: impl Into<Comment>) -> Self {
+        self.md = self.md.comment(comment.into());
+        self
+    }
+
+    /// Adds an attribute to the module item.
+    ///
+    /// # Parameters
+    ///
+    /// - `attr`: The `Attribute` to add.
+    pub fn attr(mut self, attr: impl Into<Attribute>) -> Self {
+        self.md = self.md.attr(attr.into());
+        self
+    }
+
+    /// Builds the `ItemMod` AST node.
+    ///
+    /// # Returns
+    ///
+    /// An `ItemMod` instance.
+    pub fn build(self) -> ItemMod {
+        ItemMod {
+            vis: self.vis,
+            ident: self.ident,
+            content: None,
+            md: Some(Box::new(self.md.build())),
+        }
+    }
+}
+
 
 /// Creates a new `ItemTraitAliasBuilder` to construct a trait alias.
 pub fn trait_alias_item(name: impl Into<String>, bounds: ThinVec<String>) -> ItemTraitAliasBuilder {
