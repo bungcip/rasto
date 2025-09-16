@@ -404,6 +404,53 @@ impl PrettyPrinter for Comment {
     }
 }
 
+impl PrettyPrinter for ItemExternBlock {
+    /// Pretty-prints the `ItemExternBlock` to the given printer.
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        pp_begin(&self.md, printer)?;
+        if self.is_unsafe {
+            printer.string("unsafe ");
+        }
+        printer.string("extern ");
+        if let Some(abi) = &self.abi {
+            printer.string(format!("\"{abi}\""));
+        }
+        printer.string(" ");
+        printer.begin(BreakStyle::Consistent, "{");
+        if !self.items.is_empty() {
+            printer.hard_break();
+            pp_with_breaks(&self.items, printer)?;
+        }
+        printer.end("}");
+        pp_end(&self.md, printer)?;
+        Ok(())
+    }
+}
+
+impl PrettyPrinter for ExternalItem {
+    /// Pretty-prints the `ExternalItem` to the given printer.
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        match self {
+            ExternalItem::Static(ident, ty) => {
+                printer.string("static ");
+                printer.string(ident);
+                printer.string(": ");
+                ty.pretty_print(printer)?;
+                printer.string(";");
+            }
+            ExternalItem::Fn(item_fn) => {
+                printer.string("fn ");
+                item_fn.sig.pretty_print(printer)?;
+                printer.string(";");
+            }
+            ExternalItem::Macro(item_macro) => {
+                item_macro.pretty_print(printer)?;
+            }
+        }
+        Ok(())
+    }
+}
+
 impl PrettyPrinter for AssociatedConst {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         pp_begin(&self.md, printer)?;
@@ -1219,6 +1266,7 @@ impl PrettyPrinter for Item {
             Item::Union(item_union) => item_union.pretty_print(printer),
             Item::Use(item_use) => item_use.pretty_print(printer),
             Item::Asm(item_asm) => item_asm.pretty_print(printer),
+            Item::ExternBlock(item_extern_block) => item_extern_block.pretty_print(printer),
         }
     }
 }

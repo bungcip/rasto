@@ -1,5 +1,5 @@
-use rasto::builder::*;
 use rasto::ast::Visibility;
+use rasto::builder::*;
 
 #[test]
 fn test_visibility() {
