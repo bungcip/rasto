@@ -924,7 +924,7 @@ impl StructBuilder {
     }
 }
 
-/// Creates a new `FnBuilder` to construct a function definition.
+/// Creates a new `SignatureBuilder` to construct a function signature.
 ///
 /// # Parameters
 ///
@@ -932,16 +932,15 @@ impl StructBuilder {
 ///
 /// # Returns
 ///
-/// A `FnBuilder` instance.
-pub fn fn_def(name: impl Into<String>) -> FnBuilder {
-    FnBuilder::new(name)
+/// A `SignatureBuilder` instance.
+pub fn signature(name: impl Into<String>) -> SignatureBuilder {
+    SignatureBuilder::new(name)
 }
 
-/// A builder for constructing an `ItemFn` (function definition) AST node.
+/// A builder for constructing a `Signature` AST node.
 #[derive(Default)]
-pub struct FnBuilder {
+pub struct SignatureBuilder {
     ident: String,
-    vis: Visibility,
     is_const: bool,
     is_async: bool,
     is_unsafe: bool,
@@ -951,12 +950,10 @@ pub struct FnBuilder {
     is_variadic: bool,
     output: Option<Type>,
     where_clause: Option<WhereClause>,
-    block: Block,
-    md: MdBuilder,
 }
 
-impl FnBuilder {
-    /// Creates a new `FnBuilder` with the given function name.
+impl SignatureBuilder {
+    /// Creates a new `SignatureBuilder` with the given function name.
     ///
     /// # Parameters
     ///
@@ -964,19 +961,8 @@ impl FnBuilder {
     pub fn new(name: impl Into<String>) -> Self {
         Self {
             ident: name.into(),
-            vis: Visibility::Default,
             ..Default::default()
         }
-    }
-
-    /// Sets the visibility of the function.
-    ///
-    /// # Parameters
-    ///
-    /// - `vis`: The `Visibility` to set.
-    pub fn vis(mut self, vis: Visibility) -> Self {
-        self.vis = vis;
-        self
     }
 
     /// Sets the function as `const`.
@@ -1058,6 +1044,152 @@ impl FnBuilder {
         self
     }
 
+    /// Builds the `Signature` AST node.
+    ///
+    /// # Returns
+    ///
+    /// An `Signature` instance.
+    pub fn build(self) -> Signature {
+        Signature {
+            is_const: self.is_const,
+            is_async: self.is_async,
+            is_unsafe: self.is_unsafe,
+            abi: self.abi,
+            ident: self.ident,
+            generics: self.generics,
+            inputs: self.inputs,
+            is_variadic: self.is_variadic,
+            output: self.output,
+            where_clause: self.where_clause,
+        }
+    }
+}
+
+/// Creates a new `FnBuilder` to construct a function definition.
+///
+/// # Parameters
+///
+/// - `name`: The name of the function.
+///
+/// # Returns
+///
+/// A `FnBuilder` instance.
+pub fn fn_def(name: impl Into<String>) -> FnBuilder {
+    FnBuilder::new(name)
+}
+
+/// A builder for constructing an `ItemFn` (function definition) AST node.
+pub struct FnBuilder {
+    vis: Visibility,
+    sig: SignatureBuilder,
+    block: Block,
+    md: MdBuilder,
+}
+
+impl FnBuilder {
+    /// Creates a new `FnBuilder` with the given function name.
+    ///
+    /// # Parameters
+    ///
+    /// - `name`: The name of the function.
+    pub fn new(name: impl Into<String>) -> Self {
+        Self {
+            vis: Visibility::Default,
+            sig: signature(name),
+            block: Block::default(),
+            md: MdBuilder::new(),
+        }
+    }
+
+    /// Sets the visibility of the function.
+    ///
+    /// # Parameters
+    ///
+    /// - `vis`: The `Visibility` to set.
+    pub fn vis(mut self, vis: Visibility) -> Self {
+        self.vis = vis;
+        self
+    }
+
+    /// Sets the function as `const`.
+    pub fn const_(mut self) -> Self {
+        self.sig = self.sig.const_();
+        self
+    }
+
+    /// Sets the function as `async`.
+    pub fn async_(mut self) -> Self {
+        self.sig = self.sig.async_();
+        self
+    }
+
+    /// Sets the function as `unsafe`.
+    pub fn unsafe_(mut self) -> Self {
+        self.sig = self.sig.unsafe_();
+        self
+    }
+
+    /// Sets the ABI of the function.
+    pub fn abi(mut self, abi: Abi) -> Self {
+        self.sig = self.sig.abi(abi);
+        self
+    }
+
+    /// Adds a generic parameter to the function.
+    ///
+    /// # Parameters
+    ///
+    /// - `param`: The generic parameter to add.
+    pub fn generic(mut self, param: impl Into<GenericParam>) -> Self {
+        self.sig = self.sig.generic(param);
+        self
+    }
+
+    /// Adds an input parameter to the function.
+    ///
+    /// # Parameters
+    ///
+    /// - `pat`: The pattern for the input parameter.
+    pub fn input(mut self, pat: impl Into<Pat>) -> Self {
+        self.sig = self.sig.input(pat);
+        self
+    }
+
+    /// Adds a typed input parameter to the function.
+    ///
+    /// This is a convenience method for creating a `Pat::Type` pattern.
+    ///
+    /// # Parameters
+    ///
+    /// - `name`: The name of the input parameter.
+    /// - `ty`: The type of the input parameter.
+    pub fn input_typed(mut self, name: impl Into<String>, ty: impl Into<Type>) -> Self {
+        self.sig = self.sig.input_typed(name, ty);
+        self
+    }
+
+    /// Sets whether the function is variadic.
+    pub fn variadic(mut self, is_variadic: bool) -> Self {
+        self.sig = self.sig.variadic(is_variadic);
+        self
+    }
+
+    /// Sets the return type of the function.
+    ///
+    /// # Parameters
+    ///
+    /// - `ty`: The return type.
+    pub fn output(mut self, ty: impl Into<Type>) -> Self {
+        self.sig = self.sig.output(ty);
+        self
+    }
+
+    /// Sets the `where` clause of the function.
+    pub fn where_clause(mut self, where_clause: WhereClause) -> Self {
+        self.sig = self.sig.where_clause(where_clause);
+        self
+    }
+
     /// Sets the block of statements for the function.
     ///
     /// # Parameters
@@ -1117,18 +1249,7 @@ impl FnBuilder {
     pub fn build(self) -> ItemFn {
         ItemFn {
             vis: self.vis,
-            sig: Signature {
-                is_const: self.is_const,
-                is_async: self.is_async,
-                is_unsafe: self.is_unsafe,
-                abi: self.abi,
-                ident: self.ident,
-                generics: self.generics,
-                inputs: self.inputs,
-                is_variadic: self.is_variadic,
-                output: self.output,
-                where_clause: self.where_clause,
-            },
+            sig: self.sig.build(),
             block: self.block,
             md: Some(Box::new(self.md.build())),
         }
@@ -1251,18 +1372,8 @@ pub fn trait_item_fn(name: impl Into<String>) -> TraitItemFnBuilder {
 }
 
 /// A builder for constructing a `TraitItemFn` AST node.
-#[derive(Default)]
 pub struct TraitItemFnBuilder {
-    ident: String,
-    is_const: bool,
-    is_async: bool,
-    is_unsafe: bool,
-    abi: Option<Abi>,
-    generics: GenericParams,
-    inputs: ThinVec<Pat>,
-    is_variadic: bool,
-    output: Option<Type>,
-    where_clause: Option<WhereClause>,
+    sig: SignatureBuilder,
     block: Option<Block>,
     md: MdBuilder,
 }
@@ -1271,62 +1382,76 @@ impl TraitItemFnBuilder {
     /// Creates a new `TraitItemFnBuilder` with the given function name.
     pub fn new(name: impl Into<String>) -> Self {
         Self {
-            ident: name.into(),
-            ..Default::default()
+            sig: signature(name),
+            block: None,
+            md: MdBuilder::new(),
         }
     }
 
     /// Sets the function as `const`.
     pub fn const_(mut self) -> Self {
-        self.is_const = true;
+        self.sig = self.sig.const_();
         self
     }
 
     /// Sets the function as `async`.
     pub fn async_(mut self) -> Self {
-        self.is_async = true;
+        self.sig = self.sig.async_();
         self
     }
 
     /// Sets the function as `unsafe`.
     pub fn unsafe_(mut self) -> Self {
-        self.is_unsafe = true;
+        self.sig = self.sig.unsafe_();
         self
     }
 
     /// Sets the ABI of the function.
     pub fn abi(mut self, abi: Abi) -> Self {
-        self.abi = Some(abi);
+        self.sig = self.sig.abi(abi);
         self
     }
 
     /// Adds a generic parameter to the function.
     pub fn generic(mut self, param: impl Into<GenericParam>) -> Self {
-        self.generics.params.push(param.into());
+        self.sig = self.sig.generic(param);
         self
     }
 
     /// Adds an input parameter to the function.
     pub fn input(mut self, pat: impl Into<Pat>) -> Self {
-        self.inputs.push(pat.into());
+        self.sig = self.sig.input(pat);
+        self
+    }
+
+    /// Adds a typed input parameter to the function.
+    ///
+    /// This is a convenience method for creating a `Pat::Type` pattern.
+    ///
+    /// # Parameters
+    ///
+    /// - `name`: The name of the input parameter.
+    /// - `ty`: The type of the input parameter.
+    pub fn input_typed(mut self, name: impl Into<String>, ty: impl Into<Type>) -> Self {
+        self.sig = self.sig.input_typed(name, ty);
         self
     }
 
     /// Sets whether the function is variadic.
     pub fn variadic(mut self, is_variadic: bool) -> Self {
-        self.is_variadic = is_variadic;
+        self.sig = self.sig.variadic(is_variadic);
         self
     }
 
     /// Sets the return type of the function.
     pub fn output(mut self, ty: impl Into<Type>) -> Self {
-        self.output = Some(ty.into());
+        self.sig = self.sig.output(ty);
         self
     }
 
     /// Sets the `where` clause of the function.
     pub fn where_clause(mut self, where_clause: WhereClause) -> Self {
-        self.where_clause = Some(where_clause);
+        self.sig = self.sig.where_clause(where_clause);
         self
     }
 
@@ -1339,18 +1464,7 @@ impl TraitItemFnBuilder {
     /// Builds the `TraitItemFn` AST node.
     pub fn build(self) -> TraitItemFn {
         TraitItemFn {
-            sig: Signature {
-                is_const: self.is_const,
-                is_async: self.is_async,
-                is_unsafe: self.is_unsafe,
-                abi: self.abi,
-                ident: self.ident,
-                generics: self.generics,
-                inputs: self.inputs,
-                is_variadic: self.is_variadic,
-                output: self.output,
-                where_clause: self.where_clause,
-            },
+            sig: self.sig.build(),
             block: self.block,
             md: Some(Box::new(self.md.build())),
         }

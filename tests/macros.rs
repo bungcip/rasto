@@ -1,4 +1,4 @@
-use rasto::{ast_item, pretty, PrettyPrinter, Printer};
+use rasto::{PrettyPrinter, Printer, ast_item, pretty};
 
 ast_item! {
     pub struct MyMacroItem with generics {
