@@ -68,6 +68,14 @@ fn test_union_item() {
 }
 
 #[test]
+fn test_trait_with_function() {
+    let item = trait_def("MyTrait")
+        .item(trait_item_fn("my_func"))
+        .build();
+    insta::assert_snapshot!(pretty(&item));
+}
+
+#[test]
 fn test_visibility() {
     let pub_fn = fn_def("my_public_fn").vis(Visibility::Public).build();
     insta::assert_snapshot!(pretty(&pub_fn));
