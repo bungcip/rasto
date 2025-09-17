@@ -1502,7 +1502,9 @@ fn pp_with_breaks<'a, T: PrettyPrinter>(items: &'a [T], printer: &mut Printer<'a
 
 impl PrettyPrinter for File {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
-        pp_with_breaks(&self.items, printer)
+        pp_begin(&self.md, printer)?;
+        pp_with_breaks(&self.items, printer)?;
+        pp_end(&self.md, printer)
     }
 }
 

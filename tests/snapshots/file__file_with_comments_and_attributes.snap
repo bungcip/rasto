@@ -1,0 +1,8 @@
+---
+source: tests/file.rs
+expression: pretty(&file)
+---
+#![allow(dead_code)]
+
+// This is a file-level comment.
+fn my_function() {}
