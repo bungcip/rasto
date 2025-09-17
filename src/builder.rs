@@ -1435,6 +1435,7 @@ pub struct LocalBuilder {
     pat: Pat,
     ty: Option<Type>,
     expr: Option<Expr>,
+    else_block: Option<Block>,
 }
 
 impl LocalBuilder {
@@ -1448,6 +1449,7 @@ impl LocalBuilder {
             pat: pat.into(),
             ty: None,
             expr: None,
+            else_block: None,
         }
     }
 
@@ -1471,16 +1473,34 @@ impl LocalBuilder {
         self
     }
 
+    /// Sets the `else` block for a `let-else` statement.
+    ///
+    /// # Parameters
+    ///
+    /// - `block`: The `Block` to be executed if the pattern does not match.
+    pub fn else_block(mut self, block: BlockBuilder) -> Self {
+        self.else_block = Some(block.build());
+        self
+    }
+
     /// Builds the `Stmt::Local` AST node.
+    ///
+    /// # Panics
+    ///
+    /// Panics if an `else` block is provided without an initializer expression.
     ///
     /// # Returns
     ///
     /// A `Stmt` instance representing the `let` binding.
     pub fn build(self) -> Stmt {
+        if self.else_block.is_some() && self.expr.is_none() {
+            panic!("let-else statements must have an initializer expression");
+        }
         Stmt::Local(Local {
             pat: self.pat,
             ty: self.ty,
             expr: self.expr,
+            else_block: self.else_block.map(Box::new),
         })
     }
 }

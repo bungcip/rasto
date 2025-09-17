@@ -1307,7 +1307,12 @@ impl PrettyPrinter for Local {
             printer.string(" = ");
             expr.pretty_print(printer)?;
         }
-        printer.string(";");
+        if let Some(else_block) = &self.else_block {
+            printer.string(" else ");
+            else_block.pretty_print(printer)?;
+        } else {
+            printer.string(";");
+        }
         Ok(())
     }
 }

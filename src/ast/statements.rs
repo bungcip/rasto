@@ -53,4 +53,6 @@ pub struct Local {
     pub ty: Option<Type>,
     /// The optional expression to initialize the variable.
     pub expr: Option<Expr>,
+    /// The optional `else` block, for `let-else` statements.
+    pub else_block: Option<Box<Block>>,
 }

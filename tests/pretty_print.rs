@@ -32,6 +32,20 @@ fn test_file() {
 }
 
 #[test]
+fn test_let_else_statement() {
+    let ast = fn_def("foo")
+        .statement(
+            stmt()
+                .local(pat().tuple([pat().ident("Some"), pat().ident("x")]))
+                .expr(expr().call(expr().lit("Some"), [expr().lit(1)]))
+                .else_block(block().statement(expr().return_expr(None))),
+        )
+        .build();
+
+    insta::assert_snapshot!(pretty(&ast));
+}
+
+#[test]
 fn test_expr_try() {
     let ast = expr().try_block([expr().lit(1)]);
     insta::assert_snapshot!(pretty(&ast));

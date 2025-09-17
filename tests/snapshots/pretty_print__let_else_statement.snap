@@ -1,0 +1,9 @@
+---
+source: tests/pretty_print.rs
+expression: pretty(&ast)
+---
+fn foo() {
+    let (Some, x) = "Some"(1) else {
+        return;
+    }
+}
