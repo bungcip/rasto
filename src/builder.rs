@@ -42,6 +42,7 @@ pub fn file() -> FileBuilder {
 #[derive(Default)]
 pub struct FileBuilder {
     items: ThinVec<Item>,
+    md: MdBuilder,
 }
 
 impl FileBuilder {
@@ -60,13 +61,32 @@ impl FileBuilder {
         self
     }
 
+    /// Adds a comment to the file.
+    pub fn comment(mut self, comment: impl Into<Comment>) -> Self {
+        self.md = self.md.comment(comment.into());
+        self
+    }
+
+    /// Adds an attribute to the file.
+    pub fn attr(mut self, attr: impl Into<Attribute>) -> Self {
+        self.md = self.md.attr(attr.into());
+        self
+    }
+
     /// Builds the `File` AST node.
     ///
     /// # Returns
     ///
     /// A `File` instance.
     pub fn build(self) -> File {
-        File { items: self.items }
+        File {
+            items: self.items,
+            md: if self.md.is_empty() {
+                None
+            } else {
+                Some(Box::new(self.md.build()))
+            },
+        }
     }
 }
 
@@ -2163,6 +2183,11 @@ impl MdBuilder {
     pub fn trailing_comment(mut self, comment: impl Into<Comment>) -> Self {
         self.trailing_comments.push(comment.into());
         self
+    }
+
+    /// Returns true if no metadata has been added.
+    pub fn is_empty(&self) -> bool {
+        self.attrs.is_empty() && self.comments.is_empty() && self.trailing_comments.is_empty()
     }
 
     /// Builds the `Md` AST node.

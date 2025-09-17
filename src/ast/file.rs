@@ -1,6 +1,7 @@
 //! Defines the top-level AST node for a Rust file.
 
 use crate::ast::items::Item;
+use crate::ast::metadata::Md;
 use crate::pretty_printer::{PrettyPrinter, Printer};
 use std::fmt;
 use thin_vec::ThinVec;
@@ -14,6 +15,8 @@ use thin_vec::ThinVec;
 pub struct File {
     /// The top-level items in the file.
     pub items: ThinVec<Item>,
+    /// The comments and attributes associated with the file.
+    pub md: Option<Box<Md>>,
 }
 
 impl fmt::Display for File {
