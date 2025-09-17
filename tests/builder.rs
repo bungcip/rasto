@@ -52,6 +52,7 @@ fn test_stmt_builder() {
             }),
             ty: Some("i32".into()),
             expr: Some(Expr::Lit(Lit::Int(LitInt::new(42)))),
+            else_block: None,
         })
     );
 
