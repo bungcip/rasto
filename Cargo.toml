@@ -9,3 +9,11 @@ thin-vec = "0.2.14"
 
 [lints.clippy]
 bool_comparison = "allow" # reason: `expr == false` is better than !expr suggeste by clippy
+
+[[example]]
+name = "pretty_print_simple"
+path = "examples/pretty_print_simple.rs"
+
+[[example]]
+name = "pretty_print_trait"
+path = "examples/pretty_print_trait.rs"

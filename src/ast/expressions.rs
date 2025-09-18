@@ -382,6 +382,18 @@ pub enum BinOp {
     Mul,
     /// The division operator `/`.
     Div,
+    /// The equality operator `==`.
+    Eq,
+    /// The less than operator `<`.
+    Lt,
+    /// The less than or equal to operator `<=`.
+    Le,
+    /// The not equal to operator `!=`.
+    Ne,
+    /// The greater than or equal to operator `>=`.
+    Ge,
+    /// The greater than operator `>`.
+    Gt,
 }
 
 /// Represents an `if` expression, which allows for conditional execution.

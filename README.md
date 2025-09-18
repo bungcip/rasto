@@ -80,6 +80,15 @@ pub fn my_function<T>(arg) -> T {
 }
 ```
 
+## Examples
+
+You can run the examples using the following commands:
+
+```bash
+cargo run --example pretty_print_simple
+cargo run --example pretty_print_trait
+```
+
 ## Documentation
 
 The full documentation for this crate can be found on [docs.rs](https://docs.rs/rasto).

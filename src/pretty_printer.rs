@@ -868,6 +868,12 @@ impl PrettyPrinter for BinOp {
             BinOp::Sub => printer.string("-"),
             BinOp::Mul => printer.string("*"),
             BinOp::Div => printer.string("/"),
+            BinOp::Eq => printer.string("=="),
+            BinOp::Lt => printer.string("<"),
+            BinOp::Le => printer.string("<="),
+            BinOp::Ne => printer.string("!="),
+            BinOp::Ge => printer.string(">="),
+            BinOp::Gt => printer.string(">"),
         }
         Ok(())
     }
