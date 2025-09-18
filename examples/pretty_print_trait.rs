@@ -1,5 +1,7 @@
 use rasto::ast::*;
-use rasto::builder::{block, expr, file, fn_def, impl_block, stmt, struct_def, trait_def, trait_item_fn, path};
+use rasto::builder::{
+    block, expr, file, fn_def, impl_block, path, stmt, struct_def, trait_def, trait_item_fn,
+};
 use rasto::pretty;
 
 fn main() {
@@ -25,17 +27,11 @@ fn main() {
                         .output(path("String").build_type())
                         .block(
                             block()
-                                .statement(
-                                    stmt()
-                                        .local("name")
-                                        .expr(
-                                            expr().method_call(
-                                                expr().lit("cat"),
-                                                "to_string",
-                                                [],
-                                            ),
-                                        ),
-                                )
+                                .statement(stmt().local("name").expr(expr().method_call(
+                                    expr().lit("cat"),
+                                    "to_string",
+                                    [],
+                                )))
                                 .statement(expr().path("name"))
                                 .has_trailing_semicolon(false),
                         ),

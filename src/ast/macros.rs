@@ -14,6 +14,40 @@ macro_rules! impl_display_for_item {
     };
 }
 
+/// A helper macro for generating AST item structs.
+#[macro_export]
+macro_rules! ast_item_impl {
+    (
+        $(#[$outer:meta])*
+        $vis:vis struct $name:ident {
+            $(
+                $(#[$common_f_outer:meta])*
+                $common_f_vis:vis $common_field:ident: $common_ty:ty
+            ),*
+        }
+        {
+            $(
+                $(#[$f_outer:meta])*
+                $f_vis:vis $field:ident: $ty:ty
+            ),*
+        }
+    ) => {
+        $(#[$outer])*
+        #[derive(Debug, Clone, PartialEq)]
+        $vis struct $name {
+            $(
+                $(#[$common_f_outer])*
+                $common_f_vis $common_field: $common_ty,
+            )*
+            $(
+                $(#[$f_outer])*
+                $f_vis $field: $ty
+            ),*
+        }
+        $crate::impl_display_for_item!($name);
+    }
+}
+
 /// A macro for generating AST item structs.
 ///
 /// This macro reduces boilerplate by generating the struct definition with
@@ -32,22 +66,23 @@ macro_rules! ast_item {
             $(,)?
         }
     ) => {
-        $(#[$outer])*
-        #[derive(Debug, Clone, PartialEq)]
-        $vis struct $name {
-            /// The visibility of the item.
-            pub vis: $crate::ast::visibility::Visibility,
-            /// The name of the item.
-            pub ident: String,
-            /// Metadata about the item, including attributes and comments.
-            pub md: Option<Box<$crate::ast::metadata::Md>>,
-            $(
-                $(#[$f_outer])*
-                $f_vis $field: $ty
-            ),*
+        ast_item_impl! {
+            $(#[$outer])*
+            $vis struct $name {
+                /// The visibility of the item.
+                pub vis: $crate::ast::visibility::Visibility,
+                /// The name of the item.
+                pub ident: String,
+                /// Metadata about the item, including attributes and comments.
+                pub md: Option<Box<$crate::ast::metadata::Md>>
+            }
+            {
+                $(
+                    $(#[$f_outer])*
+                    $f_vis $field: $ty
+                ),*
+            }
         }
-
-        $crate::impl_display_for_item!($name);
     };
     (
         $(#[$outer:meta])*
@@ -59,16 +94,16 @@ macro_rules! ast_item {
             $(,)?
         }
     ) => {
-        $(#[$outer])*
-        #[derive(Debug, Clone, PartialEq)]
-        $vis struct $name {
-            $(
-                $(#[$f_outer])*
-                $f_vis $field: $ty
-            ),*
+        ast_item_impl! {
+            $(#[$outer])*
+            $vis struct $name {}
+            {
+                $(
+                    $(#[$f_outer])*
+                    $f_vis $field: $ty
+                ),*
+            }
         }
-
-        $crate::impl_display_for_item!($name);
     };
     (
         $(#[$outer:meta])*
@@ -80,20 +115,21 @@ macro_rules! ast_item {
             $(,)?
         }
     ) => {
-        $(#[$outer])*
-        #[derive(Debug, Clone, PartialEq)]
-        $vis struct $name {
-            /// The visibility of the item.
-            pub vis: $crate::ast::visibility::Visibility,
-            /// Metadata about the item, including attributes and comments.
-            pub md: Option<Box<$crate::ast::metadata::Md>>,
-            $(
-                $(#[$f_outer])*
-                $f_vis $field: $ty
-            ),*
+        ast_item_impl! {
+            $(#[$outer])*
+            $vis struct $name {
+                /// The visibility of the item.
+                pub vis: $crate::ast::visibility::Visibility,
+                /// Metadata about the item, including attributes and comments.
+                pub md: Option<Box<$crate::ast::metadata::Md>>
+            }
+            {
+                $(
+                    $(#[$f_outer])*
+                    $f_vis $field: $ty
+                ),*
+            }
         }
-
-        $crate::impl_display_for_item!($name);
     };
     (
         $(#[$outer:meta])*
@@ -105,18 +141,19 @@ macro_rules! ast_item {
             $(,)?
         }
     ) => {
-        $(#[$outer])*
-        #[derive(Debug, Clone, PartialEq)]
-        $vis struct $name {
-            /// Metadata about the item, including attributes and comments.
-            pub md: Option<Box<$crate::ast::metadata::Md>>,
-            $(
-                $(#[$f_outer])*
-                $f_vis $field: $ty
-            ),*
+        ast_item_impl! {
+            $(#[$outer])*
+            $vis struct $name {
+                /// Metadata about the item, including attributes and comments.
+                pub md: Option<Box<$crate::ast::metadata::Md>>
+            }
+            {
+                $(
+                    $(#[$f_outer])*
+                    $f_vis $field: $ty
+                ),*
+            }
         }
-
-        $crate::impl_display_for_item!($name);
     };
     (
         $(#[$outer:meta])*
@@ -128,20 +165,21 @@ macro_rules! ast_item {
             $(,)?
         }
     ) => {
-        $(#[$outer])*
-        #[derive(Debug, Clone, PartialEq)]
-        $vis struct $name {
-            /// The name of the item.
-            pub ident: String,
-            /// Metadata about the item, including attributes and comments.
-            pub md: Option<Box<$crate::ast::metadata::Md>>,
-            $(
-                $(#[$f_outer])*
-                $f_vis $field: $ty
-            ),*
+        ast_item_impl! {
+            $(#[$outer])*
+            $vis struct $name {
+                /// The name of the item.
+                pub ident: String,
+                /// Metadata about the item, including attributes and comments.
+                pub md: Option<Box<$crate::ast::metadata::Md>>
+            }
+            {
+                $(
+                    $(#[$f_outer])*
+                    $f_vis $field: $ty
+                ),*
+            }
         }
-
-        $crate::impl_display_for_item!($name);
     };
     (
         $(#[$outer:meta])*
@@ -153,23 +191,24 @@ macro_rules! ast_item {
             $(,)?
         }
     ) => {
-        $(#[$outer])*
-        #[derive(Debug, Clone, PartialEq)]
-        $vis struct $name {
-            /// The visibility of the item.
-            pub vis: $crate::ast::visibility::Visibility,
-            /// The name of the item.
-            pub ident: String,
-            /// The generic parameters of the item.
-            pub generics: $crate::ast::generics::GenericParams,
-            /// Metadata about the item, including attributes and comments.
-            pub md: Option<Box<$crate::ast::metadata::Md>>,
-            $(
-                $(#[$f_outer])*
-                $f_vis $field: $ty
-            ),*
+        ast_item_impl! {
+            $(#[$outer])*
+            $vis struct $name {
+                /// The visibility of the item.
+                pub vis: $crate::ast::visibility::Visibility,
+                /// The name of the item.
+                pub ident: String,
+                /// The generic parameters of the item.
+                pub generics: $crate::ast::generics::GenericParams,
+                /// Metadata about the item, including attributes and comments.
+                pub md: Option<Box<$crate::ast::metadata::Md>>
+            }
+            {
+                $(
+                    $(#[$f_outer])*
+                    $f_vis $field: $ty
+                ),*
+            }
         }
-
-        $crate::impl_display_for_item!($name);
     };
 }
