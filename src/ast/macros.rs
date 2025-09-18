@@ -1,3 +1,19 @@
+/// A macro for generating the `Display` implementation for an AST item.
+#[doc(hidden)]
+#[macro_export]
+macro_rules! impl_display_for_item {
+    ($name:ident) => {
+        impl ::std::fmt::Display for $name {
+            /// Formats the item using the pretty-printer.
+            fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+                let mut printer = $crate::pretty_printer::Printer::new(f);
+                self.pretty_print(&mut printer)?;
+                printer.finish()
+            }
+        }
+    };
+}
+
 /// A macro for generating AST item structs.
 ///
 /// This macro reduces boilerplate by generating the struct definition with
@@ -31,14 +47,7 @@ macro_rules! ast_item {
             ),*
         }
 
-        impl ::std::fmt::Display for $name {
-            /// Formats the item using the pretty-printer.
-            fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-                let mut printer = $crate::pretty_printer::Printer::new(f);
-                self.pretty_print(&mut printer)?;
-                printer.finish()
-            }
-        }
+        $crate::impl_display_for_item!($name);
     };
     (
         $(#[$outer:meta])*
@@ -59,14 +68,7 @@ macro_rules! ast_item {
             ),*
         }
 
-        impl ::std::fmt::Display for $name {
-            /// Formats the item using the pretty-printer.
-            fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-                let mut printer = $crate::pretty_printer::Printer::new(f);
-                self.pretty_print(&mut printer)?;
-                printer.finish()
-            }
-        }
+        $crate::impl_display_for_item!($name);
     };
     (
         $(#[$outer:meta])*
@@ -91,14 +93,7 @@ macro_rules! ast_item {
             ),*
         }
 
-        impl ::std::fmt::Display for $name {
-            /// Formats the item using the pretty-printer.
-            fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-                let mut printer = $crate::pretty_printer::Printer::new(f);
-                self.pretty_print(&mut printer)?;
-                printer.finish()
-            }
-        }
+        $crate::impl_display_for_item!($name);
     };
     (
         $(#[$outer:meta])*
@@ -121,14 +116,7 @@ macro_rules! ast_item {
             ),*
         }
 
-        impl ::std::fmt::Display for $name {
-            /// Formats the item using the pretty-printer.
-            fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-                let mut printer = $crate::pretty_printer::Printer::new(f);
-                self.pretty_print(&mut printer)?;
-                printer.finish()
-            }
-        }
+        $crate::impl_display_for_item!($name);
     };
     (
         $(#[$outer:meta])*
@@ -153,14 +141,7 @@ macro_rules! ast_item {
             ),*
         }
 
-        impl ::std::fmt::Display for $name {
-            /// Formats the item using the pretty-printer.
-            fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-                let mut printer = $crate::pretty_printer::Printer::new(f);
-                self.pretty_print(&mut printer)?;
-                printer.finish()
-            }
-        }
+        $crate::impl_display_for_item!($name);
     };
     (
         $(#[$outer:meta])*
@@ -189,13 +170,6 @@ macro_rules! ast_item {
             ),*
         }
 
-        impl ::std::fmt::Display for $name {
-            /// Formats the item using the pretty-printer.
-            fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-                let mut printer = $crate::pretty_printer::Printer::new(f);
-                self.pretty_print(&mut printer)?;
-                printer.finish()
-            }
-        }
+        $crate::impl_display_for_item!($name);
     };
 }
