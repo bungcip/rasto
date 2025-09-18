@@ -55,6 +55,8 @@ pub enum Expr {
     MethodCall(ExprMethodCall),
     /// A parenthesized expression: `(a + b)`.
     Paren(ExprParen),
+    /// A path expression.
+    Path(ExprPath),
     /// A range expression: `a..b`, `a..=b`, `..b`, `a..`.
     Range(ExprRange),
     /// A reference expression: `&x` or `&mut x`.
@@ -255,6 +257,19 @@ pub struct ExprMethodCall {
 pub struct ExprParen {
     /// The expression that is enclosed within the parentheses.
     pub expr: Box<Expr>,
+}
+
+/// A path expression, e.g. `foo` or `foo::bar`
+#[derive(Debug, Clone, PartialEq)]
+pub struct ExprPath {
+    /// The path to the item
+    pub path: Path,
+}
+
+impl From<ExprPath> for Expr {
+    fn from(expr: ExprPath) -> Self {
+        Expr::Path(expr)
+    }
 }
 
 /// Represents a range expression, which can be used for slicing or iteration.

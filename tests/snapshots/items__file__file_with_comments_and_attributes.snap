@@ -1,6 +1,5 @@
 ---
 source: tests/file.rs
-assertion_line: 49
 expression: pretty(&file)
 ---
 #![allow(dead_code)]
