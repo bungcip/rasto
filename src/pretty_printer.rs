@@ -934,8 +934,16 @@ impl PrettyPrinter for Expr {
             Expr::Struct(expr) => expr.pretty_print(printer),
             Expr::Try(expr) => expr.pretty_print(printer),
             Expr::Tuple(expr) => expr.pretty_print(printer),
+            Expr::Infer(expr) => expr.pretty_print(printer),
             Expr::Unary(expr) => expr.pretty_print(printer),
         }
+    }
+}
+
+impl PrettyPrinter for ExprInfer {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        printer.string("_");
+        Ok(())
     }
 }
 

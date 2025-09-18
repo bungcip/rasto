@@ -1,0 +1,6 @@
+---
+source: tests/infer_expr.rs
+assertion_line: 11
+expression: pretty(&path)
+---
+MyType<_>

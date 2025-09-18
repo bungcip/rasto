@@ -43,6 +43,8 @@ pub enum Expr {
     If(ExprIf),
     /// An index expression: `arr[i]`.
     Index(ExprIndex),
+    /// An inferred expression: `_`.
+    Infer(ExprInfer),
     /// A literal expression, like `1` or `"hello"`.
     Lit(Lit),
     /// A `loop` expression: `loop { ... }`.
@@ -211,6 +213,16 @@ pub struct ExprIndex {
     pub expr: Box<Expr>,
     /// The expression that evaluates to the index.
     pub index: Box<Expr>,
+}
+
+/// Represents an inferred expression (`_`).
+#[derive(Debug, Clone, PartialEq)]
+pub struct ExprInfer;
+
+impl From<ExprInfer> for Expr {
+    fn from(expr: ExprInfer) -> Self {
+        Expr::Infer(expr)
+    }
 }
 
 /// Represents a `match` expression, which allows for branching based on
