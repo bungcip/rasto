@@ -6,7 +6,6 @@ use rasto::builder::{
 use rasto::pretty;
 use thin_vec::thin_vec;
 
-
 #[test]
 fn test_file() {
     let ast = file()

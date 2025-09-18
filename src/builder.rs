@@ -2761,6 +2761,11 @@ impl ExprBuilder {
         })
     }
 
+    /// Creates an inferred expression (`_`).
+    pub fn infer(self) -> Expr {
+        Expr::Infer(ExprInfer)
+    }
+
     /// Creates a literal expression.
     ///
     /// # Parameters
