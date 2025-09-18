@@ -1,0 +1,6 @@
+---
+source: tests/macros.rs
+assertion_line: 49
+expression: pretty(&item)
+---
+MyMacroItemWithoutGenerics

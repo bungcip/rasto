@@ -29,16 +29,25 @@ fn test_struct_with_generics() {
 }
 
 #[test]
-fn test_from_impls() {
+fn test_generic_param_from_lifetime() {
     let param: GenericParam = generic_param().lifetime("a").into();
     assert!(matches!(param, GenericParam::Lifetime(_)));
+}
 
+#[test]
+fn test_generic_param_from_type() {
     let param: GenericParam = generic_param().ty("T").into();
     assert!(matches!(param, GenericParam::Type(_)));
+}
 
+#[test]
+fn test_generic_param_from_const() {
     let param: GenericParam = generic_param().const_("N", "usize").into();
     assert!(matches!(param, GenericParam::Const(_)));
+}
 
+#[test]
+fn test_generic_args_new() {
     let args: GenericArgs = GenericArgs::new();
     assert!(args.args.is_empty());
 }

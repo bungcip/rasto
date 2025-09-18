@@ -1,0 +1,6 @@
+---
+source: tests/macros.rs
+assertion_line: 138
+expression: pretty(&item)
+---
+MyMacroItemWithoutVis
