@@ -2872,6 +2872,15 @@ impl ExprBuilder {
         })
     }
 
+    /// Creates a path expression.
+    ///
+    /// # Parameters
+    ///
+    /// - `path`: The path.
+    pub fn path(self, path: impl Into<Path>) -> Expr {
+        Expr::Path(ExprPath { path: path.into() })
+    }
+
     /// Creates a range expression.
     ///
     /// # Parameters

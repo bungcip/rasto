@@ -32,6 +32,12 @@ fn test_file() {
 }
 
 #[test]
+fn test_path_expr() {
+    let expr = expr().path(path("foo").segment("bar"));
+    insta::assert_snapshot!(pretty(&expr));
+}
+
+#[test]
 fn test_let_else_statement() {
     let ast = fn_def("foo")
         .statement(

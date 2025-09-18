@@ -920,6 +920,7 @@ impl PrettyPrinter for Expr {
             Expr::Match(expr) => expr.pretty_print(printer),
             Expr::MethodCall(expr) => expr.pretty_print(printer),
             Expr::Paren(expr) => expr.pretty_print(printer),
+            Expr::Path(expr) => expr.pretty_print(printer),
             Expr::Range(expr) => expr.pretty_print(printer),
             Expr::Reference(expr) => expr.pretty_print(printer),
             Expr::RawRef(expr) => expr.pretty_print(printer),
@@ -1095,6 +1096,12 @@ impl PrettyPrinter for ExprParen {
         self.expr.pretty_print(printer)?;
         printer.string(")");
         Ok(())
+    }
+}
+
+impl PrettyPrinter for ExprPath {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        self.path.pretty_print(printer)
     }
 }
 
