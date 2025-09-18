@@ -25,8 +25,7 @@ use crate::ast::item_use::ItemUse;
 use crate::ast::metadata::Md;
 use crate::ast::statements::Block;
 use crate::ast::types::Type;
-use crate::pretty_printer::{PrettyPrinter, Printer};
-use std::fmt;
+use crate::pretty_printer::PrettyPrinter;
 use thin_vec::ThinVec;
 
 /// A top-level item in a Rust file.
@@ -68,14 +67,7 @@ pub enum Item {
     Use(ItemUse),
 }
 
-impl fmt::Display for Item {
-    /// Formats the `Item` using the pretty-printer.
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let mut printer = Printer::new(f);
-        self.pretty_print(&mut printer)?;
-        printer.finish()
-    }
-}
+impl_display_for_item!(Item);
 
 /// An item within a trait definition.
 #[derive(Debug, Clone, PartialEq)]
@@ -97,14 +89,7 @@ pub struct TraitItemFn {
     pub md: Option<Box<Md>>,
 }
 
-impl fmt::Display for ItemImpl {
-    /// Formats the `ItemImpl` using the pretty-printer.
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let mut printer = Printer::new(f);
-        self.pretty_print(&mut printer)?;
-        printer.finish()
-    }
-}
+impl_display_for_item!(ItemImpl);
 
 /// An `impl` block.
 #[derive(Debug, Clone, PartialEq)]

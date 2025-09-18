@@ -3,9 +3,7 @@ use rasto::pretty;
 
 #[test]
 fn test_fn_with_test_attribute() {
-    let item = fn_def("my_func")
-        .attr(attr().meta("test"))
-        .build();
+    let item = fn_def("my_func").attr(attr().meta("test")).build();
 
     insta::assert_snapshot!(pretty(&item), @r###"
     #[test]
