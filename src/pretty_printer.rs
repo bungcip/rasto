@@ -881,12 +881,13 @@ impl PrettyPrinter for BinOp {
 
 impl PrettyPrinter for ExprBinary {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        let precedence = self.op.precedence();
         printer.begin(BreakStyle::Inconsistent, "");
-        self.left.pretty_print(printer)?;
+        pretty_print_expr(&self.left, printer, precedence, true)?;
         printer.break_();
         self.op.pretty_print(printer)?;
         printer.string(" ");
-        self.right.pretty_print(printer)?;
+        pretty_print_expr(&self.right, printer, precedence, false)?;
         printer.end("");
         Ok(())
     }
@@ -902,42 +903,67 @@ impl PrettyPrinter for ExprUnary {
 
 impl PrettyPrinter for Expr {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
-        match self {
-            Expr::Lit(lit) => lit.pretty_print(printer),
-            Expr::Binary(expr) => expr.pretty_print(printer),
-            Expr::If(expr) => expr.pretty_print(printer),
-            Expr::Block(expr) => expr.pretty_print(printer),
-            Expr::Loop(expr) => expr.pretty_print(printer),
-            Expr::While(expr) => expr.pretty_print(printer),
-            Expr::For(expr) => expr.pretty_print(printer),
-            Expr::Assign(expr) => expr.pretty_print(printer),
-            Expr::MacroCall(expr) => expr.pretty_print(printer),
-            Expr::Array(expr) => expr.pretty_print(printer),
-            Expr::Async(expr) => expr.pretty_print(printer),
-            Expr::Await(expr) => expr.pretty_print(printer),
-            Expr::Break(expr) => expr.pretty_print(printer),
-            Expr::Call(expr) => expr.pretty_print(printer),
-            Expr::Cast(expr) => expr.pretty_print(printer),
-            Expr::Closure(expr) => expr.pretty_print(printer),
-            Expr::Const(expr) => expr.pretty_print(printer),
-            Expr::Continue(expr) => expr.pretty_print(printer),
-            Expr::Field(expr) => expr.pretty_print(printer),
-            Expr::Index(expr) => expr.pretty_print(printer),
-            Expr::Match(expr) => expr.pretty_print(printer),
-            Expr::MethodCall(expr) => expr.pretty_print(printer),
-            Expr::Paren(expr) => expr.pretty_print(printer),
-            Expr::Path(expr) => expr.pretty_print(printer),
-            Expr::Range(expr) => expr.pretty_print(printer),
-            Expr::Reference(expr) => expr.pretty_print(printer),
-            Expr::RawRef(expr) => expr.pretty_print(printer),
-            Expr::Return(expr) => expr.pretty_print(printer),
-            Expr::Struct(expr) => expr.pretty_print(printer),
-            Expr::Try(expr) => expr.pretty_print(printer),
-            Expr::Tuple(expr) => expr.pretty_print(printer),
-            Expr::Infer(expr) => expr.pretty_print(printer),
-            Expr::Unary(expr) => expr.pretty_print(printer),
-        }
+        pretty_print_expr(self, printer, 0, false)
     }
+}
+
+fn pretty_print_expr<'a>(
+    expr: &'a Expr,
+    printer: &mut Printer<'a>,
+    parent_precedence: u8,
+    is_left: bool,
+) -> fmt::Result {
+    match expr {
+        Expr::Binary(binary) => {
+            let precedence = binary.op.precedence();
+            let needs_paren = if is_left {
+                precedence < parent_precedence
+            } else {
+                precedence <= parent_precedence
+            };
+
+            if needs_paren {
+                printer.string("(");
+                binary.pretty_print(printer)?;
+                printer.string(")");
+            } else {
+                binary.pretty_print(printer)?;
+            }
+        }
+        Expr::Lit(lit) => lit.pretty_print(printer)?,
+        Expr::If(expr) => expr.pretty_print(printer)?,
+        Expr::Block(expr) => expr.pretty_print(printer)?,
+        Expr::Loop(expr) => expr.pretty_print(printer)?,
+        Expr::While(expr) => expr.pretty_print(printer)?,
+        Expr::For(expr) => expr.pretty_print(printer)?,
+        Expr::Assign(expr) => expr.pretty_print(printer)?,
+        Expr::MacroCall(expr) => expr.pretty_print(printer)?,
+        Expr::Array(expr) => expr.pretty_print(printer)?,
+        Expr::Async(expr) => expr.pretty_print(printer)?,
+        Expr::Await(expr) => expr.pretty_print(printer)?,
+        Expr::Break(expr) => expr.pretty_print(printer)?,
+        Expr::Call(expr) => expr.pretty_print(printer)?,
+        Expr::Cast(expr) => expr.pretty_print(printer)?,
+        Expr::Closure(expr) => expr.pretty_print(printer)?,
+        Expr::Const(expr) => expr.pretty_print(printer)?,
+        Expr::Continue(expr) => expr.pretty_print(printer)?,
+        Expr::Field(expr) => expr.pretty_print(printer)?,
+        Expr::Index(expr) => expr.pretty_print(printer)?,
+        Expr::Match(expr) => expr.pretty_print(printer)?,
+        Expr::MethodCall(expr) => expr.pretty_print(printer)?,
+        Expr::Paren(expr) => expr.pretty_print(printer)?,
+        Expr::Path(expr) => expr.pretty_print(printer)?,
+        Expr::Range(expr) => expr.pretty_print(printer)?,
+        Expr::Reference(expr) => expr.pretty_print(printer)?,
+        Expr::RawRef(expr) => expr.pretty_print(printer)?,
+        Expr::Return(expr) => expr.pretty_print(printer)?,
+        Expr::Struct(expr) => expr.pretty_print(printer)?,
+        Expr::Try(expr) => expr.pretty_print(printer)?,
+        Expr::Tuple(expr) => expr.pretty_print(printer)?,
+        Expr::Infer(expr) => expr.pretty_print(printer)?,
+        Expr::Unary(expr) => expr.pretty_print(printer)?,
+    }
+    Ok(())
 }
 
 impl PrettyPrinter for ExprInfer {

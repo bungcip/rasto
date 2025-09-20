@@ -408,6 +408,17 @@ pub enum BinOp {
     Gt,
 }
 
+impl BinOp {
+    /// Returns the precedence of the operator.
+    pub fn precedence(&self) -> u8 {
+        match self {
+            BinOp::Mul | BinOp::Div => 2,
+            BinOp::Add | BinOp::Sub => 1,
+            _ => 0,
+        }
+    }
+}
+
 /// Represents an `if` expression, which allows for conditional execution.
 ///
 /// An `if` expression can optionally have an `else` branch.

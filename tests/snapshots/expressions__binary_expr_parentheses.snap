@@ -1,0 +1,5 @@
+---
+source: tests/expressions.rs
+expression: pretty(&outer_expr)
+---
+(a + b) * c

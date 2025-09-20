@@ -1,6 +1,5 @@
 ---
 source: tests/macros.rs
-assertion_line: 115
 expression: pretty(&item)
 ---
-MyMacroItemWithoutVisAndIdent
+MyMacroItemWithoutVisIdentMd
