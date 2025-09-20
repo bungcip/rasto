@@ -1,6 +1,5 @@
 ---
 source: tests/macros.rs
-assertion_line: 93
 expression: pretty(&item)
 ---
 MyMacroItemWithoutIdent

@@ -210,3 +210,23 @@ fn test_method_call_expr() {
     let expr = expr().method_call("my_obj".into(), "my_method", vec![expr().lit(1)]);
     insta::assert_snapshot!(pretty(&expr));
 }
+
+#[test]
+fn test_nested_binary_expr_precedence() {
+    let expr = expr().binary(
+        expr().binary(expr().lit(1), BinOp::Add, expr().lit(2)),
+        BinOp::Mul,
+        expr().lit(3),
+    );
+    insta::assert_snapshot!(pretty(&expr), @"(1 + 2) * 3");
+}
+
+#[test]
+fn test_nested_binary_expr_precedence_2() {
+    let expr = expr().binary(
+        expr().lit(1),
+        BinOp::Add,
+        expr().binary(expr().lit(2), BinOp::Mul, expr().lit(3)),
+    );
+    insta::assert_snapshot!(pretty(&expr), @"1 + 2 * 3");
+}

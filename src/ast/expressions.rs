@@ -408,6 +408,25 @@ pub enum BinOp {
     Gt,
 }
 
+impl BinOp {
+    /// Returns the precedence of the operator.
+    ///
+    /// See <https://doc.rust-lang.org/reference/expressions.html#expression-precedence>
+    pub fn precedence(&self) -> u8 {
+        match self {
+            BinOp::Mul | BinOp::Div => 11,
+            BinOp::Add | BinOp::Sub => 10,
+            BinOp::Eq | BinOp::Ne | BinOp::Lt | BinOp::Le | BinOp::Gt | BinOp::Ge => 7,
+        }
+    }
+
+    /// Returns `true` if the operator is left-associative.
+    pub fn is_left_associative(&self) -> bool {
+        // All current binary operators are left-associative.
+        true
+    }
+}
+
 /// Represents an `if` expression, which allows for conditional execution.
 ///
 /// An `if` expression can optionally have an `else` branch.

@@ -882,11 +882,45 @@ impl PrettyPrinter for BinOp {
 impl PrettyPrinter for ExprBinary {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.begin(BreakStyle::Inconsistent, "");
-        self.left.pretty_print(printer)?;
+
+        let precedence = self.op.precedence();
+
+        let pp_sub_expr = |p: &mut Printer<'a>, expr: &'a Expr, is_left: bool| -> fmt::Result {
+            let sub_precedence = if let Expr::Binary(sub_expr) = expr {
+                sub_expr.op.precedence()
+            } else {
+                u8::MAX
+            };
+
+            let needs_paren = if is_left {
+                sub_precedence < precedence
+            } else {
+                // right-associative operators need parentheses on the left operand
+                // if they have the same precedence.
+                // for left-associative, they are needed on the right operand.
+                if self.op.is_left_associative() {
+                    sub_precedence <= precedence
+                } else {
+                    sub_precedence < precedence
+                }
+            };
+
+            if needs_paren {
+                p.string("(");
+                expr.pretty_print(p)?;
+                p.string(")");
+            } else {
+                expr.pretty_print(p)?;
+            }
+            Ok(())
+        };
+
+        pp_sub_expr(printer, &self.left, true)?;
         printer.break_();
         self.op.pretty_print(printer)?;
         printer.string(" ");
-        self.right.pretty_print(printer)?;
+        pp_sub_expr(printer, &self.right, false)?;
+
         printer.end("");
         Ok(())
     }
