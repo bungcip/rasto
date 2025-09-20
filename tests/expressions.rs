@@ -210,3 +210,10 @@ fn test_method_call_expr() {
     let expr = expr().method_call("my_obj".into(), "my_method", vec![expr().lit(1)]);
     insta::assert_snapshot!(pretty(&expr));
 }
+
+#[test]
+fn test_binary_expr_parentheses() {
+    let inner_expr = expr().binary(expr().path("a"), BinOp::Add, expr().path("b"));
+    let outer_expr = expr().binary(inner_expr, BinOp::Mul, expr().path("c"));
+    insta::assert_snapshot!(pretty(&outer_expr));
+}
