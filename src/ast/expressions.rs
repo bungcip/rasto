@@ -4,7 +4,9 @@
 //! This module provides the data structures for all kinds of expressions, such as binary operations,
 //! function calls, and control flow expressions like `if` and `match`.
 
-use crate::ast::{Pat, TokenStream, generics::GenericArgs, literals::Lit, statements::Block};
+use crate::ast::{
+    Pat, TokenStream, generics::GenericArgs, ident::Ident, literals::Lit, statements::Block,
+};
 use thin_vec::ThinVec;
 
 /// Represents a Rust expression.
@@ -200,7 +202,7 @@ pub struct ExprField {
     /// The expression that evaluates to the struct or tuple.
     pub expr: Box<Expr>,
     /// The name of the field being accessed.
-    pub member: String,
+    pub member: Ident,
 }
 
 /// Represents an index expression, which is used to access an element of an
@@ -257,7 +259,7 @@ pub struct ExprMethodCall {
     /// The expression that the method is being called on (the "receiver").
     pub receiver: Box<Expr>,
     /// The name of the method being called.
-    pub method: String,
+    pub method: Ident,
     /// The list of arguments passed to the method.
     pub args: ThinVec<Expr>,
 }
@@ -347,7 +349,7 @@ pub struct ExprReturn {
 #[derive(Debug, Clone, PartialEq)]
 pub struct ExprStruct {
     /// The path to the struct being instantiated, e.g., `my_module::MyStruct`.
-    pub path: String,
+    pub path: Path,
     /// The list of fields and their initial values.
     pub fields: ThinVec<FieldValue>,
 }
@@ -369,7 +371,7 @@ pub struct ExprTry {
 #[derive(Debug, Clone, PartialEq)]
 pub struct FieldValue {
     /// The name of the field being initialized.
-    pub member: String,
+    pub member: Ident,
     /// The expression that provides the value for the field.
     pub value: Expr,
 }
@@ -532,7 +534,7 @@ pub struct Path {
 #[derive(Debug, Clone, PartialEq)]
 pub struct PathSegment {
     /// The identifier of the path segment.
-    pub ident: String,
+    pub ident: Ident,
     /// The optional generic arguments associated with this path segment.
     ///
     /// For example, in `Vec<i32>`, the arguments would be `<i32>`.

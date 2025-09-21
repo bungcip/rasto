@@ -1,8 +1,8 @@
 //! The `ast` module contains the definitions for the Abstract Syntax Tree (AST) nodes
 //! that represent Rust types.
 
-use crate::ast::Expr;
-use crate::ast::expressions::{Path, PathSegment};
+use crate::ast::expressions::{Expr, Path, PathSegment};
+use crate::ast::ident::Ident;
 use crate::ast::item_macro::ItemMacro;
 use thin_vec::{ThinVec, thin_vec};
 
@@ -97,7 +97,7 @@ pub struct TypePtr {
 #[derive(Debug, Clone, PartialEq)]
 pub struct TypeReference {
     /// The lifetime of the reference.
-    pub lifetime: Option<String>,
+    pub lifetime: Option<Ident>,
     /// The referenced type.
     pub elem: Box<Type>,
     /// Whether the reference is mutable.
@@ -112,7 +112,7 @@ impl From<&str> for Type {
         Type::Path(TypePath {
             path: Path {
                 segments: thin_vec![PathSegment {
-                    ident: s.to_string(),
+                    ident: s.into(),
                     args: None,
                 }],
             },

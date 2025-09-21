@@ -399,7 +399,7 @@ impl PrettyPrinter for ItemTypeAlias {
         pp_begin(&self.md, printer)?;
         self.vis.pretty_print(printer)?;
         printer.string("type ");
-        printer.string(&self.ident);
+        self.ident.pretty_print(printer)?;
         self.generics.pretty_print(printer)?;
         printer.string(" = ");
         self.ty.pretty_print(printer)?;
@@ -414,7 +414,7 @@ impl PrettyPrinter for ItemConst {
         pp_begin(&self.md, printer)?;
         self.vis.pretty_print(printer)?;
         printer.string("const ");
-        printer.string(&self.ident);
+        self.ident.pretty_print(printer)?;
         printer.string(": ");
         self.ty.pretty_print(printer)?;
         printer.string(" = ");
@@ -433,7 +433,7 @@ impl PrettyPrinter for ItemStatic {
         if self.is_mut {
             printer.string("mut ");
         }
-        printer.string(&self.ident);
+        self.ident.pretty_print(printer)?;
         printer.string(": ");
         self.ty.pretty_print(printer)?;
         printer.string(" = ");
@@ -473,7 +473,7 @@ impl PrettyPrinter for ExternalItem {
         match self {
             ExternalItem::Static(ident, ty) => {
                 printer.string("static ");
-                printer.string(ident);
+                ident.pretty_print(printer)?;
                 printer.string(": ");
                 ty.pretty_print(printer)?;
                 printer.string(";");
@@ -495,7 +495,7 @@ impl PrettyPrinter for AssociatedConst {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         pp_begin(&self.md, printer)?;
         printer.string("const ");
-        printer.string(&self.ident);
+        self.ident.pretty_print(printer)?;
         printer.string(": ");
         self.ty.pretty_print(printer)?;
         if let Some(expr) = &self.expr {
@@ -511,7 +511,7 @@ impl PrettyPrinter for AssociatedType {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         pp_begin(&self.md, printer)?;
         printer.string("type ");
-        printer.string(&self.ident);
+        self.ident.pretty_print(printer)?;
         self.generics.pretty_print(printer)?;
         if !self.bounds.is_empty() {
             printer.string(": ");
@@ -566,7 +566,7 @@ impl PrettyPrinter for PatIdent {
         if self.is_mut {
             printer.string("mut ");
         }
-        printer.string(&self.ident);
+        self.ident.pretty_print(printer)?;
         Ok(())
     }
 }
@@ -684,7 +684,7 @@ impl PrettyPrinter for PatStruct {
 
 impl PrettyPrinter for FieldPat {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
-        printer.string(&self.member);
+        self.member.pretty_print(printer)?;
         printer.string(": ");
         self.pat.pretty_print(printer)
     }
@@ -758,7 +758,7 @@ impl PrettyPrinter for Path {
 
 impl PrettyPrinter for PathSegment {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
-        printer.string(&self.ident);
+        self.ident.pretty_print(printer)?;
         if let Some(args) = &self.args {
             args.pretty_print(printer)?;
         }
@@ -1067,7 +1067,7 @@ impl PrettyPrinter for ExprField {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         self.expr.pretty_print(printer)?;
         printer.string(".");
-        printer.string(&self.member);
+        self.member.pretty_print(printer)?;
         Ok(())
     }
 }
@@ -1117,7 +1117,7 @@ impl PrettyPrinter for ExprMethodCall {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         self.receiver.pretty_print(printer)?;
         printer.string(".");
-        printer.string(&self.method);
+        self.method.pretty_print(printer)?;
         printer.begin(BreakStyle::Consistent, "(");
         for (i, arg) in self.args.iter().enumerate() {
             if i > 0 {
@@ -1196,7 +1196,7 @@ impl PrettyPrinter for ExprReturn {
 
 impl PrettyPrinter for ExprStruct {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
-        printer.string(&self.path);
+        self.path.pretty_print(printer)?;
         if !self.fields.is_empty() {
             printer.begin(BreakStyle::Consistent, " {");
             printer.break_();
@@ -1216,7 +1216,7 @@ impl PrettyPrinter for ExprStruct {
 
 impl PrettyPrinter for FieldValue {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
-        printer.string(&self.member);
+        self.member.pretty_print(printer)?;
         printer.string(": ");
         self.value.pretty_print(printer)
     }
@@ -1265,7 +1265,7 @@ impl PrettyPrinter for Signature {
             abi.pretty_print(printer)?;
             printer.string(" ");
         }
-        printer.string(&self.ident);
+        self.ident.pretty_print(printer)?;
         self.generics.pretty_print(printer)?;
         printer.begin(BreakStyle::Consistent, "(");
         for (i, input) in self.inputs.iter().enumerate() {
@@ -1565,7 +1565,7 @@ impl PrettyPrinter for ItemStruct {
         pp_begin(&self.md, printer)?;
         self.vis.pretty_print(printer)?;
         printer.string("struct ");
-        printer.string(&self.ident);
+        self.ident.pretty_print(printer)?;
         self.generics.pretty_print(printer)?;
         printer.string(" ");
         printer.begin(BreakStyle::Consistent, "{");
@@ -1582,7 +1582,7 @@ impl PrettyPrinter for ItemStruct {
 impl PrettyPrinter for Field {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         pp_begin(&self.md, printer)?;
-        printer.string(&self.ident);
+        self.ident.pretty_print(printer)?;
         printer.string(": ");
         self.ty.pretty_print(printer)?;
         Ok(())
@@ -1594,7 +1594,7 @@ impl PrettyPrinter for ItemEnum {
         pp_begin(&self.md, printer)?;
         self.vis.pretty_print(printer)?;
         printer.string("enum ");
-        printer.string(&self.ident);
+        self.ident.pretty_print(printer)?;
         self.generics.pretty_print(printer)?;
         printer.string(" ");
         printer.begin(BreakStyle::Consistent, "{");
@@ -1611,7 +1611,7 @@ impl PrettyPrinter for ItemEnum {
 impl PrettyPrinter for Variant {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         pp_begin(&self.md, printer)?;
-        printer.string(&self.ident);
+        self.ident.pretty_print(printer)?;
         Ok(())
     }
 }
@@ -1660,7 +1660,7 @@ impl PrettyPrinter for ItemTrait {
         pp_begin(&self.md, printer)?;
         self.vis.pretty_print(printer)?;
         printer.string("trait ");
-        printer.string(&self.ident);
+        self.ident.pretty_print(printer)?;
         self.generics.pretty_print(printer)?;
         printer.string(" ");
         printer.begin(BreakStyle::Consistent, "{");
@@ -1856,10 +1856,7 @@ impl PrettyPrinter for Meta {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         match self {
             Meta::List(list) => list.pretty_print(printer),
-            Meta::Path(path) => {
-                printer.string(path);
-                Ok(())
-            }
+            Meta::Path(path) => path.pretty_print(printer),
             Meta::NameValue(name_value) => name_value.pretty_print(printer),
         }
     }
@@ -1868,7 +1865,7 @@ impl PrettyPrinter for Meta {
 impl PrettyPrinter for MetaList {
     /// Pretty-prints the `MetaList` to the given printer.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
-        printer.string(&self.path);
+        self.path.pretty_print(printer)?;
         printer.string("(");
         for (i, meta) in self.metas.iter().enumerate() {
             if i > 0 {
@@ -1884,7 +1881,7 @@ impl PrettyPrinter for MetaList {
 impl PrettyPrinter for MetaNameValue {
     /// Pretty-prints the `MetaNameValue` to the given printer.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
-        printer.string(&self.path);
+        self.path.pretty_print(printer)?;
         printer.string(" = ");
         self.value.pretty_print(printer)
     }
@@ -1913,8 +1910,7 @@ impl PrettyPrinter for GenericArg {
         match self {
             GenericArg::Lifetime(lt) => {
                 printer.string("'");
-                printer.string(lt);
-                Ok(())
+                lt.pretty_print(printer)
             }
             GenericArg::Type(t) => t.pretty_print(printer),
             GenericArg::Const(c) => c.pretty_print(printer),
@@ -1927,7 +1923,7 @@ impl PrettyPrinter for ItemExternCrate {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         pp_begin(&self.md, printer)?;
         printer.string("extern crate ");
-        printer.string(&self.ident);
+        self.ident.pretty_print(printer)?;
         printer.string(";");
         pp_end(&self.md, printer)?;
         Ok(())
@@ -1969,7 +1965,7 @@ impl PrettyPrinter for ItemMod {
         pp_begin(&self.md, printer)?;
         self.vis.pretty_print(printer)?;
         printer.string("mod ");
-        printer.string(&self.ident);
+        self.ident.pretty_print(printer)?;
         if let Some(content) = &self.content {
             printer.string(" ");
             printer.begin(BreakStyle::Consistent, "{");
@@ -1991,7 +1987,7 @@ impl PrettyPrinter for ItemTraitAlias {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         pp_begin(&self.md, printer)?;
         printer.string("trait ");
-        printer.string(&self.ident);
+        self.ident.pretty_print(printer)?;
         printer.string(" = ");
         for (i, bound) in self.bounds.iter().enumerate() {
             if i > 0 {
@@ -2011,7 +2007,7 @@ impl PrettyPrinter for ItemUnion {
         pp_begin(&self.md, printer)?;
         self.vis.pretty_print(printer)?;
         printer.string("union ");
-        printer.string(&self.ident);
+        self.ident.pretty_print(printer)?;
         self.generics.pretty_print(printer)?;
         printer.string(" ");
         printer.begin(BreakStyle::Consistent, "{");
@@ -2180,7 +2176,7 @@ impl PrettyPrinter for TypeReference {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string("&");
         if let Some(lifetime) = &self.lifetime {
-            printer.string(lifetime);
+            lifetime.pretty_print(printer)?;
             printer.string(" ");
         }
         if self.mutable {

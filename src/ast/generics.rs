@@ -1,7 +1,7 @@
 //! The `ast` module contains the definitions for the Abstract Syntax Tree (AST) nodes
 //! that represent Rust generics.
 
-use crate::ast::types::Type;
+use crate::ast::{ident::Ident, types::Type};
 use crate::pretty_printer::{PrettyPrinter, Printer};
 use std::fmt;
 
@@ -20,7 +20,7 @@ impl GenericParamBuilder {
     /// # Parameters
     ///
     /// - `ident`: The name of the type parameter.
-    pub fn ty(self, ident: impl Into<String>) -> TypeParam {
+    pub fn ty(self, ident: impl Into<Ident>) -> TypeParam {
         TypeParam {
             ident: ident.into(),
             bounds: vec![],
@@ -32,7 +32,7 @@ impl GenericParamBuilder {
     /// # Parameters
     ///
     /// - `ident`: The name of the lifetime parameter.
-    pub fn lifetime(self, ident: impl Into<String>) -> LifetimeParam {
+    pub fn lifetime(self, ident: impl Into<Ident>) -> LifetimeParam {
         LifetimeParam {
             ident: ident.into(),
         }
@@ -44,7 +44,7 @@ impl GenericParamBuilder {
     ///
     /// - `ident`: The name of the const parameter.
     /// - `ty`: The `Type` of the const parameter.
-    pub fn const_(self, ident: impl Into<String>, ty: impl Into<Type>) -> ConstParam {
+    pub fn const_(self, ident: impl Into<Ident>, ty: impl Into<Type>) -> ConstParam {
         ConstParam {
             ident: ident.into(),
             ty: ty.into(),
@@ -102,14 +102,14 @@ impl From<ConstParam> for GenericParam {
 #[derive(Debug, Clone, PartialEq)]
 pub struct LifetimeParam {
     /// The name of the lifetime, without the leading apostrophe.
-    pub ident: String,
+    pub ident: Ident,
 }
 
 /// A type parameter, such as `T: Trait`.
 #[derive(Debug, Clone, PartialEq)]
 pub struct TypeParam {
     /// The name of the type parameter.
-    pub ident: String,
+    pub ident: Ident,
     /// The bounds on the type parameter, e.g., `Trait1 + Trait2`.
     pub bounds: Vec<Type>,
 }
@@ -118,7 +118,7 @@ pub struct TypeParam {
 #[derive(Debug, Clone, PartialEq)]
 pub struct ConstParam {
     /// The name of the const parameter.
-    pub ident: String,
+    pub ident: Ident,
     /// The type of the const parameter.
     pub ty: Type,
 }
@@ -155,7 +155,7 @@ impl PrettyPrinter for LifetimeParam {
     /// Pretty-prints the `LifetimeParam` to the given printer.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string("'");
-        printer.string(&self.ident);
+        self.ident.pretty_print(printer)?;
         Ok(())
     }
 }
@@ -163,7 +163,7 @@ impl PrettyPrinter for LifetimeParam {
 impl PrettyPrinter for TypeParam {
     /// Pretty-prints the `TypeParam` to the given printer.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
-        printer.string(&self.ident);
+        self.ident.pretty_print(printer)?;
         if !self.bounds.is_empty() {
             printer.string(": ");
             for (i, bound) in self.bounds.iter().enumerate() {
@@ -181,7 +181,7 @@ impl PrettyPrinter for ConstParam {
     /// Pretty-prints the `ConstParam` to the given printer.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string("const ");
-        printer.string(&self.ident);
+        self.ident.pretty_print(printer)?;
         printer.string(": ");
         self.ty.pretty_print(printer)
     }
@@ -205,7 +205,7 @@ impl GenericArgs {
 #[derive(Debug, Clone, PartialEq)]
 pub enum GenericArg {
     /// A lifetime argument: `'a`.
-    Lifetime(String),
+    Lifetime(Ident),
     /// A type argument: `T`.
     Type(Type),
     /// A const argument: `N`.

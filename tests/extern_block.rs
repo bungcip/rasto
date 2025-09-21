@@ -9,7 +9,7 @@ fn test_extern_block() {
         .unsafe_()
         .abi("C")
         .item(ExternalItem::Static(
-            "FOO".to_string(),
+            "FOO".into(),
             type_().path(path("i32").build()).into(),
         ))
         .item(ExternalItem::Fn(fn_def("foo").build()))

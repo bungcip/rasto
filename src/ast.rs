@@ -84,6 +84,9 @@ pub use comments::*;
 pub use expressions::*;
 pub use file::*;
 pub use generics::*;
+/// Defines the AST node for an identifier.
+pub mod ident;
+pub use ident::*;
 pub use item_asm::*;
 pub use item_const::*;
 pub use item_enum::*;

@@ -1,7 +1,6 @@
 //! Defines the AST node for a struct definition.
 
-use crate::ast::metadata::Md;
-use crate::ast::types::Type;
+use crate::ast::{ident::Ident, metadata::Md, types::Type};
 use crate::pretty_printer::PrettyPrinter;
 use thin_vec::ThinVec;
 
@@ -27,7 +26,7 @@ ast_item! {
 #[derive(Debug, Clone, PartialEq)]
 pub struct Field {
     /// The name of the field.
-    pub ident: String,
+    pub ident: Ident,
     /// The data type of the field.
     pub ty: Type,
     /// Metadata, such as attributes and comments, attached to the field.

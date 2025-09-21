@@ -1,8 +1,6 @@
 //! Defines the AST node for an associated type in a trait.
 
-use crate::ast::generics::GenericParams;
-use crate::ast::metadata::Md;
-use crate::ast::types::Type;
+use crate::ast::{generics::GenericParams, ident::Ident, metadata::Md, types::Type};
 use thin_vec::ThinVec;
 
 /// Represents an associated type within a trait.
@@ -33,7 +31,7 @@ pub struct AssociatedType {
     /// The identifier of the associated type.
     ///
     /// For `type Item;`, the ident is `Item`.
-    pub ident: String,
+    pub ident: Ident,
     /// The generic parameters for the associated type.
     ///
     /// For `type Item<T>;`, the generics are `<T>`.

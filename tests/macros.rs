@@ -17,7 +17,7 @@ impl PrettyPrinter for MyMacroItem {
 fn test_ast_item_macro() {
     let item = MyMacroItem {
         vis: rasto::ast::Visibility::Public,
-        ident: "MyItem".to_string(),
+        ident: "MyItem".into(),
         generics: rasto::ast::generics::GenericParams::new(),
         fields: vec!["field1".to_string(), "field2".to_string()],
         md: None,
