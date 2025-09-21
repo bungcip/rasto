@@ -10,6 +10,7 @@ use crate::ast::item_const::ItemConst;
 use crate::ast::item_enum::ItemEnum;
 use crate::ast::item_extern_block::ItemExternBlock;
 use crate::ast::item_extern_crate::ItemExternCrate;
+use crate::ast::item_extern_type::ItemExternType;
 use crate::ast::item_fn::{ItemFn, Signature};
 use crate::ast::item_foreign_mod::ItemForeignMod;
 use crate::ast::item_impl::ImplItem;
@@ -49,6 +50,8 @@ pub enum Item {
     Trait(ItemTrait),
     /// An `extern crate` item: `extern crate semver;`.
     ExternCrate(ItemExternCrate),
+    /// An `extern type` item: `extern type MyType;`.
+    ExternType(ItemExternType),
     /// A foreign module: `extern "C" { ... }`.
     ForeignMod(ItemForeignMod),
     /// An `extern` block: `extern "C" { ... }`.
@@ -184,6 +187,13 @@ impl From<ItemExternCrate> for Item {
     /// Converts an `ItemExternCrate` into an `Item::ExternCrate` variant.
     fn from(item: ItemExternCrate) -> Self {
         Item::ExternCrate(item)
+    }
+}
+
+impl From<ItemExternType> for Item {
+    /// Converts an `ItemExternType` into an `Item::ExternType` variant.
+    fn from(item: ItemExternType) -> Self {
+        Item::ExternType(item)
     }
 }
 

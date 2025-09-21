@@ -24,6 +24,20 @@ fn test_extern_block() {
 }
 
 #[test]
+fn test_extern_block_with_type() {
+    let extern_block = extern_block_item()
+        .abi("C")
+        .item(extern_type_item("MyType").build())
+        .build();
+
+    assert_snapshot!(extern_block.to_string(), @r###"
+    extern "C" {
+        extern type MyType;
+    }
+    "###);
+}
+
+#[test]
 fn test_extern_block_with_macro() {
     let extern_block = extern_block_item()
         .abi("system")
