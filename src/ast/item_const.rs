@@ -7,6 +7,14 @@ use crate::{
 
 ast_item! {
     /// A `const` item, such as `const MAX: u16 = 234342;`.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// use rasto::builder::{const_def, expr};
+    ///
+    /// let item = const_def("MY_CONST", "u32", expr().lit(123)).build();
+    /// ```
     pub struct ItemConst {
         /// The type of the const item.
         pub(crate) ty: Type,

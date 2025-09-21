@@ -151,6 +151,7 @@ impl ItemConstBuilder {
 }
 
 impl From<ItemConstBuilder> for Item {
+    /// Converts an `ItemConstBuilder` into an `Item::Const` variant.
     fn from(builder: ItemConstBuilder) -> Self {
         Item::Const(builder.build())
     }
@@ -219,6 +220,7 @@ impl ItemTypeAliasBuilder {
 }
 
 impl From<ItemTypeAliasBuilder> for Item {
+    /// Converts an `ItemTypeAliasBuilder` into an `Item::TypeAlias` variant.
     fn from(builder: ItemTypeAliasBuilder) -> Self {
         Item::TypeAlias(builder.build())
     }
@@ -2233,90 +2235,105 @@ impl From<MdBuilder> for Option<Box<Md>> {
 }
 
 impl From<ItemExternCrateBuilder> for Item {
+    /// Converts an `ItemExternCrateBuilder` into an `Item::ExternCrate` variant.
     fn from(builder: ItemExternCrateBuilder) -> Self {
         Item::ExternCrate(builder.build())
     }
 }
 
 impl From<ItemExternBlockBuilder> for Item {
+    /// Converts an `ItemExternBlockBuilder` into an `Item::ExternBlock` variant.
     fn from(builder: ItemExternBlockBuilder) -> Self {
         Item::ExternBlock(builder.build())
     }
 }
 
 impl From<ItemForeignModBuilder> for Item {
+    /// Converts an `ItemForeignModBuilder` into an `Item::ForeignMod` variant.
     fn from(builder: ItemForeignModBuilder) -> Self {
         Item::ForeignMod(builder.build())
     }
 }
 
 impl From<ItemMacroBuilder> for Item {
+    /// Converts an `ItemMacroBuilder` into an `Item::Macro` variant.
     fn from(builder: ItemMacroBuilder) -> Self {
         Item::Macro(builder.build())
     }
 }
 
 impl From<ItemModBuilder> for Item {
+    /// Converts an `ItemModBuilder` into an `Item::Mod` variant.
     fn from(builder: ItemModBuilder) -> Self {
         Item::Mod(builder.build())
     }
 }
 
 impl From<ItemTraitAliasBuilder> for Item {
+    /// Converts an `ItemTraitAliasBuilder` into an `Item::TraitAlias` variant.
     fn from(builder: ItemTraitAliasBuilder) -> Self {
         Item::TraitAlias(builder.build())
     }
 }
 
 impl From<ItemUnionBuilder> for Item {
+    /// Converts an `ItemUnionBuilder` into an `Item::Union` variant.
     fn from(builder: ItemUnionBuilder) -> Self {
         Item::Union(builder.build())
     }
 }
 
 impl From<ItemUseBuilder> for Item {
+    /// Converts an `ItemUseBuilder` into an `Item::Use` variant.
     fn from(builder: ItemUseBuilder) -> Self {
         Item::Use(builder.build())
     }
 }
 
 impl From<AsmBuilder> for Item {
+    /// Converts an `AsmBuilder` into an `Item::Asm` variant.
     fn from(builder: AsmBuilder) -> Self {
         Item::Asm(builder.build())
     }
 }
 
 impl From<AssociatedConstBuilder> for ImplItem {
+    /// Converts an `AssociatedConstBuilder` into an `ImplItem::Const` variant.
     fn from(builder: AssociatedConstBuilder) -> Self {
         ImplItem::Const(builder.build())
     }
 }
 
 impl From<AssociatedTypeBuilder> for ImplItem {
+    /// Converts an `AssociatedTypeBuilder` into an `ImplItem::Type` variant.
     fn from(builder: AssociatedTypeBuilder) -> Self {
         ImplItem::Type(builder.build())
     }
 }
 
 impl From<FnBuilder> for ImplItem {
+    /// Converts a `FnBuilder` into an `ImplItem::Fn` variant.
     fn from(builder: FnBuilder) -> Self {
         ImplItem::Fn(builder.build())
     }
 }
 
 impl From<TraitBuilder> for Item {
+    /// Converts a `TraitBuilder` into an `Item::Trait` variant.
     fn from(builder: TraitBuilder) -> Self {
         Item::Trait(builder.build())
     }
 }
 
 impl From<EnumBuilder> for Item {
+    /// Converts an `EnumBuilder` into an `Item::Enum` variant.
     fn from(builder: EnumBuilder) -> Self {
         Item::Enum(builder.build())
     }
 }
 
 impl From<StructBuilder> for Item {
+    /// Converts a `StructBuilder` into an `Item::Struct` variant.
     fn from(builder: StructBuilder) -> Self {
         Item::Struct(builder.build())
     }
@@ -2424,42 +2441,49 @@ impl StaticItemBuilder {
 }
 
 impl From<StaticItemBuilder> for Item {
+    /// Converts a `StaticItemBuilder` into an `Item::Static` variant.
     fn from(builder: StaticItemBuilder) -> Self {
         Item::Static(builder.build())
     }
 }
 
 impl From<i32> for Expr {
+    /// Converts an `i32` into an `Expr::Lit` variant.
     fn from(val: i32) -> Self {
         Expr::Lit(val.into())
     }
 }
 
 impl From<u128> for Lit {
+    /// Converts a `u128` into a `Lit::Int` variant.
     fn from(val: u128) -> Self {
         Lit::Int(LitInt::new(val))
     }
 }
 
 impl From<u128> for Expr {
+    /// Converts a `u128` into an `Expr::Lit` variant.
     fn from(val: u128) -> Self {
         Expr::Lit(val.into())
     }
 }
 
 impl From<bool> for Expr {
+    /// Converts a `bool` into an `Expr::Lit` variant.
     fn from(val: bool) -> Self {
         Expr::Lit(val.into())
     }
 }
 
 impl From<&str> for Expr {
+    /// Converts a `&str` into an `Expr::Lit` variant.
     fn from(val: &str) -> Self {
         Expr::Lit(val.into())
     }
 }
 
 impl From<String> for Expr {
+    /// Converts a `String` into an `Expr::Lit` variant.
     fn from(val: String) -> Self {
         Expr::Lit(val.into())
     }
@@ -3028,12 +3052,14 @@ impl ExprRawRefBuilder {
 }
 
 impl From<ExprRawRefBuilder> for Expr {
+    /// Converts an `ExprRawRefBuilder` into an `Expr::RawRef` variant.
     fn from(builder: ExprRawRefBuilder) -> Self {
         builder.build()
     }
 }
 
 impl From<Expr> for Stmt {
+    /// Converts an `Expr` into a `Stmt::Expr` variant.
     fn from(value: Expr) -> Stmt {
         Stmt::Expr(value)
     }
@@ -3755,24 +3781,28 @@ impl TokenTreeBuilder {
 }
 
 impl From<LocalBuilder> for Stmt {
+    /// Converts a `LocalBuilder` into a `Stmt::Local` variant.
     fn from(value: LocalBuilder) -> Self {
         value.build()
     }
 }
 
 impl From<PathBuilder> for Path {
+    /// Converts a `PathBuilder` into a `Path`.
     fn from(builder: PathBuilder) -> Self {
         builder.build()
     }
 }
 
 impl From<&str> for Path {
+    /// Converts a `&str` into a `Path`.
     fn from(value: &str) -> Self {
         path(value).build()
     }
 }
 
 impl<const N: usize> From<&[&str; N]> for Path {
+    /// Converts an array of `&str` into a `Path`.
     fn from(array: &[&str; N]) -> Self {
         let array: ThinVec<PathSegment> = array
             .iter()
@@ -3786,6 +3816,7 @@ impl<const N: usize> From<&[&str; N]> for Path {
 }
 
 impl From<&str> for Pat {
+    /// Converts a `&str` into a `Pat::Ident` variant.
     fn from(val: &str) -> Self {
         Pat::Ident(PatIdent {
             ident: val.into(),
@@ -3795,36 +3826,42 @@ impl From<&str> for Pat {
 }
 
 impl From<BlockBuilder> for Block {
+    /// Converts a `BlockBuilder` into a `Block`.
     fn from(val: BlockBuilder) -> Self {
         val.build()
     }
 }
 
 impl From<FnBuilder> for ItemFn {
+    /// Converts a `FnBuilder` into an `ItemFn`.
     fn from(val: FnBuilder) -> Self {
         val.build()
     }
 }
 
 impl From<FnBuilder> for Item {
+    /// Converts a `FnBuilder` into an `Item::Fn` variant.
     fn from(val: FnBuilder) -> Self {
         Item::Fn(val.into())
     }
 }
 
 impl From<TraitItemFnBuilder> for TraitItem {
+    /// Converts a `TraitItemFnBuilder` into a `TraitItem::Fn` variant.
     fn from(val: TraitItemFnBuilder) -> Self {
         TraitItem::Fn(val.build())
     }
 }
 
 impl From<AssociatedTypeBuilder> for AssociatedType {
+    /// Converts an `AssociatedTypeBuilder` into an `AssociatedType`.
     fn from(val: AssociatedTypeBuilder) -> Self {
         val.build()
     }
 }
 
 impl From<Vec<Stmt>> for Block {
+    /// Converts a `Vec<Stmt>` into a `Block`.
     fn from(array: Vec<Stmt>) -> Self {
         Block {
             stmts: array.into(),
@@ -3834,6 +3871,7 @@ impl From<Vec<Stmt>> for Block {
 }
 
 impl From<Vec<Expr>> for Block {
+    /// Converts a `Vec<Expr>` into a `Block`.
     fn from(array: Vec<Expr>) -> Self {
         Block {
             stmts: array.into_iter().map(Stmt::Expr).collect(),
@@ -3843,6 +3881,7 @@ impl From<Vec<Expr>> for Block {
 }
 
 impl<const N: usize> From<[Expr; N]> for Block {
+    /// Converts an array of `Expr` into a `Block`.
     fn from(array: [Expr; N]) -> Self {
         Block {
             stmts: array.into_iter().map(Stmt::Expr).collect(),
