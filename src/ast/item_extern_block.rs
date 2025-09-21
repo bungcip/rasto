@@ -1,8 +1,6 @@
 //! Defines the AST node for an `extern` block.
 
-use crate::ast::item_fn::ItemFn;
-use crate::ast::item_macro::ItemMacro;
-use crate::ast::types::Type;
+use crate::ast::{ident::Ident, item_fn::ItemFn, item_macro::ItemMacro, types::Type};
 use crate::pretty_printer::PrettyPrinter;
 use thin_vec::ThinVec;
 
@@ -34,7 +32,7 @@ pub enum ExternalItem {
     /// A `static` variable declared in a foreign library.
     ///
     /// The `String` is the name of the variable, and the `Type` is its data type.
-    Static(String, Type),
+    Static(Ident, Type),
     /// A function declared in a foreign library.
     Fn(ItemFn),
     /// A macro invocation within an `extern` block.

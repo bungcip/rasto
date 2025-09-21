@@ -1,6 +1,7 @@
 //! An associated constant in a trait or impl.
 
 use crate::ast::expressions::Expr;
+use crate::ast::ident::Ident;
 use crate::ast::metadata::Md;
 use crate::ast::types::Type;
 
@@ -34,7 +35,7 @@ use crate::ast::types::Type;
 #[derive(Debug, Clone, PartialEq)]
 pub struct AssociatedConst {
     /// The name of the associated constant.
-    pub ident: String,
+    pub ident: Ident,
     /// The type of the associated constant.
     pub ty: Type,
     /// The optional expression that provides the value of the constant.

@@ -2,6 +2,7 @@
 
 use crate::ast::abi::Abi;
 use crate::ast::generics::GenericParams;
+use crate::ast::ident::Ident;
 use crate::ast::patterns::Pat;
 use crate::ast::statements::Block;
 use crate::ast::types::Type;
@@ -43,7 +44,7 @@ pub struct Signature {
     /// This is typically used for FFI.
     pub abi: Option<Abi>,
     /// The name of the function.
-    pub ident: String,
+    pub ident: Ident,
     /// The generic parameters of the function, such as `<T>`.
     pub generics: GenericParams,
     /// The list of input parameters (arguments) for the function.

@@ -1,6 +1,6 @@
 //! Defines the AST node for an enum definition.
 
-use crate::ast::metadata::Md;
+use crate::ast::{ident::Ident, metadata::Md};
 use crate::pretty_printer::PrettyPrinter;
 use thin_vec::ThinVec;
 
@@ -27,7 +27,7 @@ ast_item! {
 #[derive(Debug, Clone, PartialEq)]
 pub struct Variant {
     /// The name of the variant.
-    pub ident: String,
+    pub ident: Ident,
     /// Metadata, such as attributes and comments, attached to the variant.
     pub md: Option<Box<Md>>,
 }

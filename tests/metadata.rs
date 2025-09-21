@@ -16,14 +16,11 @@ fn test_metadata_comments() {
 fn test_metadata_attrs() {
     let md = Md {
         comments: thin_vec![],
-        attrs: thin_vec![Attribute::Outer(Meta::Path("my_attr".to_string()))],
+        attrs: thin_vec![Attribute::Outer(Meta::Path("my_attr".into()))],
         trailing_comments: thin_vec![],
     };
     assert_eq!(md.attrs.len(), 1);
-    assert_eq!(
-        md.attrs[0],
-        Attribute::Outer(Meta::Path("my_attr".to_string()))
-    );
+    assert_eq!(md.attrs[0], Attribute::Outer(Meta::Path("my_attr".into())));
 }
 
 #[test]

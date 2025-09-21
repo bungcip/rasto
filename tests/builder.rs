@@ -47,7 +47,7 @@ fn test_stmt_builder() {
         local_stmt,
         Stmt::Local(rasto::ast::Local {
             pat: rasto::ast::Pat::Ident(PatIdent {
-                ident: "x".to_string(),
+                ident: "x".into(),
                 is_mut: false
             }),
             ty: Some("i32".into()),
