@@ -65,9 +65,28 @@ pub enum Item {
     Union(ItemUnion),
     /// A `use` item: `use std::collections::HashMap;`.
     Use(ItemUse),
+    /// A test-only item.
+    #[cfg(test)]
+    Test(TestItem),
 }
 
 impl_display_for_item!(Item);
+
+/// A test-only item.
+#[cfg(test)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct TestItem {
+    /// The visibility of the item.
+    pub vis: crate::ast::visibility::Visibility,
+    /// The name of the item.
+    pub ident: crate::ast::ident::Ident,
+    /// The generic parameters of the item.
+    pub generics: crate::ast::generics::GenericParams,
+    /// Metadata about the item, including attributes and comments.
+    pub md: Option<Box<crate::ast::metadata::Md>>,
+    /// The fields of the item.
+    pub fields: Vec<String>,
+}
 
 /// An item within a trait definition.
 #[derive(Debug, Clone, PartialEq)]
@@ -110,41 +129,6 @@ pub struct ItemImpl {
     pub md: Option<Box<Md>>,
 }
 
-impl From<ItemAsm> for Item {
-    /// Converts an `ItemAsm` into an `Item::Asm` variant.
-    fn from(item: ItemAsm) -> Self {
-        Item::Asm(item)
-    }
-}
-
-impl From<ItemConst> for Item {
-    /// Converts an `ItemConst` into an `Item::Const` variant.
-    fn from(item: ItemConst) -> Self {
-        Item::Const(item)
-    }
-}
-
-impl From<ItemFn> for Item {
-    /// Converts an `ItemFn` into an `Item::Fn` variant.
-    fn from(item: ItemFn) -> Self {
-        Item::Fn(item)
-    }
-}
-
-impl From<ItemStruct> for Item {
-    /// Converts an `ItemStruct` into an `Item::Struct` variant.
-    fn from(item: ItemStruct) -> Self {
-        Item::Struct(item)
-    }
-}
-
-impl From<ItemStatic> for Item {
-    /// Converts an `ItemStatic` into an `Item::Static` variant.
-    fn from(item: ItemStatic) -> Self {
-        Item::Static(item)
-    }
-}
-
 impl From<TraitItemFn> for TraitItem {
     /// Converts a `TraitItemFn` into a `TraitItem::Fn` variant.
     fn from(item: TraitItemFn) -> Self {
@@ -159,86 +143,9 @@ impl From<AssociatedConst> for TraitItem {
     }
 }
 
-impl From<ItemEnum> for Item {
-    /// Converts an `ItemEnum` into an `Item::Enum` variant.
-    fn from(item: ItemEnum) -> Self {
-        Item::Enum(item)
-    }
-}
-
 impl From<ItemImpl> for Item {
     /// Converts an `ItemImpl` into an `Item::Impl` variant.
     fn from(item: ItemImpl) -> Self {
         Item::Impl(item)
-    }
-}
-
-impl From<ItemTrait> for Item {
-    /// Converts an `ItemTrait` into an `Item::Trait` variant.
-    fn from(item: ItemTrait) -> Self {
-        Item::Trait(item)
-    }
-}
-
-impl From<ItemExternCrate> for Item {
-    /// Converts an `ItemExternCrate` into an `Item::ExternCrate` variant.
-    fn from(item: ItemExternCrate) -> Self {
-        Item::ExternCrate(item)
-    }
-}
-
-impl From<ItemExternBlock> for Item {
-    /// Converts an `ItemExternBlock` into an `Item::ExternBlock` variant.
-    fn from(item: ItemExternBlock) -> Self {
-        Item::ExternBlock(item)
-    }
-}
-
-impl From<ItemForeignMod> for Item {
-    /// Converts an `ItemForeignMod` into an `Item::ForeignMod` variant.
-    fn from(item: ItemForeignMod) -> Self {
-        Item::ForeignMod(item)
-    }
-}
-
-impl From<ItemMacro> for Item {
-    /// Converts an `ItemMacro` into an `Item::Macro` variant.
-    fn from(item: ItemMacro) -> Self {
-        Item::Macro(item)
-    }
-}
-
-impl From<ItemMod> for Item {
-    /// Converts an `ItemMod` into an `Item::Mod` variant.
-    fn from(item: ItemMod) -> Self {
-        Item::Mod(item)
-    }
-}
-
-impl From<ItemTraitAlias> for Item {
-    /// Converts an `ItemTraitAlias` into an `Item::TraitAlias` variant.
-    fn from(item: ItemTraitAlias) -> Self {
-        Item::TraitAlias(item)
-    }
-}
-
-impl From<ItemTypeAlias> for Item {
-    /// Converts an `ItemTypeAlias` into an `Item::TypeAlias` variant.
-    fn from(item: ItemTypeAlias) -> Self {
-        Item::TypeAlias(item)
-    }
-}
-
-impl From<ItemUnion> for Item {
-    /// Converts an `ItemUnion` into an `Item::Union` variant.
-    fn from(item: ItemUnion) -> Self {
-        Item::Union(item)
-    }
-}
-
-impl From<ItemUse> for Item {
-    /// Converts an `ItemUse` into an `Item::Use` variant.
-    fn from(item: ItemUse) -> Self {
-        Item::Use(item)
     }
 }

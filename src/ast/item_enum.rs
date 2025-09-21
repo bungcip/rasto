@@ -17,7 +17,7 @@ ast_item! {
     ///     Variant3 { x: i32, y: i32 },
     /// }
     /// ```
-    pub struct ItemEnum with generics {
+    pub struct ItemEnum as Enum with generics {
         /// The list of variants that make up the enum.
         pub variants: ThinVec<Variant>,
     }

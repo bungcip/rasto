@@ -18,7 +18,7 @@ ast_item! {
     ///     fn my_function();
     /// }
     /// ```
-    pub struct ItemForeignMod without vis and ident {
+    pub struct ItemForeignMod as ForeignMod without vis and ident {
         /// The Application Binary Interface (ABI) of the foreign module, such
         /// as `"C"` or `"system"`.
         pub abi: String,

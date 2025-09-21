@@ -19,7 +19,7 @@ ast_item! {
     ///     f2: f32,
     /// }
     /// ```
-    pub struct ItemUnion with generics {
+    pub struct ItemUnion as Union with generics {
         /// The list of fields that are part of the union.
         pub fields: ThinVec<Field>,
     }

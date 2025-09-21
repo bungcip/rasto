@@ -15,7 +15,7 @@ ast_item! {
     ///     fn my_c_function(arg: i32) -> i32;
     /// }
     /// ```
-    pub struct ItemExternBlock without ident {
+    pub struct ItemExternBlock as ExternBlock without ident {
         /// `true` if the `extern` block is marked as `unsafe`.
         pub is_unsafe: bool,
         /// The Application Binary Interface (ABI) for the `extern` block,

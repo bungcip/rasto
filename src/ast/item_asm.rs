@@ -23,7 +23,7 @@ ast_item! {
     ///     );
     /// }
     /// ```
-    pub struct ItemAsm without vis, ident, and md {
+    pub struct ItemAsm as Asm without vis, ident, and md {
         /// A collection of string literals that make up the assembly code template.
         pub template: ThinVec<LitStr>,
         /// The list of input, output, and other operands for the assembly code.

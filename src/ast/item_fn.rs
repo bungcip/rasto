@@ -20,7 +20,7 @@ ast_item! {
     ///     arg1 + 1
     /// }
     /// ```
-    pub struct ItemFn without ident {
+    pub struct ItemFn as Fn without ident {
         /// The signature of the function, which includes its name, arguments,
         /// return type, and other properties.
         pub sig: Signature,

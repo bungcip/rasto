@@ -8,5 +8,5 @@ fn test_infer_expr() {
         .generic(GenericArg::Const(expr().infer()))
         .build();
 
-    insta::assert_display_snapshot!(pretty(&path));
+    insta::assert_snapshot!(pretty(&path));
 }

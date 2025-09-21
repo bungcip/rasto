@@ -16,7 +16,7 @@ ast_item! {
     ///     field2: String,
     /// }
     /// ```
-    pub struct ItemStruct with generics {
+    pub struct ItemStruct as Struct with generics {
         /// The list of fields that make up the struct.
         pub fields: ThinVec<Field>,
     }

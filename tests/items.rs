@@ -1,5 +1,4 @@
 mod associated_const;
-mod macros;
 
 use rasto::ast::{AsmDirection, AsmOption, LitStr, RegSpec};
 use rasto::builder::*;

@@ -1,0 +1,5 @@
+---
+source: src/ast/macros.rs
+expression: pretty(&item)
+---
+TestItem

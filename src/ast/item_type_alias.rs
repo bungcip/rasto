@@ -15,7 +15,7 @@ ast_item! {
     ///
     /// let item = type_alias("MyType", "u32").build();
     /// ```
-    pub struct ItemTypeAlias {
+    pub struct ItemTypeAlias as TypeAlias {
         /// The generic parameters of the type alias.
         pub(crate) generics: GenericParams,
         /// The type being aliased.

@@ -10,7 +10,7 @@ ast_item! {
     /// ```rust
     /// use std::collections::HashMap;
     /// ```
-    pub struct ItemUse without ident {
+    pub struct ItemUse as Use without ident {
         /// The path that is being imported into the current scope.
         pub path: String,
     }

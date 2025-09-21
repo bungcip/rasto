@@ -12,7 +12,7 @@ ast_item! {
 /// # #![feature(trait_alias)]
 /// # trait MyTrait = Clone + Send + Sync;
     /// ```
-    pub struct ItemTraitAlias without vis {
+    pub struct ItemTraitAlias as TraitAlias without vis {
         /// The list of trait bounds that the alias represents.
         pub bounds: ThinVec<String>,
     }

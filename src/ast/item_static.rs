@@ -21,7 +21,7 @@ ast_item! {
     /// ```rust
     /// static mut MY_MUT_STATIC: i32 = 0;
     /// ```
-    pub struct ItemStatic {
+    pub struct ItemStatic as Static {
         /// `true` if the static item is mutable (`static mut`).
         pub is_mut: bool,
         /// The data type of the static item.

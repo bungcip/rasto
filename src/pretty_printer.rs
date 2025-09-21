@@ -1393,7 +1393,17 @@ impl PrettyPrinter for Item {
             Item::Use(item_use) => item_use.pretty_print(printer),
             Item::Asm(item_asm) => item_asm.pretty_print(printer),
             Item::ExternBlock(item_extern_block) => item_extern_block.pretty_print(printer),
+            #[cfg(test)]
+            Item::Test(test_item) => test_item.pretty_print(printer),
         }
+    }
+}
+
+#[cfg(test)]
+impl PrettyPrinter for TestItem {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        printer.string("TestItem");
+        Ok(())
     }
 }
 

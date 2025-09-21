@@ -25,7 +25,7 @@ ast_item! {
     /// ```rust,ignore
     /// mod my_module;
     /// ```
-    pub struct ItemMod {
+    pub struct ItemMod as Mod {
         /// The content of the module, if it is defined inline.
         ///
         /// If this is `None`, the module is declared with a semicolon, and its

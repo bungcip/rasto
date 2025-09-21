@@ -14,5 +14,5 @@ ast_item! {
     /// ```rust
 /// // extern crate proc_macro;
     /// ```
-    pub struct ItemExternCrate without vis {}
+    pub struct ItemExternCrate as ExternCrate without vis {}
 }

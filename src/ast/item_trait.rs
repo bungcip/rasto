@@ -17,7 +17,7 @@ ast_item! {
     ///     fn my_method(&self);
     /// }
     /// ```
-    pub struct ItemTrait with generics {
+    pub struct ItemTrait as Trait with generics {
         /// The list of associated types defined in the trait.
         pub associated_types: ThinVec<AssociatedType>,
         /// The list of items within the trait, such as methods and associated

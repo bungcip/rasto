@@ -23,7 +23,7 @@ ast_item! {
     /// // The macro invocation is an `ItemMacro`
     /// define_my_func!();
     /// ```
-    pub struct ItemMacro without vis and ident {
+    pub struct ItemMacro as Macro without vis and ident {
         /// The macro invocation expression itself.
         pub expr: Box<Expr>,
     }

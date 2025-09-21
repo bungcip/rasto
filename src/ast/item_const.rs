@@ -15,7 +15,7 @@ ast_item! {
     ///
     /// let item = const_def("MY_CONST", "u32", expr().lit(123)).build();
     /// ```
-    pub struct ItemConst {
+    pub struct ItemConst as Const {
         /// The type of the const item.
         pub(crate) ty: Type,
         /// The value of the const item.
