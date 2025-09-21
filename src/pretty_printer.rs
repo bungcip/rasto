@@ -24,6 +24,7 @@
 //! converts the AST node into a sequence of tokens for the `Printer`.
 
 use crate::ast::item_const::ItemConst;
+use crate::ast::item_extern_type::ItemExternType;
 use crate::ast::item_type_alias::ItemTypeAlias;
 use crate::ast::items::*;
 use crate::ast::*;
@@ -445,6 +446,19 @@ impl PrettyPrinter for ItemStatic {
     }
 }
 
+impl PrettyPrinter for ItemExternType {
+    /// Pretty-prints the `ItemExternType` to the given printer.
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        pp_begin(&self.md, printer)?;
+        self.vis.pretty_print(printer)?;
+        printer.string("extern type ");
+        self.ident.pretty_print(printer)?;
+        printer.string(";");
+        pp_end(&self.md, printer)?;
+        Ok(())
+    }
+}
+
 impl PrettyPrinter for ItemExternBlock {
     /// Pretty-prints the `ItemExternBlock` to the given printer.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
@@ -486,6 +500,9 @@ impl PrettyPrinter for ExternalItem {
             }
             ExternalItem::Macro(item_macro) => {
                 item_macro.pretty_print(printer)?;
+            }
+            ExternalItem::Type(item_extern_type) => {
+                item_extern_type.pretty_print(printer)?;
             }
         }
         Ok(())
@@ -1393,6 +1410,7 @@ impl PrettyPrinter for Item {
             Item::Use(item_use) => item_use.pretty_print(printer),
             Item::Asm(item_asm) => item_asm.pretty_print(printer),
             Item::ExternBlock(item_extern_block) => item_extern_block.pretty_print(printer),
+            Item::ExternType(item_extern_type) => item_extern_type.pretty_print(printer),
         }
     }
 }

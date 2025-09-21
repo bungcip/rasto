@@ -1,6 +1,8 @@
 //! Defines the AST node for an `extern` block.
 
-use crate::ast::{ident::Ident, item_fn::ItemFn, item_macro::ItemMacro, types::Type};
+use crate::ast::{
+    ItemExternType, ident::Ident, item_fn::ItemFn, item_macro::ItemMacro, types::Type,
+};
 use crate::pretty_printer::PrettyPrinter;
 use thin_vec::ThinVec;
 
@@ -37,4 +39,6 @@ pub enum ExternalItem {
     Fn(ItemFn),
     /// A macro invocation within an `extern` block.
     Macro(ItemMacro),
+    /// A type declaration in a foreign library.
+    Type(ItemExternType),
 }

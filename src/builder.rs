@@ -23,6 +23,7 @@
 //! ```
 
 use crate::ast::item_const::ItemConst;
+use crate::ast::item_extern_type::ItemExternType;
 use crate::ast::item_type_alias::ItemTypeAlias;
 use crate::ast::items::*;
 use crate::ast::*;
@@ -2245,6 +2246,70 @@ impl From<ItemExternBlockBuilder> for Item {
     /// Converts an `ItemExternBlockBuilder` into an `Item::ExternBlock` variant.
     fn from(builder: ItemExternBlockBuilder) -> Self {
         Item::ExternBlock(builder.build())
+    }
+}
+
+/// Creates a new `ItemExternTypeBuilder` to construct an `extern type` item.
+pub fn extern_type_item(name: impl Into<Ident>) -> ItemExternTypeBuilder {
+    ItemExternTypeBuilder::new(name)
+}
+
+/// A builder for constructing an `ItemExternType` AST node.
+pub struct ItemExternTypeBuilder {
+    ident: Ident,
+    vis: Visibility,
+    md: MdBuilder,
+}
+
+impl ItemExternTypeBuilder {
+    /// Creates a new `ItemExternTypeBuilder`.
+    pub fn new(name: impl Into<Ident>) -> Self {
+        Self {
+            ident: name.into(),
+            vis: Visibility::Default,
+            md: MdBuilder::new(),
+        }
+    }
+
+    /// Sets the visibility of the extern type item.
+    pub fn vis(mut self, vis: Visibility) -> Self {
+        self.vis = vis;
+        self
+    }
+
+    /// Adds a comment to the `extern type` item.
+    pub fn comment(mut self, comment: impl Into<Comment>) -> Self {
+        self.md = self.md.comment(comment.into());
+        self
+    }
+
+    /// Adds an attribute to the `extern type` item.
+    pub fn attr(mut self, attr: impl Into<Attribute>) -> Self {
+        self.md = self.md.attr(attr.into());
+        self
+    }
+
+    /// Builds the `ItemExternType` AST node.
+    pub fn build(self) -> ItemExternType {
+        ItemExternType {
+            vis: self.vis,
+            ident: self.ident,
+            md: Some(Box::new(self.md.build())),
+        }
+    }
+}
+
+impl From<ItemExternTypeBuilder> for Item {
+    /// Converts an `ItemExternTypeBuilder` into an `Item::ExternType` variant.
+    fn from(builder: ItemExternTypeBuilder) -> Self {
+        Item::ExternType(builder.build())
+    }
+}
+
+impl From<ItemExternType> for ExternalItem {
+    /// Converts an `ItemExternType` into an `ExternalItem::Type` variant.
+    fn from(item: ItemExternType) -> Self {
+        ExternalItem::Type(item)
     }
 }
 

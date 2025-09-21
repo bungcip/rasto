@@ -33,6 +33,8 @@ pub mod item_enum;
 pub mod item_extern_block;
 /// Defines the AST node for an `extern crate` item.
 pub mod item_extern_crate;
+/// Defines the AST node for an `extern type` item.
+pub mod item_extern_type;
 /// Defines the AST node for a function.
 pub mod item_fn;
 /// Defines the AST node for a foreign module.
@@ -92,6 +94,7 @@ pub use item_const::*;
 pub use item_enum::*;
 pub use item_extern_block::*;
 pub use item_extern_crate::*;
+pub use item_extern_type::*;
 pub use item_fn::*;
 pub use item_foreign_mod::*;
 pub use item_impl::*;
