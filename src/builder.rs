@@ -2728,6 +2728,17 @@ impl ExprBuilder {
         })
     }
 
+    /// Creates a `gen` block expression.
+    ///
+    /// # Parameters
+    ///
+    /// - `block`: The block of statements inside the `gen` block.
+    pub fn gen_block(self, block: impl Into<Block>) -> Expr {
+        Expr::Gen(ExprGen {
+            block: block.into(),
+        })
+    }
+
     /// Creates an `if` expression.
     ///
     /// # Parameters

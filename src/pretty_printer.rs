@@ -948,6 +948,7 @@ fn pretty_print_expr<'a>(
         Expr::Const(expr) => expr.pretty_print(printer)?,
         Expr::Continue(expr) => expr.pretty_print(printer)?,
         Expr::Field(expr) => expr.pretty_print(printer)?,
+        Expr::Gen(expr) => expr.pretty_print(printer)?,
         Expr::Index(expr) => expr.pretty_print(printer)?,
         Expr::Match(expr) => expr.pretty_print(printer)?,
         Expr::MethodCall(expr) => expr.pretty_print(printer)?,
@@ -992,6 +993,13 @@ impl PrettyPrinter for ExprArray {
 impl PrettyPrinter for ExprAsync {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string("async ");
+        self.block.pretty_print(printer)
+    }
+}
+
+impl PrettyPrinter for ExprGen {
+    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        printer.string("gen ");
         self.block.pretty_print(printer)
     }
 }

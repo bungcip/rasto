@@ -41,6 +41,8 @@ pub enum Expr {
     Field(ExprField),
     /// A `for` loop expression: `for pat in iter { ... }`.
     For(ExprFor),
+    /// A `gen` block: `gen { ... }`.
+    Gen(ExprGen),
     /// An `if` expression: `if x { y } else { z }`.
     If(ExprIf),
     /// An index expression: `arr[i]`.
@@ -156,6 +158,18 @@ pub struct ExprCall {
 }
 
 use crate::ast::types::Type;
+/// Represents a `gen` block, which creates a `Generator` that can be yielded from.
+#[derive(Debug, Clone, PartialEq)]
+pub struct ExprGen {
+    /// The block of statements that will be executed in the generator.
+    pub block: Block,
+}
+
+impl From<ExprGen> for Expr {
+    fn from(expr: ExprGen) -> Self {
+        Expr::Gen(expr)
+    }
+}
 /// Represents a type cast expression, which converts a value from one type
 /// to another.
 ///

@@ -1,0 +1,7 @@
+---
+source: tests/expressions.rs
+expression: pretty(&expr)
+---
+gen {
+    42;
+}

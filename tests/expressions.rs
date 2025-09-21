@@ -217,3 +217,9 @@ fn test_binary_expr_parentheses() {
     let outer_expr = expr().binary(inner_expr, BinOp::Mul, expr().path("c"));
     insta::assert_snapshot!(pretty(&outer_expr));
 }
+
+#[test]
+fn test_gen_expr() {
+    let expr = expr().gen_block(block().statement(expr().lit(42)));
+    insta::assert_snapshot!(pretty(&expr));
+}
