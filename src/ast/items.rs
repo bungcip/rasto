@@ -146,12 +146,14 @@ impl From<ItemStatic> for Item {
 }
 
 impl From<TraitItemFn> for TraitItem {
+    /// Converts a `TraitItemFn` into a `TraitItem::Fn` variant.
     fn from(item: TraitItemFn) -> Self {
         TraitItem::Fn(item)
     }
 }
 
 impl From<AssociatedConst> for TraitItem {
+    /// Converts an `AssociatedConst` into a `TraitItem::Const` variant.
     fn from(item: AssociatedConst) -> Self {
         TraitItem::Const(item)
     }

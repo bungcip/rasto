@@ -41,6 +41,16 @@ Add the following to your `Cargo.toml` file:
 rasto = "0.1.0"
 ```
 
+## Project Structure
+
+-   `src/lib.rs`: The main library file, which exports the `ast` and `pretty_printer` modules.
+-   `src/ast.rs`: The root of the `ast` module, which exports all the AST nodes.
+-   `src/ast/`: This directory contains the definitions for the AST nodes. Each file in this directory corresponds to a specific part of the AST, such as expressions, statements, or items.
+-   `src/builder.rs`: A fluent builder API for constructing AST nodes programmatically.
+-   `src/pretty_printer.rs`: This file contains the implementation of the pretty-printer. It uses a token-based approach inspired by Philip Wadler's "A Prettier Printer".
+-   `tests/`: Contains the integration tests, which use snapshot testing with `insta`.
+-   `Cargo.toml`: The package manifest for Rust's package manager, Cargo.
+
 ## Usage
 
 Here's a more detailed example of how to build a function with comments and attributes, and then pretty-print it:
@@ -56,12 +66,9 @@ fn main() {
         .attr(attr().meta(meta().path("test")))
         .comment(comment().doc(" This is a doc comment for my_function."))
         .generic(generic_param().ty("T"))
-        .input(pat().ident("arg"))
+        .input_typed("arg", "T")
         .output("T")
-        .statement(stmt()
-            .local(pat().ident("x"))
-            .expr(expr().lit(42))
-        )
+        .statement(stmt().local(pat().ident("x")).expr(expr().lit(42)))
         .statement(expr().field(expr().ident("arg"), "field"))
         .build();
 
@@ -74,9 +81,65 @@ This will produce the following output:
 ```rust
 /// This is a doc comment for my_function.
 #[test]
-pub fn my_function<T>(arg) -> T {
+pub fn my_function<T>(arg: T) -> T {
     let x = 42;
     arg.field;
+}
+```
+
+Here is another example that demonstrates how to build a struct and an `impl` block for it:
+
+```rust
+use rasto::ast::*;
+use rasto::builder::*;
+use rasto::pretty;
+
+fn main() {
+    let file = file()
+        .item(
+            struct_def("MyStruct")
+                .vis(Visibility::Public)
+                .field("x", "i32")
+                .field("y", "i32")
+                .build(),
+        )
+        .item(
+            impl_block("MyStruct")
+                .item(
+                    fn_def("new")
+                        .vis(Visibility::Public)
+                        .output("Self")
+                        .statement(
+                            expr().struct_expr(
+                                "Self",
+                                vec![
+                                    field_value("x", expr().lit(0)),
+                                    field_value("y", expr().lit(0)),
+                                ],
+                            ),
+                        )
+                        .build(),
+                )
+                .build(),
+        )
+        .build();
+
+    println!("{}", pretty(&file));
+}
+```
+
+This will produce the following output:
+
+```rust
+pub struct MyStruct {
+    x: i32,
+    y: i32,
+}
+
+impl MyStruct {
+    pub fn new() -> Self {
+        Self { x: 0, y: 0 }
+    }
 }
 ```
 

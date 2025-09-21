@@ -166,6 +166,7 @@ pub struct ExprGen {
 }
 
 impl From<ExprGen> for Expr {
+    /// Converts an `ExprGen` into an `Expr::Gen` variant.
     fn from(expr: ExprGen) -> Self {
         Expr::Gen(expr)
     }
@@ -236,6 +237,7 @@ pub struct ExprIndex {
 pub struct ExprInfer;
 
 impl From<ExprInfer> for Expr {
+    /// Converts an `ExprInfer` into an `Expr::Infer` variant.
     fn from(expr: ExprInfer) -> Self {
         Expr::Infer(expr)
     }
@@ -295,6 +297,7 @@ pub struct ExprPath {
 }
 
 impl From<ExprPath> for Expr {
+    /// Converts an `ExprPath` into an `Expr::Path` variant.
     fn from(expr: ExprPath) -> Self {
         Expr::Path(expr)
     }
@@ -509,6 +512,7 @@ pub struct ExprAssign {
 }
 
 impl From<ExprTry> for Expr {
+    /// Converts an `ExprTry` into an `Expr::Try` variant.
     fn from(expr: ExprTry) -> Self {
         Expr::Try(expr)
     }

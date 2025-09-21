@@ -124,7 +124,6 @@ pub struct ConstParam {
 }
 
 impl PrettyPrinter for GenericParams {
-    /// Pretty-prints the `GenericParams` to the given printer.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         if !self.params.is_empty() {
             printer.string("<");
@@ -141,7 +140,6 @@ impl PrettyPrinter for GenericParams {
 }
 
 impl PrettyPrinter for GenericParam {
-    /// Pretty-prints the `GenericParam` to the given printer.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         match self {
             GenericParam::Lifetime(p) => p.pretty_print(printer),
@@ -152,7 +150,6 @@ impl PrettyPrinter for GenericParam {
 }
 
 impl PrettyPrinter for LifetimeParam {
-    /// Pretty-prints the `LifetimeParam` to the given printer.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string("'");
         self.ident.pretty_print(printer)?;
@@ -161,7 +158,6 @@ impl PrettyPrinter for LifetimeParam {
 }
 
 impl PrettyPrinter for TypeParam {
-    /// Pretty-prints the `TypeParam` to the given printer.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         self.ident.pretty_print(printer)?;
         if !self.bounds.is_empty() {
@@ -178,7 +174,6 @@ impl PrettyPrinter for TypeParam {
 }
 
 impl PrettyPrinter for ConstParam {
-    /// Pretty-prints the `ConstParam` to the given printer.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         printer.string("const ");
         self.ident.pretty_print(printer)?;
@@ -213,6 +208,9 @@ pub enum GenericArg {
 }
 
 impl From<&str> for GenericArg {
+    /// Converts a string slice into a `GenericArg::Type`.
+    ///
+    /// This is a convenience function for creating simple type-based generic arguments.
     fn from(s: &str) -> Self {
         GenericArg::Type(Type::from(s))
     }

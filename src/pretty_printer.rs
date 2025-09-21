@@ -88,6 +88,7 @@ pub trait PrettyPrinter {
 }
 
 impl<T: PrettyPrinter + ?Sized> PrettyPrinter for Box<T> {
+    /// Pretty-prints the boxed value.
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         (**self).pretty_print(printer)
     }
