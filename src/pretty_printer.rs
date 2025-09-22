@@ -1784,7 +1784,19 @@ impl PrettyPrinter for ExprAssign {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         self.left.pretty_print(printer)?;
         printer.string(" = ");
-        self.right.pretty_print(printer)
+        let needs_paren = if let Expr::Assign(_) = &*self.right {
+            true
+        } else {
+            false
+        };
+        if needs_paren {
+            printer.string("(");
+            self.right.pretty_print(printer)?;
+            printer.string(")");
+        } else {
+            self.right.pretty_print(printer)?;
+        }
+        Ok(())
     }
 }
 

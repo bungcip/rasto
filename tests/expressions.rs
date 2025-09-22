@@ -223,3 +223,10 @@ fn test_gen_expr() {
     let expr = expr().gen_block(block().statement(expr().lit(42)));
     insta::assert_snapshot!(pretty(&expr));
 }
+
+#[test]
+fn test_nested_assign_expr() {
+    let inner_expr = expr().assign("b".into(), "c".into());
+    let outer_expr = expr().assign("a".into(), inner_expr);
+    insta::assert_snapshot!(pretty(&outer_expr));
+}
