@@ -1,0 +1,8 @@
+---
+source: tests/items.rs
+assertion_line: 86
+expression: pretty(&ast)
+---
+// A comment.
+// Another comment.
+fn foo() {}
