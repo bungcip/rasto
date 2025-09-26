@@ -77,6 +77,16 @@ fn test_union_item() {
 }
 
 #[test]
+fn test_multiple_comments() {
+    let ast = fn_def("foo")
+        .comment(comment().line(" A comment."))
+        .comment(comment().line(" Another comment."))
+        .build();
+
+    insta::assert_snapshot!(pretty(&ast));
+}
+
+#[test]
 fn test_static_item() {
     let item = static_item("FOO", "u32", expr().lit(42)).build();
     insta::assert_snapshot!(pretty(&item));

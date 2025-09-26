@@ -1,11 +1,10 @@
 ---
 source: tests/pretty_print.rs
-expression: buf
+assertion_line: 110
+expression: pretty(&ast)
 ---
 {
-    
     // leading comment
     42;
     // trailing comment
-    
 }

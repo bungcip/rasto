@@ -385,12 +385,10 @@ impl<'a> Printer<'a> {
 
 impl PrettyPrinter for Comment {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
-        printer.hard_break();
         match self {
             Comment::Line(s) => printer.string(format!("//{s}")),
             Comment::Doc(s) => printer.string(format!("///{s}")),
         }
-        printer.hard_break();
         Ok(())
     }
 }
@@ -2079,12 +2077,13 @@ impl PrettyPrinter for ItemUse {
 /// This includes attributes and comments.
 pub fn pp_begin<'a>(md: &'a Option<Box<Md>>, printer: &mut Printer<'a>) -> fmt::Result {
     if let Some(md) = &md {
-        for attr in &md.attrs {
-            attr.pretty_print(printer)?;
+        if !md.attrs.is_empty() {
+            pp_with_breaks(&md.attrs, printer)?;
             printer.hard_break();
         }
-        for comment in &md.comments {
-            comment.pretty_print(printer)?;
+        if !md.comments.is_empty() {
+            pp_with_breaks(&md.comments, printer)?;
+            printer.hard_break();
         }
     }
     Ok(())
@@ -2095,8 +2094,9 @@ pub fn pp_begin<'a>(md: &'a Option<Box<Md>>, printer: &mut Printer<'a>) -> fmt::
 /// This includes trailing comments.
 pub fn pp_end<'a>(md: &'a Option<Box<Md>>, printer: &mut Printer<'a>) -> fmt::Result {
     if let Some(md) = &md {
-        for comment in &md.trailing_comments {
-            comment.pretty_print(printer)?;
+        if !md.trailing_comments.is_empty() {
+            printer.hard_break();
+            pp_with_breaks(&md.trailing_comments, printer)?;
         }
     }
     Ok(())
