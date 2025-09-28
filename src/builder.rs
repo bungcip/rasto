@@ -4076,6 +4076,7 @@ impl AsmOperandBuilder {
 
 /// A builder for constructing a `RegOperand` AST node.
 pub struct RegOperandBuilder {
+    name: Option<String>,
     direction: AsmDirection,
     reg: RegSpec,
     expr: Expr,
@@ -4092,11 +4093,22 @@ impl RegOperandBuilder {
     /// - `expr`: The expression for the operand.
     pub fn new(direction: AsmDirection, reg: RegSpec, expr: Expr) -> Self {
         Self {
+            name: None,
             direction,
             reg,
             expr,
             out_expr: None,
         }
+    }
+
+    /// Sets the name of the register operand.
+    ///
+    /// # Parameters
+    ///
+    /// - `name`: The name of the operand.
+    pub fn name(mut self, name: impl Into<String>) -> Self {
+        self.name = Some(name.into());
+        self
     }
 
     /// Sets the output expression for an `inout` operand.
@@ -4116,6 +4128,7 @@ impl RegOperandBuilder {
     /// An `AsmOperand` instance representing the register operand.
     pub fn build(self) -> AsmOperand {
         AsmOperand::Reg(RegOperand {
+            name: self.name,
             direction: self.direction,
             reg: self.reg,
             expr: self.expr,

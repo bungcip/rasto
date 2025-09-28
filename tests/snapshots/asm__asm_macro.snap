@@ -1,0 +1,14 @@
+---
+source: tests/asm.rs
+expression: pretty(&ast)
+---
+fn unsafe test() {
+    asm!(
+        "jmp 3f",
+        "2: .ascii \"Hello World!\"",
+        "3: lea {bytes}, [2b+rip]",
+        "mov {len}, 12",
+        bytes = out(reg) bytes,
+        len = out(reg) len
+    )
+}

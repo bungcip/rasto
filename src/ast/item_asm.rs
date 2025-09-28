@@ -50,6 +50,8 @@ pub enum AsmOperand {
 /// A register operand for an `asm!` expression.
 #[derive(Debug, Clone, PartialEq)]
 pub struct RegOperand {
+    /// The name of the operand, if specified (e.g., `bytes` in `bytes = out(reg) ...`).
+    pub name: Option<String>,
     /// The `in`, `out`, `inout`, `lateout`, or `inlateout` keyword.
     pub direction: AsmDirection,
     /// The register specifier.

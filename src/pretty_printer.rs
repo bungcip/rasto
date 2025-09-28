@@ -1417,35 +1417,30 @@ impl PrettyPrinter for Item {
 
 impl PrettyPrinter for ItemAsm {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
-        printer.string("asm!(");
-        printer.begin(BreakStyle::Consistent, "");
-        for (i, lit) in self.template.iter().enumerate() {
-            if i > 0 {
-                printer.string(", ");
-            }
-            lit.pretty_print(printer)?;
-        }
+        printer.string("asm!");
+        printer.begin(BreakStyle::Consistent, "(");
 
-        if !self.operands.is_empty() || self.options.is_some() {
-            printer.string(",");
-            printer.break_();
+        let mut args: Vec<&dyn PrettyPrinter> = Vec::new();
+        for lit in &self.template {
+            args.push(lit);
         }
-
-        for (i, operand) in self.operands.iter().enumerate() {
-            if i > 0 {
-                printer.string(",");
-                printer.break_();
-            }
-            operand.pretty_print(printer)?;
+        for operand in &self.operands {
+            args.push(operand);
         }
-
-        if !self.operands.is_empty() && self.options.is_some() {
-            printer.string(",");
-            printer.break_();
-        }
-
         if let Some(options) = &self.options {
-            options.pretty_print(printer)?;
+            args.push(options);
+        }
+
+        if !args.is_empty() {
+            printer.hard_break();
+            let total_args = args.len();
+            for (i, arg) in args.iter().enumerate() {
+                arg.pretty_print(printer)?;
+                if i < total_args - 1 {
+                    printer.string(",");
+                    printer.hard_break();
+                }
+            }
         }
 
         printer.end(")");
@@ -1472,6 +1467,10 @@ impl PrettyPrinter for AsmOperand {
 
 impl PrettyPrinter for RegOperand {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
+        if let Some(name) = &self.name {
+            printer.string(name);
+            printer.string(" = ");
+        }
         self.direction.pretty_print(printer)?;
         printer.string("(");
         self.reg.pretty_print(printer)?;
