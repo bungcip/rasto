@@ -633,6 +633,10 @@ impl PrettyPrinter for PatRange {
         if let Some(start) = &self.start {
             start.pretty_print(printer)?;
         }
+        // NOTE: The AST for `PatRange` can represent invalid patterns that will not
+        // compile, such as `start..end` or `start..=`. A more robust
+        // implementation would involve refining the `PatRange` AST to prevent
+        // these invalid states from being represented.
         match self.limits {
             RangeLimits::HalfOpen => printer.string(".."),
             RangeLimits::Closed => printer.string("..="),
@@ -1783,11 +1787,7 @@ impl PrettyPrinter for ExprAssign {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
         self.left.pretty_print(printer)?;
         printer.string(" = ");
-        let needs_paren = if let Expr::Assign(_) = &*self.right {
-            true
-        } else {
-            false
-        };
+        let needs_paren = matches!(&*self.right, Expr::Assign(_));
         if needs_paren {
             printer.string("(");
             self.right.pretty_print(printer)?;
