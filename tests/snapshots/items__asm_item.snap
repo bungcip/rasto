@@ -1,9 +1,9 @@
 ---
 source: tests/items.rs
-assertion_line: 124
-expression: item.to_string()
+expression: pretty(&item)
 ---
-asm!("
+asm!(
+    "
         mov {tmp}, {x}
         shl {tmp}, 1
         shl {x}, 2
