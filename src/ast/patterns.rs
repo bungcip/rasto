@@ -3,7 +3,7 @@
 //! Patterns are used in `let` bindings, function parameters, and `match` expressions to destructure
 //! data. They are a powerful feature of Rust that allows for expressive and concise code.
 
-use crate::ast::{ident::Ident, *};
+use crate::ast::{expressions::RangeLimits, ident::Ident, *};
 use thin_vec::ThinVec;
 
 /// Represents a pattern in a `let` binding, function parameter, or `match` arm.

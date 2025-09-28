@@ -85,6 +85,12 @@ fn test_range_pattern() {
 }
 
 #[test]
+fn test_half_open_range_pattern() {
+    let pat: Pat = pat().range(Some(expr().lit(1)), RangeLimits::HalfOpen, None);
+    insta::assert_snapshot!(pretty(&pat), @"1..");
+}
+
+#[test]
 fn test_reference_pattern() {
     let pat: Pat = pat().reference(pat().ident("a")).build();
     insta::assert_snapshot!(pretty(&pat), @"&a");
