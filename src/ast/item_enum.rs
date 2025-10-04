@@ -11,10 +11,19 @@ ast_item! {
     /// # Example
     ///
     /// ```rust
+    /// use rasto::builder::enum_def;
+    ///
+    /// let item = enum_def("MyEnum")
+    ///     .variant("Variant1")
+    ///     .variant("Variant2")
+    ///     .build();
+    /// ```
+    ///
+    /// The above builder would generate:
+    /// ```rust
     /// enum MyEnum {
     ///     Variant1,
-    ///     Variant2(u32),
-    ///     Variant3 { x: i32, y: i32 },
+    ///     Variant2,
     /// }
     /// ```
     pub struct ItemEnum with generics {
@@ -23,7 +32,10 @@ ast_item! {
     }
 }
 
-/// Represents a single variant within an enum.
+/// Represents a single, unit-like variant within an enum.
+///
+/// **Note:** Currently, only unit-like variants (e.g., `Variant1`) are supported.
+/// Variants with data, like tuple or struct variants, are not yet represented in the AST.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Variant {
     /// The name of the variant.

@@ -110,8 +110,22 @@ pub struct LifetimeParam {
 pub struct TypeParam {
     /// The name of the type parameter.
     pub ident: Ident,
-    /// The bounds on the type parameter, e.g., `Trait1 + Trait2`.
+    /// A `Vec` of `Type`s that represent the trait bounds on the type parameter.
+    /// For example, in `T: Clone + Debug`, `bounds` would contain the `Type`s
+    /// for `Clone` and `Debug`.
     pub bounds: Vec<Type>,
+}
+
+impl TypeParam {
+    /// Adds a trait bound to the type parameter.
+    ///
+    /// # Parameters
+    ///
+    /// * `bound` - The trait bound to add.
+    pub fn with_bound(mut self, bound: impl Into<Type>) -> Self {
+        self.bounds.push(bound.into());
+        self
+    }
 }
 
 /// A const parameter, such as `const N: usize`.

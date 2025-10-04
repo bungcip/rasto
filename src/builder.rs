@@ -373,9 +373,18 @@ impl TraitBuilder {
     }
 }
 
+/// Creates a new `ItemExternBlockBuilder` to construct an `extern` block.
+///
+/// # Returns
+///
+/// A `ItemExternBlockBuilder` instance.
+pub fn extern_block_item() -> ItemExternBlockBuilder {
+    ItemExternBlockBuilder::new()
+}
+
 /// A builder for constructing an `ItemExternBlock` AST node.
-#[derive(Default)]
 pub struct ItemExternBlockBuilder {
+    vis: Visibility,
     is_unsafe: bool,
     abi: Option<String>,
     items: ThinVec<ExternalItem>,
@@ -386,6 +395,26 @@ impl ItemExternBlockBuilder {
     /// Creates a new `ItemExternBlockBuilder`.
     pub fn new() -> Self {
         Self::default()
+    }
+
+    /// Sets the visibility of the extern block.
+    ///
+    /// # Parameters
+    ///
+    /// - `vis`: The `Visibility` to set.
+    pub fn vis(mut self, vis: Visibility) -> Self {
+        self.vis = vis;
+        self
+    }
+
+    /// Adds an item to the extern block.
+    ///
+    /// # Parameters
+    ///
+    /// - `item`: The `ExternalItem` to add.
+    pub fn item(mut self, item: impl Into<ExternalItem>) -> Self {
+        self.items.push(item.into());
+        self
     }
 
     /// Sets the `extern` block as `unsafe`.
@@ -401,16 +430,6 @@ impl ItemExternBlockBuilder {
     /// - `abi`: The ABI string (e.g., "C").
     pub fn abi(mut self, abi: impl Into<String>) -> Self {
         self.abi = Some(abi.into());
-        self
-    }
-
-    /// Adds an item to the `extern` block.
-    ///
-    /// # Parameters
-    ///
-    /// - `item`: The `ExternalItem` to add.
-    pub fn item(mut self, item: impl Into<ExternalItem>) -> Self {
-        self.items.push(item.into());
         self
     }
 
@@ -441,11 +460,24 @@ impl ItemExternBlockBuilder {
     /// An `ItemExternBlock` instance.
     pub fn build(self) -> ItemExternBlock {
         ItemExternBlock {
-            vis: Visibility::Default,
+            vis: self.vis,
             is_unsafe: self.is_unsafe,
             abi: self.abi,
             items: self.items,
             md: Some(Box::new(self.md.build())),
+        }
+    }
+}
+
+impl Default for ItemExternBlockBuilder {
+    /// Creates a new `ItemExternBlockBuilder` with default values.
+    fn default() -> Self {
+        Self {
+            vis: Visibility::Default,
+            is_unsafe: false,
+            abi: None,
+            items: thin_vec![],
+            md: MdBuilder::new(),
         }
     }
 }
@@ -486,6 +518,26 @@ impl AssociatedConstBuilder {
     /// - `expr`: The `Expr` of the associated const.
     pub fn expr(mut self, expr: impl Into<Expr>) -> Self {
         self.expr = Some(Box::new(expr.into()));
+        self
+    }
+
+    /// Adds a comment to the associated const.
+    ///
+    /// # Parameters
+    ///
+    /// - `comment`: The comment to add.
+    pub fn comment(mut self, comment: impl Into<Comment>) -> Self {
+        self.md = self.md.comment(comment.into());
+        self
+    }
+
+    /// Adds an attribute to the associated const.
+    ///
+    /// # Parameters
+    ///
+    /// - `attr`: The attribute to add.
+    pub fn attr(mut self, attr: impl Into<Attribute>) -> Self {
+        self.md = self.md.attr(attr.into());
         self
     }
 
@@ -767,6 +819,7 @@ pub struct ImplBuilder {
     is_unsafe: bool,
     is_negative: bool,
     items: ThinVec<ImplItem>,
+    md: MdBuilder,
 }
 
 impl ImplBuilder {
@@ -783,6 +836,7 @@ impl ImplBuilder {
             is_unsafe: false,
             is_negative: false,
             items: thin_vec![],
+            md: MdBuilder::new(),
         }
     }
 
@@ -840,6 +894,26 @@ impl ImplBuilder {
         self
     }
 
+    /// Adds a comment to the impl block.
+    ///
+    /// # Parameters
+    ///
+    /// - `comment`: The comment to add.
+    pub fn comment(mut self, comment: impl Into<Comment>) -> Self {
+        self.md = self.md.comment(comment.into());
+        self
+    }
+
+    /// Adds an attribute to the impl block.
+    ///
+    /// # Parameters
+    ///
+    /// - `attr`: The attribute to add.
+    pub fn attr(mut self, attr: impl Into<Attribute>) -> Self {
+        self.md = self.md.attr(attr.into());
+        self
+    }
+
     /// Builds the `ItemImpl` AST node.
     ///
     /// # Returns
@@ -853,7 +927,11 @@ impl ImplBuilder {
             is_unsafe: self.is_unsafe,
             is_negative: self.is_negative,
             items: self.items,
-            md: None,
+            md: if self.md.is_empty() {
+                None
+            } else {
+                Some(Box::new(self.md.build()))
+            },
         }
     }
 }
@@ -2362,6 +2440,13 @@ impl From<AsmBuilder> for Item {
     }
 }
 
+impl From<AssociatedConstBuilder> for TraitItem {
+    /// Converts an `AssociatedConstBuilder` into a `TraitItem::Const` variant.
+    fn from(builder: AssociatedConstBuilder) -> Self {
+        TraitItem::Const(builder.build())
+    }
+}
+
 impl From<AssociatedConstBuilder> for ImplItem {
     /// Converts an `AssociatedConstBuilder` into an `ImplItem::Const` variant.
     fn from(builder: AssociatedConstBuilder) -> Self {
@@ -2509,6 +2594,22 @@ impl From<StaticItemBuilder> for Item {
     /// Converts a `StaticItemBuilder` into an `Item::Static` variant.
     fn from(builder: StaticItemBuilder) -> Self {
         Item::Static(builder.build())
+    }
+}
+
+impl From<BlockBuilder> for Expr {
+    /// Converts a `BlockBuilder` into an `Expr::Block` variant.
+    fn from(builder: BlockBuilder) -> Self {
+        Expr::Block(ExprBlock {
+            block: builder.build(),
+        })
+    }
+}
+
+impl From<ImplBuilder> for Item {
+    /// Converts an `ImplBuilder` into an `Item::Impl` variant.
+    fn from(builder: ImplBuilder) -> Self {
+        Item::Impl(builder.build())
     }
 }
 
@@ -3133,11 +3234,6 @@ impl From<Expr> for Stmt {
 /// Creates a new `ItemExternCrateBuilder` to construct an `extern crate` item.
 pub fn extern_crate_item(name: impl Into<Ident>) -> ItemExternCrateBuilder {
     ItemExternCrateBuilder::new(name)
-}
-
-/// Creates a new `ItemExternBlockBuilder` to construct an `extern` block item.
-pub fn extern_block_item() -> ItemExternBlockBuilder {
-    ItemExternBlockBuilder::new()
 }
 
 /// A builder for constructing an `ItemExternCrate` AST node.

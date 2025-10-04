@@ -1,4 +1,6 @@
-//! A type alias, such as `type MyResult<T> = Result<T, MyError>`;
+//! Defines the AST node for a type alias.
+//!
+//! A type alias is a new name for an existing type.
 
 use crate::{
     ast::{generics::GenericParams, types::Type},
@@ -17,8 +19,8 @@ ast_item! {
     /// ```
     pub struct ItemTypeAlias {
         /// The generic parameters of the type alias.
-        pub(crate) generics: GenericParams,
+        pub generics: GenericParams,
         /// The type being aliased.
-        pub(crate) ty: Type,
+        pub ty: Type,
     }
 }
