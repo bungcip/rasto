@@ -49,6 +49,9 @@ impl LitStr {
 impl FromStr for LitStr {
     type Err = ();
 
+    /// Parses a string slice into a `LitStr`.
+    ///
+    /// The string slice must be enclosed in double quotes.
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         if s.starts_with('"') && s.ends_with('"') {
             Ok(LitStr {

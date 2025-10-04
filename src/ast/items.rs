@@ -4,7 +4,6 @@
 //! impl blocks, and traits. They are the top-level declarations that make up a crate.
 
 use crate::ast::associated_const::AssociatedConst;
-use crate::ast::generics::GenericParams;
 use crate::ast::item_asm::ItemAsm;
 use crate::ast::item_const::ItemConst;
 use crate::ast::item_enum::ItemEnum;
@@ -13,7 +12,7 @@ use crate::ast::item_extern_crate::ItemExternCrate;
 use crate::ast::item_extern_type::ItemExternType;
 use crate::ast::item_fn::{ItemFn, Signature};
 use crate::ast::item_foreign_mod::ItemForeignMod;
-use crate::ast::item_impl::ImplItem;
+use crate::ast::item_impl::ItemImpl;
 use crate::ast::item_macro::ItemMacro;
 use crate::ast::item_mod::ItemMod;
 use crate::ast::item_static::ItemStatic;
@@ -25,9 +24,7 @@ use crate::ast::item_union::ItemUnion;
 use crate::ast::item_use::ItemUse;
 use crate::ast::metadata::Md;
 use crate::ast::statements::Block;
-use crate::ast::types::Type;
 use crate::pretty_printer::PrettyPrinter;
-use thin_vec::ThinVec;
 
 /// A top-level item in a Rust file.
 #[derive(Debug, Clone, PartialEq)]
@@ -89,27 +86,6 @@ pub struct TraitItemFn {
     /// An optional default implementation of the function.
     pub block: Option<Block>,
     /// Metadata about the function, including attributes and comments.
-    pub md: Option<Box<Md>>,
-}
-
-impl_display_for_item!(ItemImpl);
-
-/// An `impl` block.
-#[derive(Debug, Clone, PartialEq)]
-pub struct ItemImpl {
-    /// The type the `impl` block is for.
-    pub ty: Type,
-    /// The trait being implemented, if any.
-    pub trait_: Option<Type>,
-    /// Whether the `impl` is `unsafe`.
-    pub is_unsafe: bool,
-    /// Whether the `impl` is negative.
-    pub is_negative: bool,
-    /// The generic parameters of the `impl` block.
-    pub generics: GenericParams,
-    /// The items within the `impl` block.
-    pub items: ThinVec<ImplItem>,
-    /// Metadata about the `impl` block, including attributes and comments.
     pub md: Option<Box<Md>>,
 }
 

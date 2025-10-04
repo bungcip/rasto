@@ -15,6 +15,9 @@ macro_rules! impl_display_for_item {
 }
 
 /// A helper macro for generating AST item structs.
+///
+/// This macro is not intended to be used directly. Instead, use the `ast_item!`
+/// macro, which provides a more user-friendly interface.
 #[macro_export]
 macro_rules! ast_item_impl {
     (

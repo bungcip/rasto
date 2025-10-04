@@ -1,29 +1,26 @@
-# Rasto - **R**ust **AST** **O**pinionated Crates
+# Rasto - A Rust AST Generation and Pretty-Printing Crate
 
 [![Latest Version](https://img.shields.io/crates/v/rasto.svg)](https://crates.io/crates/rasto)
 [![Docs.rs](https://docs.rs/rasto/badge.svg)](https://docs.rs/rasto)
 [![CI](https://github.com/bungcip/rasto/actions/workflows/ci.yml/badge.svg)](https://github.com/bungcip/rasto/actions/workflows/ci.yml)
 
-`rasto` is a Rust crate for programmatic manipulation of Rust code.
-
-It provides a set of data structures for representing a Rust Abstract Syntax Tree (AST) and a pretty-printer to format the AST back into well-structured Rust code.
+`rasto` is a Rust crate for programmatic manipulation of Rust code. It provides a comprehensive set of data structures for representing a Rust Abstract Syntax Tree (AST) and a high-quality pretty-printer to format the AST back into well-structured, readable Rust code.
 
 ## Philosophy
 
-`rasto` is an opinionated library with a specific focus on AST manipulation and code generation. It is designed with the following principles in mind:
+`rasto` is an opinionated library designed with a clear focus on AST manipulation and code generation. Its core principles are:
 
--   **Opinionated Comment Placement**: `rasto` enforces a specific style of comment placement. Not all AST nodes can have comments attached to them. This is a deliberate design choice to ensure that the generated code is always well-formatted and readable.
-
--   **No Parser**: `rasto` does not include a parser. The focus of the library is on AST manipulation and pretty-printing. Parsing is considered a separate concern and is out of the scope of this project. For parsing Rust code, we recommend using other libraries like `syn`.
+-   **Opinionated Comment Placement**: `rasto` enforces a specific style for comment placement. Not all AST nodes can have comments attached, a deliberate design choice to ensure that the generated code is always well-formatted and readable.
+-   **No Parser**: `rasto` does not include a parser. The library's focus is on AST manipulation and pretty-printing. For parsing Rust code, we recommend using other excellent libraries like `syn`.
 
 ## Features
 
 -   **Fluent Builder API**: A comprehensive and easy-to-use builder API for constructing Rust AST nodes.
--   **Pretty-Printing**: A high-quality pretty-printer that formats the AST back into well-structured and readable Rust code.
+-   **High-Quality Pretty-Printer**: A pretty-printer that formats the AST back into well-structured and readable Rust code, inspired by Philip Wadler's "A Prettier Printer".
 -   **Extensive AST Coverage**: Data structures for a wide range of Rust syntax, including expressions, statements, items, and more.
--   **Snapshot Testing**: Integration with `insta` for robust snapshot testing of the pretty-printer.
+-   **Snapshot Testing**: Robust integration with `insta` for snapshot testing of the pretty-printer's output.
 
-## Comparison with other crates
+## Comparison with Other Crates
 
 | Crate         | AST Manipulation | Parsing | Pretty Printing | Focus                                            |
 |---------------|------------------|---------|-----------------|--------------------------------------------------|
@@ -32,28 +29,18 @@ It provides a set of data structures for representing a Rust Abstract Syntax Tre
 | `quote`       | No               | No      | Yes             | Turning a syntax tree back into Rust code        |
 | `proc-macro2` | No               | No      | No              | A wrapper around the compiler's `proc_macro` API |
 
-## Setup
+## Getting Started
 
-Add the following to your `Cargo.toml` file:
+To start using `rasto`, add it to your `Cargo.toml` file:
 
 ```toml
 [dependencies]
 rasto = "0.1.0"
 ```
 
-## Project Structure
+### Usage
 
--   `src/lib.rs`: The main library file, which exports the `ast` and `pretty_printer` modules.
--   `src/ast.rs`: The root of the `ast` module, which exports all the AST nodes.
--   `src/ast/`: This directory contains the definitions for the AST nodes. Each file in this directory corresponds to a specific part of the AST, such as expressions, statements, or items.
--   `src/builder.rs`: A fluent builder API for constructing AST nodes programmatically.
--   `src/pretty_printer.rs`: This file contains the implementation of the pretty-printer. It uses a token-based approach inspired by Philip Wadler's "A Prettier Printer".
--   `tests/`: Contains the integration tests, which use snapshot testing with `insta`.
--   `Cargo.toml`: The package manifest for Rust's package manager, Cargo.
-
-## Usage
-
-Here's a more detailed example of how to build a function with comments and attributes, and then pretty-print it:
+`rasto` provides a fluent builder API for constructing AST nodes. Here’s an example of how to build a function with comments and attributes, and then pretty-print it:
 
 ```rust
 use rasto::ast::*;
@@ -143,26 +130,47 @@ impl MyStruct {
 }
 ```
 
-## Examples
+## Project Structure
 
-You can run the examples using the following commands:
+The project follows a standard Rust library layout:
 
-```bash
-cargo run --example pretty_print_simple
-cargo run --example pretty_print_trait
-```
+-   `src/lib.rs`: The main library file, which exports the public modules.
+-   `src/ast.rs`: The root of the `ast` module, which exports all the AST node types.
+-   `src/ast/`: This directory contains the definitions for the AST nodes. Each file corresponds to a specific part of the Rust language's syntax, such as expressions (`expressions.rs`), statements (`statements.rs`), or items (`item_*.rs` files).
+-   `src/builder.rs`: Implements the fluent builder API for programmatically constructing AST nodes.
+-   `src/pretty_printer.rs`: Contains the implementation of the pretty-printer.
+-   `tests/`: Contains integration tests that use snapshot testing with `insta`.
+-   `examples/`: Contains runnable examples that demonstrate the crate's usage.
 
 ## Documentation
 
-The full documentation for this crate can be found on [docs.rs](https://docs.rs/rasto).
+This crate is thoroughly documented, and the build will fail if any public item is missing documentation. You can generate and view the documentation locally by running:
+
+```bash
+cargo doc --open
+```
+
+The full documentation is also available on [docs.rs](https://docs.rs/rasto).
 
 ## Contributing
 
-Contributions are welcome! Please open an issue or submit a pull request on GitHub.
+Contributions are welcome! If you find a bug or have a feature request, please open an issue on GitHub. Pull requests are also encouraged.
 
-### Testing
+### Development Workflow
 
-To run the tests, use `cargo test`. If you make changes that affect the pretty-printer's output, you can update the snapshots with `cargo insta review`.
+To contribute to the project, please follow these steps:
+
+1.  Fork the repository and create a new branch for your changes.
+2.  Make your changes, ensuring that all new public items are fully documented.
+3.  Run the tests to ensure that your changes do not break existing functionality:
+    ```bash
+    cargo test
+    ```
+4.  If your changes affect the output of the pretty-printer, you will need to review and update the snapshots:
+    ```bash
+    cargo insta review
+    ```
+5.  Submit a pull request with a clear description of your changes.
 
 ## Code of Conduct
 

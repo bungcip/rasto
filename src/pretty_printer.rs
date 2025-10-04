@@ -51,27 +51,46 @@ pub enum BreakStyle {
     Inconsistent,
 }
 
-/// A token used by the pretty-printer.
+/// Represents the fundamental units of code formatting used by the pretty-printer.
+///
+/// The `Token` enum defines the set of instructions that guide the `Printer` in
+/// laying out the code. Each variant corresponds to a specific formatting action,
+/// such as printing a string, inserting a line break, or grouping a set of tokens.
 pub enum Token<'a> {
-    /// A string to be printed.
+    /// A string to be printed literally to the output.
+    ///
+    /// This token represents a piece of code that does not change, such as a keyword,
+    /// an identifier, or an operator.
     String(Cow<'a, str>),
-    /// A potential line break. If the line is too long, this will be replaced
-    /// with a newline and indentation. Otherwise, it will be replaced with a
-    /// space.
+    /// A potential line break.
+    ///
+    /// If the line is too long, this will be replaced with a newline and indentation.
+    /// Otherwise, it will be replaced with a space. This allows for flexible and
+    /// adaptive code formatting.
     Break {
         /// The number of spaces to print if the break is not taken.
         len: usize,
     },
     /// A hard line break that will always be printed as a newline.
+    ///
+    /// This is used for mandatory line breaks, such as between statements or items.
     HardBreak,
     /// The beginning of a group of tokens.
+    ///
+    /// A group is a sequence of tokens that are treated as a single unit for the
+    /// purpose of line breaking. If a group is broken, all consistent breaks within
+    /// it are also broken.
     Begin {
-        /// The style of the break.
+        /// The style of the break, which determines how line breaks are handled
+        /// within the group.
         style: BreakStyle,
         /// The opening string of the group (e.g., `(`, `[`, `{`).
         open: &'a str,
     },
     /// The end of a group of tokens.
+    ///
+    /// This token marks the closing of a group and is typically associated with a
+    /// closing delimiter.
     End {
         /// The closing string of the group (e.g., `)`, `]`, `}`).
         close: &'a str,
@@ -1646,44 +1665,6 @@ impl PrettyPrinter for Variant {
     }
 }
 
-impl PrettyPrinter for ImplItem {
-    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
-        match self {
-            ImplItem::Fn(item_fn) => item_fn.pretty_print(printer),
-            ImplItem::Type(associated_type) => associated_type.pretty_print(printer),
-            ImplItem::Const(associated_const) => associated_const.pretty_print(printer),
-        }
-    }
-}
-
-impl PrettyPrinter for ItemImpl {
-    fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {
-        pp_begin(&self.md, printer)?;
-        if self.is_unsafe {
-            printer.string("unsafe ");
-        }
-        printer.string("impl");
-        self.generics.pretty_print(printer)?;
-        printer.string(" ");
-        if self.is_negative {
-            printer.string("!");
-        }
-        if let Some(trait_) = &self.trait_ {
-            trait_.pretty_print(printer)?;
-            printer.string(" for ");
-        }
-        self.ty.pretty_print(printer)?;
-        printer.string(" ");
-        printer.begin(BreakStyle::Consistent, "{");
-        if !self.items.is_empty() {
-            printer.hard_break();
-            pp_with_breaks(&self.items, printer)?;
-        }
-        printer.end("}");
-        pp_end(&self.md, printer)?;
-        Ok(())
-    }
-}
 
 impl PrettyPrinter for ItemTrait {
     fn pretty_print<'a>(&'a self, printer: &mut Printer<'a>) -> fmt::Result {

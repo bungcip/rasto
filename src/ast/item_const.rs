@@ -1,4 +1,7 @@
-//! An item, such as a `const` definition.
+//! Defines the AST node for a `const` item.
+//!
+//! A `const` item is a value that is computed at compile time and can be used
+//! in any constant context.
 
 use crate::{
     ast::{expressions::Expr, types::Type},
@@ -17,8 +20,8 @@ ast_item! {
     /// ```
     pub struct ItemConst {
         /// The type of the const item.
-        pub(crate) ty: Type,
+        pub ty: Type,
         /// The value of the const item.
-        pub(crate) expr: Box<Expr>,
+        pub expr: Box<Expr>,
     }
 }

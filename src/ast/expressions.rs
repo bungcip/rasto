@@ -428,7 +428,10 @@ pub enum BinOp {
 }
 
 impl BinOp {
-    /// Returns the precedence of the operator.
+    /// Returns the precedence of the operator, which is used to determine the
+    /// order of operations in an expression.
+    ///
+    /// Higher values indicate higher precedence.
     pub fn precedence(&self) -> u8 {
         match self {
             BinOp::Mul | BinOp::Div => 2,
