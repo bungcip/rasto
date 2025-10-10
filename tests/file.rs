@@ -1,23 +1,64 @@
+//! Tests for the `file` module.
+
 use rasto::builder::*;
-use rasto::pretty;
+use rasto::ast::*;
 
 #[test]
-fn test_file_display() {
+fn test_file_with_items_and_metadata() {
     let file = file()
-        .item(fn_def("my_function").build())
-        .item(struct_def("MyStruct").build())
+        .comment(comment().line(" This is a file-level comment."))
+        .attr(
+            attr()
+                .inner()
+                .meta(meta().path("allow_internal_unstable"))
+        )
+        .item(
+            fn_def("main")
+                .block(
+                    block()
+                        .statement(
+                            expr().call(
+                                expr().path("println!"),
+                                vec![expr().lit("Hello, world!")],
+                            ),
+                        ),
+                )
+                .build(),
+        )
         .build();
-    insta::assert_snapshot!(pretty(&file));
+
+    let expected_output = r#"#![allow_internal_unstable]
+
+// This is a file-level comment.
+fn main() {
+    println!("Hello, world!");
+}"#;
+    assert_eq!(file.to_string(), expected_output);
 }
 
-use rasto::ast::Comment;
+#[test]
+fn test_empty_file() {
+    let file = file().build();
+    assert_eq!(file.to_string(), "");
+}
 
 #[test]
-fn test_file_with_comments_and_attributes() {
+fn test_file_with_multiple_items() {
     let file = file()
-        .comment(Comment::Line(" This is a file-level comment.".into()))
-        .attr(attr().inner().meta(meta().path("allow(dead_code)")))
-        .item(fn_def("my_function").build())
+        .item(struct_def("MyStruct").field("field1", type_().path("u32")).build())
+        .item(
+            fn_def("my_function")
+                .input_typed("s", type_().path("MyStruct"))
+                .block(block().statement(expr().path("s")))
+                .build(),
+        )
         .build();
-    insta::assert_snapshot!(pretty(&file));
+
+    let expected_output = r#"struct MyStruct {
+    field1: u32,
+}
+fn my_function(s: MyStruct) {
+    s;
+}"#;
+    assert_eq!(file.to_string(), expected_output);
 }

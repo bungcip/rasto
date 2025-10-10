@@ -1,7 +1,7 @@
-use rasto::ast::*;
+use rasto::ast::{self, *};
 use rasto::builder::{
     block, comment, enum_def, expr, field_value, file, fn_def, impl_block, pat, stmt, struct_def,
-    trait_def, trait_item_fn, tt,
+    trait_def, trait_item_fn, tt, type_,
 };
 use rasto::pretty;
 use thin_vec::thin_vec;
@@ -25,6 +25,84 @@ fn test_file() {
         )
         .build();
 
+    insta::assert_snapshot!(pretty(&ast));
+}
+
+#[test]
+fn test_complex_patterns() {
+    let ast = fn_def("foo")
+        .input(
+            pat().struct_("MyStruct")
+                .field("a", pat().ident("a"))
+                .field("b", pat().wild())
+                .rest()
+                .build(),
+        )
+        .input(
+            pat().or([pat().lit(1), pat().lit(2), pat().lit(3)])
+        )
+        .build();
+    insta::assert_snapshot!(pretty(&ast));
+}
+
+#[test]
+fn test_various_types() {
+    let ast = file()
+        .item(
+            fn_def("foo")
+                .input_typed(
+                    "a",
+                    type_().bare_fn(
+                        [type_().path("i32"), type_().path("i32")],
+                        Some(type_().path("i32")),
+                    ),
+                )
+                .input_typed("b", type_().ptr(true, type_().path("u8")))
+                .input_typed("c", type_().slice(type_().path("f64")))
+                .input_typed("d", type_().trait_object())
+                .input_typed("e", type_().impl_trait())
+                .input_typed("f", type_().tuple([type_().path("i32")]))
+                .build()
+        )
+        .build();
+    insta::assert_snapshot!(pretty(&ast));
+}
+
+#[test]
+fn test_union_pretty_print() {
+    let ast = rasto::builder::union_item("MyUnion")
+        .field("f1", type_().path("u32"))
+        .field("f2", type_().path("f32"))
+        .build();
+    insta::assert_snapshot!(pretty(&ast));
+}
+
+#[test]
+fn test_where_clause() {
+    let ast = fn_def("foo")
+        .generic(ast::GenericParam::Type(ast::TypeParam {
+            ident: "T".into(),
+            bounds: vec![],
+        }))
+        .where_clause(
+            ast::WhereClause {
+                predicates: vec![
+                    ast::WherePredicate::Type(
+                        ast::where_clause::TypePredicate {
+                            ty: ast::Type::Path(ast::TypePath {
+                                path: path("T").build()
+                            }),
+                            bounds: vec![
+                                ast::Type::Path(ast::TypePath {
+                                    path: path("Debug").build()
+                                })
+                            ]
+                        }
+                    )
+                ]
+            }
+        )
+        .build();
     insta::assert_snapshot!(pretty(&ast));
 }
 

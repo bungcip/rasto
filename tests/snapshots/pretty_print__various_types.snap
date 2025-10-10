@@ -1,0 +1,5 @@
+---
+source: tests/pretty_print.rs
+expression: pretty(&ast)
+---
+fn foo(a: fn(i32, i32) -> i32, b: *mut u8, c: [f64], d: dyn Trait, e: impl Trait, f: (i32,)) {}
