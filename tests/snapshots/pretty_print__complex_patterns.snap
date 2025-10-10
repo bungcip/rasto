@@ -1,0 +1,5 @@
+---
+source: tests/pretty_print.rs
+expression: pretty(&ast)
+---
+fn foo(MyStruct { a: a, b: _, .. }, 1 | 2 | 3) {}

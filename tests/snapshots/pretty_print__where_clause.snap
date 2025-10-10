@@ -1,0 +1,5 @@
+---
+source: tests/pretty_print.rs
+expression: pretty(&ast)
+---
+fn foo<T>() where T: Debug {}
